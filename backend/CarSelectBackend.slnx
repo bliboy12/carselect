@@ -1,0 +1,7 @@
+<Solution>
+  <Project Path="CarSelect.API/CarSelect.API.csproj" />
+  <Project Path="CarSelect.Domain.Model/CarSelect.Domain.Model.csproj" />
+  <Project Path="CarSelect.Domain.Services/CarSelect.Domain.Services.csproj" />
+  <Project Path="CarSelect.Repository.Entities/CarSelect.Repository.Entities.csproj" />
+  <Project Path="CarSelect.Repository/CarSelect.Repository.csproj" />
+</Solution>
