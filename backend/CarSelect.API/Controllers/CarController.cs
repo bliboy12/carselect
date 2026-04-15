@@ -2,15 +2,15 @@
 using Microsoft.AspNetCore.Mvc;
 
 [ApiController]
-[Route("car")]
+[Route("api/car")]
 public class CarController
 {
     public CarResponseContract[] GetAllCars()
     {
         throw new NotImplementedException();
     }
-    [HttpGet("Id")]
-    public CarResponseContract GetCarWithId([FromRoute] int Id)
+    [HttpGet("{id}")]
+    public CarResponseContract GetCarWithId([FromRoute] int id)
     {
         throw new NotImplementedException();
     }
@@ -24,8 +24,8 @@ public class CarController
     {
         throw new NotImplementedException();
     }
-    [HttpPut("Id")]
-    public void UpdateCar([FromRoute] int Id, [FromBody] CarRequestContract updateCarRequest)
+    [HttpPut("{id}")]
+    public void UpdateCar([FromRoute] int id, [FromBody] CarRequestContract updateCarRequest)
     {
         throw new NotImplementedException();
     }

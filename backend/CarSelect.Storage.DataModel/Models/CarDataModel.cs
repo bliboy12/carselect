@@ -1,5 +1,8 @@
-public class CarRequestContract
+public class CarDataModel
 {
+    public int Id { get; set; }
+    public int OwnerId { get; set; }
+    public UserDataModel Owner { get; set; } = null!;
     public string Brand { get; set; } = string.Empty;
     public string Model { get; set; } = string.Empty;
     public string Color { get; set; } = string.Empty;
@@ -9,5 +12,5 @@ public class CarRequestContract
     public string Transmission { get; set; } = string.Empty;
     public int Kilometers { get; set; }
     public int Doors { get; set; }
-    public DriveType Drive { get; set; }
+    public string Drive { get; set; } = string.Empty;
 }
