@@ -1,6 +1,6 @@
 public class PurchaseModel
 {
-    public int Id { get; set; }
+    public Guid Id { get; set; }
     public int BuyerId { get; set; }
     public int ListingId { get; set; }
     public decimal? AgreedPrice { get; set; }

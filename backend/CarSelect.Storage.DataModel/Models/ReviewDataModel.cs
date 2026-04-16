@@ -1,6 +1,9 @@
+using System.Text.Json.Serialization;
+
 public class ReviewDataModel
 {
-    public int Id { get; set; }
+    [JsonPropertyName("id")]
+    public string Id { get; set; } = Guid.NewGuid().ToString();
     public int SellerId { get; set; }
     public int ReviewerId { get; set; }
     public int Rating { get; set; }

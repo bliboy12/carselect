@@ -1,26 +1,51 @@
 public class UserRepository : IUserRepository
 {
-    public UserDataModel AddUser(UserDataModel userDataModel)
+    public Task<FavoriteDataModel> AddFavoriteAsync(FavoriteDataModel favoriteData)
     {
         throw new NotImplementedException();
     }
 
-    public ICollection<UserDataModel> GetAllUsers()
+    public Task<UserDataModel> AddUserAsync(UserDataModel userDataModel)
     {
         throw new NotImplementedException();
     }
 
-    public UserDataModel GetUserWithId(int id)
+    public Task<IEnumerable<FavoriteDataModel>> GetAllFavoritesByUserIdAsync(int userId)
     {
         throw new NotImplementedException();
     }
 
-    public void RemoveUser(int id)
+    public Task<IEnumerable<UserDataModel>> GetAllUsers(bool newestFirst = true)
     {
         throw new NotImplementedException();
     }
 
-    public UserDataModel UpdateUser(UserDataModel updateUserDataModel)
+    public Task<IEnumerable<UserDataModel>> GetAllUsersByNameAsync(string firstName, string lastName)
+    {
+        throw new NotImplementedException();
+    }
+
+    public Task<UserDataModel?> GetUserByIdAsync(int userId)
+    {
+        throw new NotImplementedException();
+    }
+
+    public Task<bool> IsFavoritedAsync(int userId, int listingId)
+    {
+        throw new NotImplementedException();
+    }
+
+    public Task RemoveFavoriteAsync(int userId, int listingId)
+    {
+        throw new NotImplementedException();
+    }
+
+    public Task RemoveUserAsync(int id)
+    {
+        throw new NotImplementedException();
+    }
+
+    public Task<UserDataModel> UpdateUserAsync(UserDataModel updateUserDataModel)
     {
         throw new NotImplementedException();
     }

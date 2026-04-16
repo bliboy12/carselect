@@ -1,8 +1,11 @@
+using System.Text.Json.Serialization;
+
 public class CarDataModel
 {
-    public int Id { get; set; }
-    public int OwnerId { get; set; }
-    public UserDataModel Owner { get; set; } = null!;
+    [JsonPropertyName("id")]
+    public string Id { get; set; } = Guid.NewGuid().ToString();
+    //public int OwnerId { get; set; }
+    //public UserDataModel Owner { get; set; } = null!;
     public string Brand { get; set; } = string.Empty;
     public string Model { get; set; } = string.Empty;
     public string Color { get; set; } = string.Empty;

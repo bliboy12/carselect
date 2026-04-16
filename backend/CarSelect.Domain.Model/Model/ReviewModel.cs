@@ -1,6 +1,6 @@
 public class ReviewModel
 {
-    public int Id { get; set; }
+    public Guid Id { get; set; }
     public int SellerId { get; set; }
     public int ReviewerId { get; set; }
     public int Rating { get; set; }

@@ -1,6 +1,9 @@
+using System.Text.Json.Serialization;
+
 public class PurchaseDataModel
 {
-    public int Id { get; set; }
+    [JsonPropertyName("id")]
+    public string Id { get; set; } = Guid.NewGuid().ToString();
     public int BuyerId { get; set; }
     public int ListingId { get; set; }
     public decimal? AgreedPrice { get; set; }

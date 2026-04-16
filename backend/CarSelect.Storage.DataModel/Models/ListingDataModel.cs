@@ -1,6 +1,9 @@
+using System.Text.Json.Serialization;
+
 public class ListingDataModel
 {
-    public int Id { get; set; }
+    [JsonPropertyName("id")]
+    public string Id { get; set; } = Guid.NewGuid().ToString();
     public int SellerId { get; set; }
     public int CarId { get; set; }
     public double Price { get; set; }
