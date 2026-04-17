@@ -19,44 +19,64 @@ public class CarRepository : ICarRepository
         return createdCar.Resource;
     }
 
+    // ONLY FOR ADMINS
     public async Task<IEnumerable<CarDataModel>> GetAllCarsAsync()
     {
-        var query = _container.GetItemQueryIterator<CarDataModel>(new QueryDefinition("SELECT * FROM cars"));
+        var query = _container.GetItemQueryIterator<CarDataModel>(new QueryDefinition("SELECT * FROM c"));
 
         var results = new List<CarDataModel>();
 
         while (query.HasMoreResults)
         {
             var response = await query.ReadNextAsync();
-            results.AddRange(response);
+            results.AddRange(response.Resource);
         }
-
         return results;
+    }
+
+    // Add filter conditions to be easier to put it in a SQL Query
+    private static void AddFilter(List<string> conditions, List<(string name, object value)> parameters, string condition, string paramName, object? value)
+    {
+        if (value is string s && string.IsNullOrEmpty(s)) return;
+        if (value is null) return;
+
+        conditions.Add(condition);
+        parameters.Add((paramName, value));
     }
 
     public async Task<IEnumerable<CarDataModel>> GetAllCarsByFilterAsync(CarFilter filter)
     {
-        var query = _container.GetItemQueryIterator<CarDataModel>(
-            new QueryDefinition("SELECT * FROM cars WHERE brand=@brand model=@model color=@color trim=@trim buildyear=@buildyear fuel=@fuel transmission=@transmission doors=@doors drive=@drive AND kilometers BETWEEN @minKilometer AND @maxKilometer")
-            .WithParameter("@brand", filter.Brand)
-            .WithParameter("@model", filter.Model)
-            .WithParameter("@color", filter.Color)
-            .WithParameter("@trim", filter.Trim)
-            .WithParameter("@buildyear", filter.BuildYear)
-            .WithParameter("@fuel", filter.Fuel)
-            .WithParameter("@transmission", filter.Transmission)
-            .WithParameter("@minKilometers", filter.MinKilometers)
-            .WithParameter("@maxKilometer", filter.MaxKilometers)
-            .WithParameter("@doors", filter.Doors)
-            .WithParameter("@drive", filter.Drive)
-        );
+        var conditions = new List<string>();
+        var parameters = new List<(string name, object value)>();
+
+        AddFilter(conditions, parameters, "brand=@brand", "@brand", filter.Brand);
+        AddFilter(conditions, parameters, "model=@model", "@model", filter.Model);
+        AddFilter(conditions, parameters, "color=@color", "@color", filter.Color);
+        AddFilter(conditions, parameters, "trim=@trim", "@trim", filter.Trim);
+        AddFilter(conditions, parameters, "buildYear=@buildYear", "@buildYear", filter.BuildYear);
+        AddFilter(conditions, parameters, "fuel=@fuel", "@fuel", filter.Fuel);
+        AddFilter(conditions, parameters, "transmission=@transmission", "@transmission", filter.Transmission);
+        AddFilter(conditions, parameters, "kilometers <= @minKilometer", "@minKilometer", filter.MinKilometers);
+        AddFilter(conditions, parameters, "kilometers >= @maxKilometer", "@maxKilometer", filter.MaxKilometers);
+        AddFilter(conditions, parameters, "doors=@doors", "@doors", filter.Doors);
+        AddFilter(conditions, parameters, "drive=@drive", "@drive", filter.Drive);
+
+        var sql = "SELECT * FROM c";
+        if (conditions.Count > 0)
+            sql += " WHERE " + string.Join(" AND ", conditions);
+
+        var queryDef = new QueryDefinition(sql);
+        foreach (var (name, value) in parameters)
+            queryDef.WithParameter(name, value);
+
+        var query = _container.GetItemQueryIterator<CarDataModel>(queryDef);
 
         var results = new List<CarDataModel>();
 
         while (query.HasMoreResults)
         {
             var response = await query.ReadNextAsync();
-            results.AddRange(response);
+            results.AddRange(response.Resource);
         }
 
         return results;
@@ -77,32 +97,42 @@ public class CarRepository : ICarRepository
             );
             return response.Resource;
         }
-        catch (CosmosException ex) when (ex.StatusCode == System.Net.HttpStatusCode.NotFound)
+        catch (CosmosException)
         {
             return null;
         }
     }
 
-    public Task RemoveCarAsync(string carId)
+    public async Task RemoveCarAsync(string carId)
     {
         try
         {
-            var response = _container.DeleteItemAsync<CarDataModel>(
+            await _container.DeleteItemAsync<CarDataModel>(
                 id: carId,
                 partitionKey: new PartitionKey(carId)
             );
-
-            return response;
         }
-        catch (CosmosException ex)
+        catch (CosmosException)
         {
-            return null;
+            throw new NotFoundException($"Car with id {carId} was not found");
         }
     }
 
-    public Task<CarDataModel> UpdateCarAsync(CarDataModel updateCar)
+    public async Task<CarDataModel> UpdateCarAsync(CarDataModel updateCar)
     {
-        if (GetCarWithIdAsync(updateCar.Id) == null)
-            throw new CosmosException("CarId doesn't exists");
+        try
+        {
+            var response = await _container.ReplaceItemAsync<CarDataModel>(
+                id: updateCar.Id,
+                item: updateCar,
+                partitionKey: new PartitionKey(updateCar.Id)
+            );
+            return response.Resource;
+        }
+        // only catch 404 Not Found errors, everything else will bubble up.
+        catch (CosmosException ex) when (ex.StatusCode == System.Net.HttpStatusCode.NotFound)
+        {
+            throw new NotFoundException($"Car with id {updateCar.Id} was not found");
+        }
     }
 }

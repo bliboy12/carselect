@@ -4,6 +4,6 @@ public class FavoriteDataModel
 {
     [JsonPropertyName("id")]
     public string Id { get; set; } = Guid.NewGuid().ToString();
-    public int UserId { get; set; }
-    public int ListingId { get; set; }
+    public string UserId { get; set; } = string.Empty;
+    public string ListingId { get; set; } = string.Empty;
 }

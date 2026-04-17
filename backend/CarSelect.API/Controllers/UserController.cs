@@ -1,13 +1,21 @@
+using Microsoft.AspNetCore.Http.HttpResults;
 using Microsoft.AspNetCore.Mvc;
 
 [ApiController]
 [Route("api/users")]
-public class UserController
+public class UserController : ControllerBase
 {
     [HttpGet("Id")]
-    public UserResponseContract GetUser([FromRoute] int Id)
+    public async Task<ActionResult<UserResponseContract>> GetUser([FromRoute] int Id)
     {
-        throw new NotImplementedException();
+        try
+        {
+
+        }
+        catch (Exception ex)
+        {
+            return NotFound(ex.Message);
+        }
     }
 
     [HttpGet]

@@ -1,52 +1,180 @@
+using Microsoft.Azure.Cosmos;
+using Microsoft.Extensions.Options;
+
 public class UserRepository : IUserRepository
 {
-    public Task<FavoriteDataModel> AddFavoriteAsync(FavoriteDataModel favoriteData)
+    private readonly Container _container;
+    public UserRepository(IOptions<UserRepositoryOptions> userOptions, IOptions<CosmosOptions> cosmosOptions)
     {
-        throw new NotImplementedException();
+        var client = new CosmosClient(cosmosOptions.Value.Connectionstring);
+        _container = client.GetDatabase(cosmosOptions.Value.DatabaseName).GetContainer(userOptions.Value.ContainerName);
+    }
+    public async Task<FavoriteDataModel> AddFavoriteAsync(FavoriteDataModel favoriteData)
+    {
+        var createdFavorite = await _container.CreateItemAsync<FavoriteDataModel>(
+            item: favoriteData,
+            partitionKey: new PartitionKey($"{favoriteData.Id}")
+        );
+
+        return createdFavorite.Resource;
     }
 
-    public Task<UserDataModel> AddUserAsync(UserDataModel userDataModel)
+    public async Task<UserDataModel> AddUserAsync(UserDataModel userDataModel)
     {
-        throw new NotImplementedException();
+        var createdFavorite = await _container.CreateItemAsync<UserDataModel>(
+            item: userDataModel,
+            partitionKey: new PartitionKey($"{userDataModel.Id}")
+        );
+
+        return createdFavorite.Resource;
     }
 
-    public Task<IEnumerable<FavoriteDataModel>> GetAllFavoritesByUserIdAsync(int userId)
+    public async Task<IEnumerable<FavoriteDataModel>> GetAllFavoritesByUserIdAsync(string userId)
     {
-        throw new NotImplementedException();
+        var query = _container.GetItemQueryIterator<FavoriteDataModel>(new QueryDefinition("SELECT * FROM c WHERE userId=@userId").WithParameter("@userId", userId));
+
+        var results = new List<FavoriteDataModel>();
+        while (query.HasMoreResults)
+        {
+            var response = await query.ReadNextAsync();
+            results.AddRange(response.Resource);
+        }
+        return results;
     }
 
-    public Task<IEnumerable<UserDataModel>> GetAllUsers(bool newestFirst = true)
+    public async Task<IEnumerable<UserDataModel>> GetAllUsers(bool newestFirst = true)
     {
-        throw new NotImplementedException();
+        var query = _container.GetItemQueryIterator<UserDataModel>(new QueryDefinition("SELECT * FROM c"));
+
+        var results = new List<UserDataModel>();
+
+        while (query.HasMoreResults)
+        {
+            var response = await query.ReadNextAsync();
+            results.AddRange(response.Resource);
+        }
+        return results;
     }
 
-    public Task<IEnumerable<UserDataModel>> GetAllUsersByNameAsync(string firstName, string lastName)
+    public async Task<IEnumerable<UserDataModel>> GetAllUsersByNameAsync(string firstName, string lastName)
     {
-        throw new NotImplementedException();
+        try
+        {
+            List<string> conditions = new();
+
+            if (!string.IsNullOrEmpty(firstName))
+                conditions.Add("firstName=@firstName");
+            if (!string.IsNullOrEmpty(lastName))
+                conditions.Add("lastName=@lastName");
+
+            // Returning a empty Enumerable if both parameters are empty
+            if (conditions.Count == 0)
+                return Enumerable.Empty<UserDataModel>(); ;
+
+            var sql = "SELECT * FROM c WHERE " + string.Join(" AND ", conditions);
+
+            var queryDef = new QueryDefinition(sql);
+
+            if (!string.IsNullOrEmpty(firstName))
+                queryDef = queryDef.WithParameter("@firstName", firstName);
+            if (!string.IsNullOrEmpty(lastName))
+                queryDef = queryDef.WithParameter("@lastName", lastName);
+
+            var query = _container.GetItemQueryIterator<UserDataModel>(queryDef);
+            List<UserDataModel> results = new();
+            while (query.HasMoreResults)
+            {
+                var response = await query.ReadNextAsync();
+                results.AddRange(response.Resource);
+            }
+            return results;
+        }
+        catch (CosmosException ex) when (ex.StatusCode == System.Net.HttpStatusCode.NotFound)
+        {
+            // Returning nothing if both 
+            throw new NotFoundException($"Results on FirstName {firstName} and LastName {lastName} Not Found");
+        }
     }
 
-    public Task<UserDataModel?> GetUserByIdAsync(int userId)
+    public async Task<UserDataModel?> GetUserByIdAsync(string userId)
     {
-        throw new NotImplementedException();
+        try
+        {
+            var result = await _container.ReadItemAsync<UserDataModel>(
+                id: userId,
+                partitionKey: new PartitionKey(userId)
+            );
+
+            return result.Resource;
+        }
+        catch (CosmosException ex) when (ex.StatusCode == System.Net.HttpStatusCode.NotFound)
+        {
+            throw new NotFoundException($"User with Id {userId} Not Found");
+        }
     }
 
-    public Task<bool> IsFavoritedAsync(int userId, int listingId)
+    public async Task<bool> IsFavoritedAsync(string userId, string listingId)
     {
-        throw new NotImplementedException();
+        try
+        {
+            var result = await _container.ReadItemAsync<FavoriteDataModel>(
+                id: $"{userId}_{listingId}",
+                partitionKey: new PartitionKey($"{userId}_{listingId}")
+            );
+
+            return true;
+        }
+        catch (CosmosException ex) when (ex.StatusCode == System.Net.HttpStatusCode.NotFound)
+        {
+            return false;
+        }
     }
 
-    public Task RemoveFavoriteAsync(int userId, int listingId)
+    public async Task RemoveFavoriteAsync(string userId, string listingId)
     {
-        throw new NotImplementedException();
+        try
+        {
+            var result = await _container.DeleteItemAsync<FavoriteDataModel>(
+                id: $"{userId}_{listingId}",
+                partitionKey: new PartitionKey($"{userId}_{listingId}")
+            );
+        }
+        catch (CosmosException ex) when (ex.StatusCode == System.Net.HttpStatusCode.NotFound)
+        {
+            throw new NotFoundException($"favorite with id {userId}_{listingId} Not Found");
+        }
     }
 
-    public Task RemoveUserAsync(int id)
+    public async Task RemoveUserAsync(string userId)
     {
-        throw new NotImplementedException();
+        try
+        {
+            var result = await _container.DeleteItemAsync<UserDataModel>(
+                id: userId,
+                partitionKey: new PartitionKey(userId)
+            );
+        }
+        catch (CosmosException ex) when (ex.StatusCode == System.Net.HttpStatusCode.NotFound)
+        {
+            throw new NotFoundException($"user with id {userId} Not Found");
+        }
     }
 
-    public Task<UserDataModel> UpdateUserAsync(UserDataModel updateUserDataModel)
+    public async Task<UserDataModel> UpdateUserAsync(UserDataModel updateUserDataModel)
     {
-        throw new NotImplementedException();
+        try
+        {
+            var result = await _container.ReplaceItemAsync<UserDataModel>(
+                id: updateUserDataModel.Id,
+                item: updateUserDataModel,
+                partitionKey: new PartitionKey(updateUserDataModel.Id)
+            );
+
+            return result.Resource;
+        }
+        catch (CosmosException ex) when (ex.StatusCode == System.Net.HttpStatusCode.NotFound)
+        {
+            throw new NotFoundException($"user with id {updateUserDataModel.Id} Not Found");
+        }
     }
 }

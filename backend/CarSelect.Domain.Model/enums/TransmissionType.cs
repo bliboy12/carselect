@@ -1,5 +1,5 @@
 public enum TransmissionType
 {
-    manual = 1,
-    automatic = 2
+    Manuel = 1,
+    Automatic = 2
 }
