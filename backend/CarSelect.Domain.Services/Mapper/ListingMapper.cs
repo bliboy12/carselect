@@ -1,6 +1,6 @@
 public class ListingMapper
 {
-    public ListingModel MapToDomein(ListingDataModel listingDataModel)
+    public static ListingModel MapToDomein(ListingDataModel listingDataModel)
     {
         return new ListingModel
         {
@@ -12,7 +12,7 @@ public class ListingMapper
             Status = listingDataModel.Status == "active" ? ListingStatus.Active : (listingDataModel.Status == "sold" ? ListingStatus.Sold : ListingStatus.Removed)
         };
     }
-    public ListingDataModel MapFromDomein(ListingModel listingModel)
+    public static ListingDataModel MapFromDomein(ListingModel listingModel)
     {
         return new ListingDataModel
         {

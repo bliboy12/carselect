@@ -8,5 +8,5 @@ public class ListingModel
     public ListingStatus Status { get; set; }
     public UserModel? Seller { get; set; } = null!;
 
-    public ICollection<CarImageModel> CarImages { get; set; } = [];
+    public List<CarImageModel> CarImages { get; set; } = new();
 }

@@ -1,7 +1,7 @@
 public interface IUserService
 {
     Task<UserModel> AddUserAsync(UserModel userDataModel);
-    Task<UserModel?> GetUserByIdAsync(Guid userId);
+    Task<UserModel> GetUserByIdAsync(Guid userId);
     Task<IEnumerable<UserModel>> GetAllUsersByNameAsync(string firstName, string lastName);
     //Task<IEnumerable<UserDataModel>> OrderByNewestUsersAsync(); ==>
     //   ==> Both bad design. Because every sorting will need a independent method which isn't very practical.

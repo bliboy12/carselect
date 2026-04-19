@@ -1,6 +1,6 @@
 public class CarMapper
 {
-    public CarModel MapToDomein(CarDataModel carDataModel)
+    public static CarModel MapToDomein(CarDataModel carDataModel)
     {
         return new CarModel
         {
@@ -17,7 +17,7 @@ public class CarMapper
             Drive = carDataModel.Drive == "4wd" ? DriveType.FourWd : (carDataModel.Drive == "fwd" ? DriveType.Fwd : (carDataModel.Drive == "rwd" ? DriveType.Rwd : DriveType.Awd))
         };
     }
-    public CarDataModel MapFromDomein(CarModel carModel)
+    public static CarDataModel MapFromDomein(CarModel carModel)
     {
         return new CarDataModel
         {
@@ -32,6 +32,23 @@ public class CarMapper
             Kilometers = carModel.Kilometers,
             Doors = carModel.Doors,
             Drive = carModel.Drive.ToString()
+        };
+    }
+    public static CarFilterDataModel MapFromDomein(CarFilter carFilter)
+    {
+        return new CarFilterDataModel
+        {
+            Brand = carFilter.Brand,
+            Model = carFilter.Model,
+            Color = carFilter.Color,
+            Trim = carFilter.Trim,
+            BuildYear = carFilter.BuildYear,
+            Fuel = carFilter.Fuel,
+            Transmission = carFilter.Transmission,
+            MinKilometers = carFilter.MinKilometers,
+            MaxKilometers = carFilter.MaxKilometers,
+            Doors = carFilter.Doors,
+            Drive = carFilter.Drive
         };
     }
 }

@@ -1,6 +1,6 @@
 public class CarResponseContract
 {
-    public int Id { get; set; }
+    public Guid Id { get; set; }
     public string Brand { get; set; } = string.Empty;
     public string Model { get; set; } = string.Empty;
     public string Color { get; set; } = string.Empty;

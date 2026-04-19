@@ -9,5 +9,5 @@ public class CarRequestContract
     public string Transmission { get; set; } = string.Empty;
     public int Kilometers { get; set; }
     public int Doors { get; set; }
-    public DriveType Drive { get; set; }
+    public string Drive { get; set; } = string.Empty;
 }

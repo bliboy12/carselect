@@ -1,19 +1,18 @@
 public interface IListingRepository
 {
-    Task<ListingDataModel> AddListing(ListingDataModel listingData);
-    Task<ListingDataModel> GetListingWithId(int listingId);
-    Task<IEnumerable<ListingDataModel>> GetAllListingsBySellerId(int sellerId);
-    Task<ListingDataModel> GetListingById(int listingId);
-    Task<IEnumerable<ListingDataModel>> GetAllListings();
+    Task<ListingDataModel> CreateListingAsync(ListingDataModel listingData);
+    Task<ListingDataModel> GetListingByIdAsync(string listingId);
+    Task<IEnumerable<ListingDataModel>> GetAllListingsBySellerIdAsync(string sellerId);
+    Task<IEnumerable<ListingDataModel>> GetAllListingsAsync();
 
     // Car Images for the associated listing
     Task<CarImageDataModel> AddCarImageAsync(CarImageDataModel carImageData);
     Task<CarImageDataModel> UpdateCarImageAsync(CarImageDataModel carImageData);
-    Task<IEnumerable<CarImageDataModel>> GetAllCarImagesByListingIdAsync(int listingId);
-    Task<CarImageDataModel?> GetFirstCarImageByListingIdAsync(int listingId); // TO BE SEEN
-    Task RemoveCarImageAsync(int carImageId);
+    Task<IEnumerable<CarImageDataModel>> GetAllCarImagesByListingIdAsync(string listingId);
+    Task<CarImageDataModel?> GetFirstCarImageByListingIdAsync(string listingId); // TO BE SEEN
+    Task RemoveCarImageAsync(string carImageId);
 
     // Amount of Favorited of this listing
-    Task<IEnumerable<FavoriteDataModel>> GetAllFavoritesWithListingIdAsync(int userId, int listingId);
+    Task<IEnumerable<FavoriteDataModel>> GetAllFavoritesWithListingIdAsync(string userId, string listingId);
 
 }

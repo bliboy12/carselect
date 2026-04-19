@@ -1,48 +1,90 @@
+using Microsoft.AspNetCore.Http.HttpResults;
 using Microsoft.AspNetCore.Mvc;
 
 [ApiController]
 [Route("api/listing")]
-public class ListingController
+public class ListingController : ControllerBase
 {
-    [HttpGet]
-    public ListingResponseContract[] GetAllListings()
+    private readonly ICarImageService _carImageService;
+    private readonly IListingService _listingService;
+    public ListingController(ICarImageService carImageService, IListingService listingService)
     {
-        throw new NotImplementedException();
+        _carImageService = carImageService;
+        _listingService = listingService;
+    }
+    [HttpGet]
+    public async Task<ActionResult<IEnumerable<ListingResponseContract>>> GetAllListingsAsync()
+    {
+        var response = await _listingService.GetAllListingsAsync();
+        List<ListingResponseContract> listings = new();
+
+        foreach (ListingModel listing in response)
+            listings.Add(ListingApiMapper.MapToContract(listing));
+
+        return Ok(listings);
     }
 
     [HttpGet("{id}")]
-    public ListingResponseContract GetListingWithId([FromRoute] int id)
+    public async Task<ActionResult<ListingResponseContract>> GetListingByIdAsync([FromRoute] Guid id)
     {
-        throw new NotImplementedException();
+        try
+        {
+            var result = await _listingService.GetListingByIdAsync(id);
+            return Ok(ListingApiMapper.MapToContract(result));
+        }
+        catch (NotFoundException nfe)
+        {
+            return NotFound(nfe.Message);
+        }
     }
-
+    // The adding of images to the listing will be called by a separate HttpPost 
     [HttpPost]
-    public ListingResponseContract CreateListing([FromBody] ListingRequestContract listingRequest)
+    public async Task<ActionResult<ListingResponseContract>> CreateListing([FromBody] ListingRequestContract listingRequest)
     {
-        throw new NotImplementedException();
+        var result = await _listingService.CreateListingAsync(ListingApiMapper.MapToDomein(listingRequest));
+        return Ok(ListingApiMapper.MapToContract(result));
     }
 
     [HttpPut("{id}")]
-    public ListingResponseContract UpdateListing([FromRoute] int id, [FromBody] ListingRequestContract updateListing)
+    public async Task<ActionResult<ListingResponseContract>> UpdateListing([FromRoute] Guid id, [FromBody] ListingRequestContract updateListing)
     {
-        throw new NotImplementedException();
+        var convertModel = ListingApiMapper.MapToDomein(updateListing);
+        convertModel.Id = id;
+        var result = await _listingService.UpdateListingAsync(convertModel);
+
+        return Ok(ListingApiMapper.MapToContract(result));
     }
     [HttpDelete("{id}")]
-    public void RemoveListing([FromRoute] int id)
+    public async Task<ActionResult> DeleteListingByIdAsync([FromRoute] Guid id)
     {
-        throw new NotImplementedException();
+        await _listingService.DeletelistingById(id);
+        return Ok();
     }
     [HttpGet("{id}/images")]
-    public ICollection<string> GetAllImages([FromRoute] int id)
+    public async Task<ActionResult<ICollection<CarImageResponseContract>>> GetAllImagesByListingId([FromRoute] Guid listingId)
     {
-        throw new NotImplementedException();
+        var response = await _carImageService.GetAllCarImagesByListingIdAsync(listingId);
+        List<CarImageResponseContract> carImages = new();
+
+        foreach (CarImageModel carImage in response)
+            carImages.Add(CarImageApiMapper.MapToContract(carImage));
+
+        return Ok(carImages);
     }
     // This is still a question because once the frontend has everything it can used that instead of calling for API again.
     // Another thing, perhaps we can change this to return one image. that way we can display the first image for each listing instead of loading everything
     // Pethaps with a query /?1
     [HttpGet("{id}/images/{imageId}")]
-    public string GetImageWithId([FromRoute] int id, [FromRoute] int imageId)
+    public async Task<ActionResult<CarImageResponseContract>> GetCarImageById([FromRoute] Guid id, [FromRoute] Guid imageId)
     {
-        throw new NotImplementedException();
+        try
+        {
+            var result = await _carImageService.GetCarImageById(imageId);
+            return Ok(CarImageApiMapper.MapToContract(result));
+        }
+        catch (NotFoundException nfe)
+        {
+            return NotFound(nfe.Message);
+        }
     }
 }

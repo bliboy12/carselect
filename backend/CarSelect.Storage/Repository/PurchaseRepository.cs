@@ -1,4 +1,4 @@
-public class PurchaseRepository : IPurchaseRespository
+public class PurchaseRepository : IPurchaseRepository
 {
     public Task<PurchaseDataModel> AddPurchaseAsync(PurchaseDataModel purchaseDataModel)
     {

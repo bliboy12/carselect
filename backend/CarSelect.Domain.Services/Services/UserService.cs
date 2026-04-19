@@ -50,12 +50,9 @@ public class UserService : IUserService
         return users;
     }
 
-    public async Task<UserModel?> GetUserByIdAsync(Guid userId)
+    public async Task<UserModel> GetUserByIdAsync(Guid userId)
     {
         var user = await _repo.GetUserByIdAsync(userId.ToString());
-
-        if (user == null)
-            return null;
 
         return UserMapper.MapToDomein(user);
     }

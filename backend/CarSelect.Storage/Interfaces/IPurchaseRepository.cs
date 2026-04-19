@@ -1,4 +1,4 @@
-public interface IPurchaseRespository
+public interface IPurchaseRepository
 {
     Task<PurchaseDataModel> AddPurchaseAsync(PurchaseDataModel purchaseDataModel);
     Task<PurchaseDataModel?> GetPurchaseByIdAsync(int purchaseId);

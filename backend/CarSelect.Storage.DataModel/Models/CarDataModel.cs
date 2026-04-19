@@ -3,7 +3,7 @@ using System.Text.Json.Serialization;
 public class CarDataModel
 {
     [JsonPropertyName("id")]
-    public string Id { get; set; } = Guid.NewGuid().ToString();
+    public string Id { get; set; } = string.Empty;
     //public int OwnerId { get; set; }
     //public UserDataModel Owner { get; set; } = null!;
     public string Brand { get; set; } = string.Empty;

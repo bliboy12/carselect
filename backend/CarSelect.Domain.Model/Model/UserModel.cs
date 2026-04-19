@@ -11,5 +11,5 @@ public class UserModel
     public ICollection<ReviewModel> ReceivedReviews { get; set; } = new List<ReviewModel>();
     public ICollection<ReviewModel> WrittenReviews { get; set; } = new List<ReviewModel>();
     public ICollection<PurchaseModel> Purchases { get; set; } = new List<PurchaseModel>();
-    public ICollection<FavoritesModel> Favorites { get; set; } = new List<FavoritesModel>();
+    public ICollection<FavoriteModel> Favorites { get; set; } = new List<FavoriteModel>();
 }

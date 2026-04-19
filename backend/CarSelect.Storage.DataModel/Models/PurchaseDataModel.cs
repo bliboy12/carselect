@@ -3,9 +3,9 @@ using System.Text.Json.Serialization;
 public class PurchaseDataModel
 {
     [JsonPropertyName("id")]
-    public string Id { get; set; } = Guid.NewGuid().ToString();
-    public string BuyerId { get; set; }
-    public string ListingId { get; set; }
+    public string Id { get; set; } = string.Empty;
+    public string BuyerId { get; set; } = string.Empty;
+    public string ListingId { get; set; } = string.Empty;
     public decimal AgreedPrice { get; set; }
     public DateTime PurchaseDate { get; set; }
 }

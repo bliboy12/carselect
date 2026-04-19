@@ -21,6 +21,7 @@ public class UserRepository : IUserRepository
 
     public async Task<UserDataModel> AddUserAsync(UserDataModel userDataModel)
     {
+        userDataModel.Id = Guid.NewGuid().ToString();
         var createdFavorite = await _container.CreateItemAsync<UserDataModel>(
             item: userDataModel,
             partitionKey: new PartitionKey($"{userDataModel.Id}")
@@ -96,7 +97,7 @@ public class UserRepository : IUserRepository
         }
     }
 
-    public async Task<UserDataModel?> GetUserByIdAsync(string userId)
+    public async Task<UserDataModel> GetUserByIdAsync(string userId)
     {
         try
         {

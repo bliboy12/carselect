@@ -1,32 +1,52 @@
 public class CarService : ICarService
 {
-    public Task<CarModel> AddCarAsync(CarModel carDataModel)
+    private readonly ICarRepository _carRepo;
+    public CarService(ICarRepository carRepository)
     {
-        throw new NotImplementedException();
+        _carRepo = carRepository;
+    }
+    public async Task<CarModel> CreateCarAsync(CarModel carDataModel)
+    {
+        carDataModel.Id = Guid.NewGuid();
+        var response = await _carRepo.CreateCarAsync(CarMapper.MapFromDomein(carDataModel));
+        return CarMapper.MapToDomein(response);
     }
 
-    public Task<IEnumerable<CarModel>> GetAllCarsAsync()
+    public async Task<IEnumerable<CarModel>> GetAllCarsAsync()
     {
-        throw new NotImplementedException();
+        var response = await _carRepo.GetAllCarsAsync();
+        List<CarModel> cars = new();
+
+        foreach (CarDataModel car in response)
+            cars.Add(CarMapper.MapToDomein(car));
+        return cars;
     }
 
-    public Task<IEnumerable<CarModel>> GetAllCarsByFilterAsync(CarFilter filter)
+    public async Task<IEnumerable<CarModel>> GetAllCarsByFilterAsync(CarFilter filter)
     {
-        throw new NotImplementedException();
+        var response = await _carRepo.GetAllCarsByFilterAsync(CarMapper.MapFromDomein(filter));
+        List<CarModel> cars = new();
+
+        foreach (CarDataModel car in response)
+            cars.Add(CarMapper.MapToDomein(car));
+
+        return cars;
     }
 
-    public Task<CarModel?> GetCarWithIdAsync(Guid carId)
+    public async Task<CarModel> GetCarWithIdAsync(Guid carId)
     {
-        throw new NotImplementedException();
+        var result = await _carRepo.GetCarWithIdAsync(carId.ToString());
+        return CarMapper.MapToDomein(result);
     }
 
-    public Task RemoveCarAsync(Guid carId)
+    public async Task RemoveCarAsync(Guid carId)
     {
-        throw new NotImplementedException();
+        await _carRepo.RemoveCarAsync(carId.ToString());
     }
 
-    public Task<CarModel> UpdateCarAsync(CarModel updateCar)
+    public async Task<CarModel> UpdateCarAsync(CarModel updateCar)
     {
-        throw new NotImplementedException();
+        var response = await _carRepo.UpdateCarAsync(CarMapper.MapFromDomein(updateCar));
+        return CarMapper.MapToDomein(response);
     }
 }

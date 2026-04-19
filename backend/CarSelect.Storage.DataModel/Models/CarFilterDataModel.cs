@@ -1,4 +1,4 @@
-public class CarFilter
+public class CarFilterDataModel
 {
     public string? Brand { get; set; }
     public string? Model { get; set; }

@@ -1,7 +1,7 @@
 public class ListingRequestContract
 {
-    public int SellerId { get; set; }
-    public int CarId { get; set; }
-    public double Price { get; set; }
-    public string Status { get; set; } = "Active";
+    public Guid SellerId { get; set; }
+    public Guid CarId { get; set; }
+    public decimal Price { get; set; }
+    public List<CarImageRequestContract> CarImages { get; set; } = new();
 }

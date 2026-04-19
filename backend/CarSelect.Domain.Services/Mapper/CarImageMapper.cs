@@ -1,6 +1,6 @@
 public class CarImageMapper
 {
-    public CarImageModel MapToDomein(CarImageDataModel carImageDataModel)
+    public static CarImageModel MapToDomein(CarImageDataModel carImageDataModel)
     {
         return new CarImageModel
         {
@@ -10,7 +10,7 @@ public class CarImageMapper
         };
     }
 
-    public CarImageDataModel MapFromDomein(CarImageModel carImageModel)
+    public static CarImageDataModel MapFromDomein(CarImageModel carImageModel)
     {
         return new CarImageDataModel
         {

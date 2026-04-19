@@ -1,7 +1,7 @@
 public interface ICarService
 {
-    Task<CarModel> AddCarAsync(CarModel carDataModel);
-    Task<CarModel?> GetCarWithIdAsync(Guid carId);
+    Task<CarModel> CreateCarAsync(CarModel carDataModel);
+    Task<CarModel> GetCarWithIdAsync(Guid carId);
     Task<IEnumerable<CarModel>> GetAllCarsAsync(); // admin use only
     //Task<IEnumerable<CarDataModel>> GetAllCarsWithOwnerIdAsync(int ownerId);
     Task<IEnumerable<CarModel>> GetAllCarsByFilterAsync(CarFilter filter);
