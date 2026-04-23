@@ -1,14 +1,15 @@
 using Microsoft.AspNetCore.Mvc;
 
 [ApiController]
+[Route("api/reviews")]
 public class ReviewController
 {
-    [HttpGet("reviewId")]
+    [HttpGet("{reviewId}")]
     public ReviewResponseContract GetReviewWithId([FromRoute] int reviewId)
     {
         throw new NotImplementedException();
     }
-    [HttpPut("reviewId")]
+    [HttpPut("{reviewId}")]
     public ReviewResponseContract updateReview([FromRoute] int reviewId, [FromBody] ReviewRequestContract updateReviewRequest)
     {
         throw new NotImplementedException();
@@ -18,7 +19,7 @@ public class ReviewController
     {
         throw new NotImplementedException();
     }
-    [HttpDelete("reviewId")]
+    [HttpDelete("{reviewId}")]
     public void RemoveReview([FromRoute] int reviewId)
     {
         throw new NotImplementedException();

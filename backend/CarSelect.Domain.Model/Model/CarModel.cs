@@ -1,9 +1,9 @@
 
 public class CarModel
 {
-    public int Id { get; set; }
-    public int OwnerId { get; set; }
-    public UserModel Owner { get; set; } = null!;
+    public Guid Id { get; set; }
+    //public int OwnerId { get; set; }
+    //public UserModel Owner { get; set; } = null!;
     public string Brand { get; set; } = string.Empty;
     public string Model { get; set; } = string.Empty;
     public string Color { get; set; } = string.Empty;

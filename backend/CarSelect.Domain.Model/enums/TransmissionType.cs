@@ -1,5 +1,9 @@
+using System.ComponentModel;
+
 public enum TransmissionType
 {
-    manual = 1,
-    automatic = 2
+    [Description("manuel")]
+    Manuel,
+    [Description("automatic")]
+    Automatic
 }
