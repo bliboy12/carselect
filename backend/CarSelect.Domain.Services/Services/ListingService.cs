@@ -1,56 +1,93 @@
 public class ListingService : IListingService
 {
+    private readonly ICarService _carService;
     private readonly IListingRepository _listingRepo;
     private readonly ICarImageService _carImageSerivce;
-    public ListingService(IListingRepository listingRepository, CarImageService carImageService)
+    public ListingService(IListingRepository listingRepository, ICarImageService carImageService, ICarService carService)
     {
         _listingRepo = listingRepository;
         _carImageSerivce = carImageService;
+        _carService = carService;
     }
 
     public async Task<ListingModel> CreateListingAsync(ListingModel listingModel)
     {
-        ListingDataModel result;
-        // This is to prevent a carImages to be created in Blob without a listing. If listing fails we can't create images to blob
+        var carResult = await _carService.CreateCarAsync(listingModel.Car);
+        // we try to create listing after having made the car and if it fails
+        // we make sure to delete the car associated to it insuring that we don't have any cars floating around without any reference
         try
         {
-            result = await _listingRepo.CreateListingAsync(ListingMapper.MapFromDomein(listingModel));
+            // assign the newly created cars id to the listing carId reference
+            listingModel.CarId = carResult.Id;
+            // creating a new Id at assigning it to the new listingId that will be send out to the repo to create
+            listingModel.Id = Guid.NewGuid();
+            // Keeping it UTC insure different dateTime that don't align (if the users are in different TimeZones), we keep it universal
+            listingModel.CreatedAt = DateTime.UtcNow;
+            listingModel.UpdatedAt = listingModel.CreatedAt;
+
+            var listingResult = await _listingRepo.CreateListingAsync(ListingMapper.MapFromDomein(listingModel));
+            return ListingMapper.MapToDomein(listingResult);
         }
         catch (Exception ex)
         {
-            Console.WriteLine($"Something went wrong: {ex.Message}");
-            throw;
+            await _carService.DeleteCarByIdAsync(carResult.Id);
+            throw new Exception(ex.Message);
         }
-        var createdImage = _carImageSerivce.CreateCarImage()
+
     }
 
-    public Task DeletelistingById(Guid listingId)
+    public async Task DeletelistingById(Guid listingId)
     {
-        throw new NotImplementedException();
+        await _carImageSerivce.DeleteAllImagesByListingIdAsync(listingId);
+        await _listingRepo.DeleteListingByIdAsync(listingId.ToString());
     }
 
-    public Task<IEnumerable<FavoriteModel>> GetAllFavoritesWithListingIdAsync(Guid userId, Guid listingId)
+    public async Task<IEnumerable<FavoriteModel>> GetAllFavoritesByListingIdAsync(Guid userId, Guid listingId)
     {
-        throw new NotImplementedException();
+        var results = await _listingRepo.GetAllFavoritesByListingIdAsync(userId.ToString(), listingId.ToString());
+        List<FavoriteModel> favorites = new();
+
+        foreach (FavoriteDataModel favorite in results)
+            favorites.Add(FavoriteMapper.MapToDomein(favorite));
+
+        return favorites;
     }
 
-    public Task<IEnumerable<ListingModel>> GetAllListingsAsync()
+    public async Task<IEnumerable<ListingModel>> GetAllListingsAsync()
     {
-        throw new NotImplementedException();
+        var results = await _listingRepo.GetAllListingsAsync();
+        List<ListingModel> listings = new();
+
+        foreach (ListingDataModel listing in results)
+            listings.Add(ListingMapper.MapToDomein(listing));
+
+        return listings;
     }
 
-    public Task<IEnumerable<ListingModel>> GetAllListingsBySellerIdAsync(Guid sellerId)
+    public async Task<IEnumerable<ListingModel>> GetAllListingsBySellerIdAsync(Guid sellerId)
     {
-        throw new NotImplementedException();
+        var results = await _listingRepo.GetAllListingsBySellerIdAsync(sellerId.ToString());
+        List<ListingModel> listings = new();
+
+        foreach (ListingDataModel listing in results)
+            listings.Add(ListingMapper.MapToDomein(listing));
+
+        return listings;
     }
 
-    public Task<ListingModel> GetListingByIdAsync(Guid listingId)
+    public async Task<ListingModel> GetListingByIdAsync(Guid listingId)
     {
-        throw new NotImplementedException();
+        var result = await _listingRepo.GetListingByIdAsync(listingId.ToString());
+
+        return ListingMapper.MapToDomein(result);
     }
 
-    public Task<ListingModel> UpdateListingAsync(ListingModel listingModel)
+    public async Task<ListingModel> UpdateListingAsync(ListingModel listingModel)
     {
-        throw new NotImplementedException();
+        var getOldListing = await _listingRepo.GetListingByIdAsync(listingModel.Id.ToString());
+        listingModel.CreatedAt = getOldListing.CreatedAt;
+        var result = await _listingRepo.UpdateListingAsync(ListingMapper.MapFromDomein(listingModel));
+
+        return ListingMapper.MapToDomein(result);
     }
 }

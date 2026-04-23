@@ -15,5 +15,5 @@ public interface IListingService
     // Task RemoveCarImageAsync(Guid carImageId);
 
     // Amount of Favorited of this listing
-    Task<IEnumerable<FavoriteModel>> GetAllFavoritesWithListingIdAsync(Guid userId, Guid listingId);
+    Task<IEnumerable<FavoriteModel>> GetAllFavoritesByListingIdAsync(Guid userId, Guid listingId);
 }

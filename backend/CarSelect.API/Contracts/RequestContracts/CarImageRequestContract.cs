@@ -1,5 +1,5 @@
 public class CarImageRequestContract
 {
-    public string ImageUrl { get; set; } = string.Empty;
-    public bool IsMainImage { get; set; }
+    public required IFormFile File { get; set; }
+    public bool IsMainImage { get; set; } = false;
 }

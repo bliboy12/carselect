@@ -1,9 +1,9 @@
-public interface IPurchaseRepository
+public interface ITransactionRepository
 {
-    Task<PurchaseDataModel> AddPurchaseAsync(PurchaseDataModel purchaseDataModel);
-    Task<PurchaseDataModel?> GetPurchaseByIdAsync(int purchaseId);
-    Task<IEnumerable<PurchaseDataModel>> GetAllPurchasesByBuyerIdAsync(int userId);
-    Task<PurchaseDataModel?> GetPurchaseByListingIdAsync(int listingId);
-    Task<PurchaseDataModel> UpdatePurchaseAsync(PurchaseDataModel purchaseDataModel);
-    Task RemovePurchaseByIdAsync(int purchaseId);
+    Task<TransactionDataModel> AddTransactionAsync(TransactionDataModel TransactionDataModel);
+    Task<TransactionDataModel?> GetTransactionByIdAsync(string transactionId);
+    Task<IEnumerable<TransactionDataModel>> GetAllTransactionsByBuyerIdAsync(string userId);
+    Task<TransactionDataModel?> GetTransactionByListingIdAsync(string listingId);
+    Task<TransactionDataModel> UpdateTransactionAsync(TransactionDataModel transactionDataModel);
+    Task RemoveTransactionByIdAsync(string transactionId);
 }

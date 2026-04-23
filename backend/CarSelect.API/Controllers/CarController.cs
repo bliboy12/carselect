@@ -2,7 +2,7 @@
 using Microsoft.AspNetCore.Mvc;
 
 [ApiController]
-[Route("api/car")]
+[Route("api/cars")]
 public class CarController : ControllerBase
 {
     private readonly ICarService _service;
@@ -60,4 +60,13 @@ public class CarController : ControllerBase
 
         return Ok(CarApiMapper.MapToContract(response));
     }
+
+    // Car can't have a endpoint to delete on its own. If a car needs to be deleted, you'll have to delete the listing associated with it.
+    // So only in listing can a car+listing be deleted.
+    // [HttpDelete("{id}")]
+    // public async Task<ActionResult> DeleteCarByIdAsync([FromRoute] Guid id)
+    // {
+    //     await _service.DeleteCarByIdAsync(id);
+    //     return Ok();
+    // }
 }

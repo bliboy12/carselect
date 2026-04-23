@@ -14,21 +14,21 @@ public class CarImageRepository : ICarImageRepository
     {
         return await _container.CreateItemAsync<CarImageDataModel>(
             item: carImageModel,
-            partitionKey: new PartitionKey(carImageModel.Id)
+            partitionKey: new PartitionKey(carImageModel.ListingId)
         );
     }
 
-    public async Task DeleteCarImageAsync(string carImageId)
+    public async Task DeleteCarImageByIdAsync(string listingId, string carImageId)
     {
         await _container.DeleteItemAsync<CarImageDataModel>(
             id: carImageId,
-            partitionKey: new PartitionKey(carImageId)
+            partitionKey: new PartitionKey(listingId)
         );
     }
 
     public async Task<IEnumerable<CarImageDataModel>> GetAllCarImagesByListingIdAsync(string listingId)
     {
-        var sqlDef = new QueryDefinition("SELECT * FROM c WHERE c.listingId=@listingId").WithParameter("@listingId", listingId);
+        QueryDefinition sqlDef = new QueryDefinition("SELECT * FROM c WHERE c.listingId=@listingId").WithParameter("@listingId", listingId);
         var query = _container.GetItemQueryIterator<CarImageDataModel>(sqlDef);
 
         List<CarImageDataModel> carImages = new();
@@ -41,15 +41,16 @@ public class CarImageRepository : ICarImageRepository
         return carImages;
     }
 
-    public async Task<CarImageDataModel> GetCarImageByIdAsync(string carImageId)
+    public async Task<CarImageDataModel> GetCarImageByIdAsync(string listingId, string carImageId)
     {
         var result = await _container.ReadItemAsync<CarImageDataModel>(
             id: carImageId,
-            partitionKey: new PartitionKey(carImageId)
+            partitionKey: new PartitionKey(listingId)
         );
 
-        return result;
+        return result.Resource;
     }
+    // INCORRECT METHOD - DELETE
     public async Task<IEnumerable<CarImageDataModel>> GetAllFirstImagesOfAllListings()
     {
         var sqlDef = new QueryDefinition("SELECT DISTINCT * FROM c");
@@ -64,4 +65,6 @@ public class CarImageRepository : ICarImageRepository
         }
         return carImages;
     }
+
+
 }

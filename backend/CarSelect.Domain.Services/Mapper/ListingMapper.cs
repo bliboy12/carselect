@@ -8,8 +8,9 @@ public class ListingMapper
             SellerId = Guid.Parse(listingDataModel.SellerId),
             CarId = Guid.Parse(listingDataModel.CarId),
             Price = listingDataModel.Price,
-            ListedDate = listingDataModel.ListedDate,
-            Status = listingDataModel.Status == "active" ? ListingStatus.Active : (listingDataModel.Status == "sold" ? ListingStatus.Sold : ListingStatus.Removed)
+            CreatedAt = listingDataModel.CreatedAt,
+            UpdatedAt = listingDataModel.UpdatedAt,
+            Status = listingDataModel.Status.ToLower() == "active" ? ListingStatus.Active : (listingDataModel.Status.ToLower() == "sold" ? ListingStatus.Sold : ListingStatus.Removed)
         };
     }
     public static ListingDataModel MapFromDomein(ListingModel listingModel)
@@ -20,7 +21,8 @@ public class ListingMapper
             SellerId = listingModel.SellerId.ToString(),
             CarId = listingModel.CarId.ToString(),
             Price = listingModel.Price,
-            ListedDate = listingModel.ListedDate,
+            CreatedAt = listingModel.CreatedAt,
+            UpdatedAt = listingModel.UpdatedAt,
             Status = listingModel.Status.ToString()
         };
     }

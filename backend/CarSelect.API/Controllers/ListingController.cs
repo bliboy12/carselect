@@ -2,7 +2,7 @@ using Microsoft.AspNetCore.Http.HttpResults;
 using Microsoft.AspNetCore.Mvc;
 
 [ApiController]
-[Route("api/listing")]
+[Route("api/listings")]
 public class ListingController : ControllerBase
 {
     private readonly ICarImageService _carImageService;
@@ -24,12 +24,12 @@ public class ListingController : ControllerBase
         return Ok(listings);
     }
 
-    [HttpGet("{id}")]
-    public async Task<ActionResult<ListingResponseContract>> GetListingByIdAsync([FromRoute] Guid id)
+    [HttpGet("{listingId}")]
+    public async Task<ActionResult<ListingResponseContract>> GetListingByIdAsync([FromRoute] Guid listingId)
     {
         try
         {
-            var result = await _listingService.GetListingByIdAsync(id);
+            var result = await _listingService.GetListingByIdAsync(listingId);
             return Ok(ListingApiMapper.MapToContract(result));
         }
         catch (NotFoundException nfe)
@@ -39,29 +39,33 @@ public class ListingController : ControllerBase
     }
     // The adding of images to the listing will be called by a separate HttpPost 
     [HttpPost]
-    public async Task<ActionResult<ListingResponseContract>> CreateListing([FromBody] ListingRequestContract listingRequest)
+    public async Task<ActionResult<ListingResponseContract>> CreateListingAsync([FromBody] CreateListingRequestContract listingRequest)
     {
         var result = await _listingService.CreateListingAsync(ListingApiMapper.MapToDomein(listingRequest));
         return Ok(ListingApiMapper.MapToContract(result));
     }
 
-    [HttpPut("{id}")]
-    public async Task<ActionResult<ListingResponseContract>> UpdateListing([FromRoute] Guid id, [FromBody] ListingRequestContract updateListing)
+    // Question: is a user allowed to change the carId on a listing?
+    [HttpPut("{listingId}")]
+    public async Task<ActionResult<ListingResponseContract>> UpdateListingAsync([FromRoute] Guid listingId, [FromBody] ListingRequestContract updateListing)
     {
         var convertModel = ListingApiMapper.MapToDomein(updateListing);
-        convertModel.Id = id;
+        convertModel.Id = listingId;
         var result = await _listingService.UpdateListingAsync(convertModel);
 
         return Ok(ListingApiMapper.MapToContract(result));
     }
-    [HttpDelete("{id}")]
-    public async Task<ActionResult> DeleteListingByIdAsync([FromRoute] Guid id)
+    [HttpDelete("{listingId}")]
+    public async Task<ActionResult> DeleteListingByIdAsync([FromRoute] Guid listingId)
     {
-        await _listingService.DeletelistingById(id);
+        await _listingService.DeletelistingById(listingId);
         return Ok();
     }
-    [HttpGet("{id}/images")]
-    public async Task<ActionResult<ICollection<CarImageResponseContract>>> GetAllImagesByListingId([FromRoute] Guid listingId)
+
+    // CAR IMAGES 
+
+    [HttpGet("{listingId}/images")]
+    public async Task<ActionResult<ICollection<CarImageResponseContract>>> GetAllImagesByListingIdAsync([FromRoute] Guid listingId)
     {
         var response = await _carImageService.GetAllCarImagesByListingIdAsync(listingId);
         List<CarImageResponseContract> carImages = new();
@@ -74,13 +78,57 @@ public class ListingController : ControllerBase
     // This is still a question because once the frontend has everything it can used that instead of calling for API again.
     // Another thing, perhaps we can change this to return one image. that way we can display the first image for each listing instead of loading everything
     // Pethaps with a query /?1
-    [HttpGet("{id}/images/{imageId}")]
-    public async Task<ActionResult<CarImageResponseContract>> GetCarImageById([FromRoute] Guid id, [FromRoute] Guid imageId)
+    [HttpGet("{listingId}/images/{imageId}")]
+    public async Task<ActionResult<CarImageResponseContract>> GetCarImageByIdAsync([FromRoute] Guid listingId, [FromRoute] Guid imageId)
     {
         try
         {
-            var result = await _carImageService.GetCarImageById(imageId);
+            var result = await _carImageService.GetCarImageByIdAsync(listingId, imageId);
             return Ok(CarImageApiMapper.MapToContract(result));
+        }
+        catch (NotFoundException nfe)
+        {
+            return NotFound(nfe.Message);
+        }
+    }
+    [HttpPost("{listingId}/images")]
+    public async Task<ActionResult<IEnumerable<CarImageResponseContract>>> CreateCarImageAsync([FromRoute] Guid listingId, [FromForm] IEnumerable<IFormFile> files)
+    {
+        if (files == null || !files.Any())
+            return BadRequest("No File(s) Provided");
+
+        List<CarImageResponseContract> carImages = new();
+
+        foreach (IFormFile file in files)
+        {
+            // the 'using' is to insure that the stream is closed instead of waiting for the garabage collector to eventually close it on its own, which is unpredictable
+            using var stream = file.OpenReadStream();
+
+            var result = await _carImageService.CreateCarImageAsync(listingId, stream, file.FileName, file.ContentType);
+            carImages.Add(CarImageApiMapper.MapToContract(result));
+        }
+        return Ok(carImages);
+    }
+    [HttpDelete("{listingId}/images/{imageId}")]
+    public async Task<ActionResult> DeleteCarImageByIdAsync([FromRoute] Guid listingId, [FromRoute] Guid imageId)
+    {
+        try
+        {
+            await _carImageService.DeleteCarImageByIdAsync(listingId, imageId);
+            return Ok();
+        }
+        catch (NotFoundException nfe)
+        {
+            return NotFound(nfe.Message);
+        }
+    }
+    [HttpDelete("{listingId}/images")]
+    public async Task<ActionResult> DeleteAllImagesByListingIdAsync([FromRoute] Guid listingId)
+    {
+        try
+        {
+            await _listingService.DeletelistingById(listingId);
+            return Ok();
         }
         catch (NotFoundException nfe)
         {

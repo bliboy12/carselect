@@ -1,7 +1,13 @@
+using System.ComponentModel;
+
 public enum FuelType
 {
-    Petrol = 1,
-    diesel = 2,
-    electric = 3,
-    hybrid = 4
+    [Description("petrol")]
+    Petrol,
+    [Description("diesel")]
+    diesel,
+    [Description("electric")]
+    electric,
+    [Description("hybrid")]
+    hybrid
 }

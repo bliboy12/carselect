@@ -8,7 +8,8 @@ public class UserApiMapper
             FirstName = userModel.FirstName,
             LastName = userModel.LastName,
             Email = userModel.Email,
-            RegisterDate = userModel.RegisterDate,
+            CreatedAt = userModel.CreatedAt,
+            UpdatedAt = userModel.UpdatedAt,
             IsAdmin = userModel.IsAdmin
         };
     }
@@ -20,7 +21,8 @@ public class UserApiMapper
             FirstName = userResponseContract.FirstName,
             LastName = userResponseContract.LastName,
             Email = userResponseContract.Email,
-            RegisterDate = userResponseContract.RegisterDate,
+            CreatedAt = userResponseContract.CreatedAt,
+            UpdatedAt = userResponseContract.UpdatedAt,
             IsAdmin = userResponseContract.IsAdmin
         };
     }
@@ -31,7 +33,6 @@ public class UserApiMapper
             FirstName = userRequestContract.FirstName,
             LastName = userRequestContract.LastName,
             Email = userRequestContract.Email,
-            RegisterDate = DateTime.Now,
             IsAdmin = false
         };
     }

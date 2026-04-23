@@ -1,20 +1,21 @@
 public class CarFilterApiMapper
 {
-    public static CarFilter MapToDomein(CarFilterRequestContract carFilterRequest)
+    public static CarFilterModel MapToDomein(CarFilterRequestContract carFilterRequest)
     {
-        return new CarFilter
+        return new CarFilterModel
         {
             Brand = carFilterRequest.Brand,
             Model = carFilterRequest.Model,
             Color = carFilterRequest.Color,
             Trim = carFilterRequest.Trim,
-            BuildYear = carFilterRequest.BuildYear,
-            Fuel = carFilterRequest.Fuel,
-            Transmission = carFilterRequest.Transmission,
+            YearFrom = carFilterRequest.YearFrom,
+            YearTo = carFilterRequest.YearTo,
+            Fuel = carFilterRequest.Fuel == null ? null : (FuelType)carFilterRequest.Fuel,
+            Transmission = carFilterRequest.Transmission == null ? null : (TransmissionType)carFilterRequest.Transmission,
             MinKilometers = carFilterRequest.MinKilometers,
             MaxKilometers = carFilterRequest.MaxKilometers,
             Doors = carFilterRequest.Doors,
-            Drive = carFilterRequest.Drive
+            Drive = carFilterRequest.Drive == null ? null : (DriveType)carFilterRequest.Drive
         };
     }
 }

@@ -1,4 +1,6 @@
 
+using System.Text.Json.Serialization;
+
 var builder = WebApplication.CreateBuilder(args);
 
 builder.Services.Configure<CarImageRepositoryOptions>(
@@ -21,8 +23,8 @@ builder.Services.Configure<ListingRepositoryOptions>(
     builder.Configuration.GetSection("ListingRepositoryOptions")
 );
 
-builder.Services.Configure<PurchaseRepositoryOptions>(
-    builder.Configuration.GetSection("PurchaseRepositoryOptions")
+builder.Services.Configure<TransactionRepositoryOptions>(
+    builder.Configuration.GetSection("TransactionRepositoryOptions")
 );
 
 builder.Services.Configure<ReviewRepositoryOptions>(
@@ -39,14 +41,14 @@ builder.Services.Configure<BlobStorageRepositoryOptions>(
 
 builder.Services.AddScoped<ICarService, CarService>();
 builder.Services.AddScoped<IListingService, ListingService>();
-builder.Services.AddScoped<IPurchaseService, PurchaseService>();
+builder.Services.AddScoped<ITransactionService, TransactionService>();
 builder.Services.AddScoped<IReviewService, ReviewService>();
 builder.Services.AddScoped<IUserService, UserService>();
 builder.Services.AddScoped<ICarImageService, CarImageService>();
 
 builder.Services.AddScoped<ICarRepository, CarRepository>();
 builder.Services.AddScoped<IListingRepository, ListingRepository>();
-builder.Services.AddScoped<IPurchaseRepository, PurchaseRepository>();
+builder.Services.AddScoped<ITransactionRepository, TransactionRepository>();
 builder.Services.AddScoped<IReviewRepository, ReviewRepository>();
 builder.Services.AddScoped<IUserRepository, UserRepository>();
 builder.Services.AddScoped<ICarImageRepository, CarImageRepository>();
@@ -55,7 +57,8 @@ builder.Services.AddScoped<IBlobStorageRepository, BlobStorageRepository>();
 
 builder.Services.AddHttpClient();
 builder.Services.AddControllers();
-
+// Converts enums to strings and vice versa even ignoring capitilizations
+builder.Services.AddControllers().AddJsonOptions(options => options.JsonSerializerOptions.Converters.Add(new JsonStringEnumConverter()));
 
 var app = builder.Build();
 

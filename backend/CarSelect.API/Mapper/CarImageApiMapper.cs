@@ -6,7 +6,8 @@ public class CarImageApiMapper
         {
             Id = carImageModel.Id,
             ListingId = carImageModel.ListingId,
-            ImageUrl = carImageModel.ImageUrl
+            ImageUrl = carImageModel.ImageUrl,
+            IsMainImage = carImageModel.IsMainImage
         };
     }
     public static CarImageModel MapToDomein(CarImageResponseContract carImageResponseContract)
@@ -15,14 +16,14 @@ public class CarImageApiMapper
         {
             Id = carImageResponseContract.Id,
             ListingId = carImageResponseContract.ListingId,
-            ImageUrl = carImageResponseContract.ImageUrl
+            ImageUrl = carImageResponseContract.ImageUrl,
+            IsMainImage = carImageResponseContract.IsMainImage
         };
     }
     public static CarImageModel MapToDomein(CarImageRequestContract carImageRequestContract)
     {
         return new CarImageModel
         {
-            ImageUrl = carImageRequestContract.ImageUrl,
             IsMainImage = carImageRequestContract.IsMainImage
         };
     }

@@ -6,7 +6,8 @@ public class CarImageMapper
         {
             Id = Guid.Parse(carImageDataModel.Id),
             ListingId = Guid.Parse(carImageDataModel.ListingId),
-            ImageUrl = carImageDataModel.ImageUrl
+            ImageUrl = carImageDataModel.ImageUrl,
+            IsMainImage = carImageDataModel.IsMainImage
         };
     }
 
@@ -16,7 +17,8 @@ public class CarImageMapper
         {
             Id = carImageModel.Id.ToString(),
             ListingId = carImageModel.ListingId.ToString(),
-            ImageUrl = carImageModel.ImageUrl
+            ImageUrl = carImageModel.ImageUrl,
+            IsMainImage = carImageModel.IsMainImage
         };
     }
 }

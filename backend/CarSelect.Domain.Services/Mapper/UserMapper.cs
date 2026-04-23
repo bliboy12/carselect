@@ -10,7 +10,10 @@ public class UserMapper
             Email = userDataModel.Email,
             Password = userDataModel.Password,
             RegisterDate = userDataModel.RegisterDate,
-            IsAdmin = userDataModel.IsAdmin
+            IsAdmin = userDataModel.IsAdmin,
+            IsDeleted = userDataModel.IsDeleted,
+            CreatedAt = userDataModel.CreatedAt,
+            UpdatedAt = userDataModel.UpdatedAt
         };
     }
     public static UserDataModel MapFromDomein(UserModel userModel)
@@ -23,7 +26,9 @@ public class UserMapper
             Email = userModel.Email,
             Password = userModel.Password,
             RegisterDate = userModel.RegisterDate,
-            IsAdmin = userModel.IsAdmin
+            IsAdmin = userModel.IsAdmin,
+            CreatedAt = userModel.CreatedAt,
+            UpdatedAt = userModel.UpdatedAt
         };
     }
 }

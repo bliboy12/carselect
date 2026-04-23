@@ -12,7 +12,7 @@ public class UserController : ControllerBase
     [HttpPost]
     public async Task<ActionResult<UserResponseContract>> CreateUserAsync([FromBody] UserRequestContract userRequest)
     {
-        var request = await _service.AddUserAsync(UserApiMapper.MapToDomein(userRequest));
+        var request = await _service.CreateUserAsync(UserApiMapper.MapToDomein(userRequest));
         return UserApiMapper.MapToResponse(request);
     }
     [HttpGet("{id}")]
@@ -73,7 +73,7 @@ public class UserController : ControllerBase
         }
     }
     [HttpGet("search")] // Admin to search on a specific users first-, lastname
-    public async Task<ActionResult<UserResponseContract>> GetAllUsersByNameAsync([FromQuery] string firstName, [FromQuery] string lastName)
+    public async Task<ActionResult<UserResponseContract>> GetAllUsersByNameAsync([FromQuery] string? firstName, [FromQuery] string? lastName)
     {
         var response = await _service.GetAllUsersByNameAsync(firstName, lastName);
         List<UserResponseContract> results = new();

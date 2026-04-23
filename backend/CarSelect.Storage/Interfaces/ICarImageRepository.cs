@@ -1,7 +1,7 @@
 public interface ICarImageRepository
 {
     Task<CarImageDataModel> CreateCarImageAsync(CarImageDataModel carImageModel);
-    Task<CarImageDataModel> GetCarImageByIdAsync(string carImageId);
+    Task<CarImageDataModel> GetCarImageByIdAsync(string carImageId, string listingId);
     Task<IEnumerable<CarImageDataModel>> GetAllCarImagesByListingIdAsync(string listingId);
-    Task DeleteCarImageAsync(string carImageId);
+    Task DeleteCarImageByIdAsync(string listingId, string carImageId);
 }

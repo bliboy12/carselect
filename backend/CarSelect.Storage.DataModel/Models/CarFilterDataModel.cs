@@ -4,7 +4,8 @@ public class CarFilterDataModel
     public string? Model { get; set; }
     public string? Color { get; set; }
     public string? Trim { get; set; }
-    public int? BuildYear { get; set; }
+    public int? YearFrom { get; set; }
+    public int? YearTo { get; set; }
     public string? Fuel { get; set; }
     public string? Transmission { get; set; }
     public int? MinKilometers { get; set; }

@@ -19,9 +19,12 @@ public class UserRepository : IUserRepository
         return createdFavorite.Resource;
     }
 
-    public async Task<UserDataModel> AddUserAsync(UserDataModel userDataModel)
+    public async Task<UserDataModel> CreateUserAsync(UserDataModel userDataModel)
     {
         userDataModel.Id = Guid.NewGuid().ToString();
+        userDataModel.CreatedAt = DateTime.Now;
+        userDataModel.UpdatedAt = DateTime.Now;
+
         var createdFavorite = await _container.CreateItemAsync<UserDataModel>(
             item: userDataModel,
             partitionKey: new PartitionKey($"{userDataModel.Id}")
@@ -57,20 +60,21 @@ public class UserRepository : IUserRepository
         return results;
     }
 
-    public async Task<IEnumerable<UserDataModel>> GetAllUsersByNameAsync(string firstName, string lastName)
+    public async Task<IEnumerable<UserDataModel>> GetAllUsersByNameAsync(string? firstName, string? lastName)
     {
         try
         {
             List<string> conditions = new();
 
+            // here we put the conditions: names that start with the values given from the user, case-insensitive 
             if (!string.IsNullOrEmpty(firstName))
-                conditions.Add("firstName=@firstName");
+                conditions.Add("STARTSWITH(c.firstName, @firstName, true)");
             if (!string.IsNullOrEmpty(lastName))
-                conditions.Add("lastName=@lastName");
+                conditions.Add("STARTSWITH(c.lastName, @lastName, true)");
 
             // Returning a empty Enumerable if both parameters are empty
             if (conditions.Count == 0)
-                return Enumerable.Empty<UserDataModel>(); ;
+                return Enumerable.Empty<UserDataModel>();
 
             var sql = "SELECT * FROM c WHERE " + string.Join(" AND ", conditions);
 
@@ -114,6 +118,45 @@ public class UserRepository : IUserRepository
         }
     }
 
+    public async Task<IEnumerable<UserDataModel>> SearchUserByEmail(string email)
+    {
+        try
+        {
+
+            QueryDefinition sql = new QueryDefinition("SELECT * FROM c WHERE STARTSWITH(c.email, @email, true)");
+            var query = _container.GetItemQueryIterator<UserDataModel>(sql);
+
+            List<UserDataModel> results = new();
+            while (query.HasMoreResults)
+            {
+                var response = await query.ReadNextAsync();
+                results.AddRange(response.Resource);
+            }
+            return results;
+        }
+        catch (CosmosException ex) when (ex.StatusCode == System.Net.HttpStatusCode.NotFound)
+        {
+            throw new NotFoundException($"User with email {email} Not Found");
+        }
+    }
+
+    public async Task<bool> EmailExists(string email)
+    {
+        QueryDefinition sql = new QueryDefinition("SELECT * FROM c WHERE c.email=@email").WithParameter("@email", email);
+
+        var queryOption = new QueryRequestOptions { MaxItemCount = 1 };
+        var query = _container.GetItemQueryIterator<UserDataModel>(sql, requestOptions: queryOption);
+
+        while (query.HasMoreResults)
+        {
+            // the first match we have we check if its true otherwise its going to indicate to false
+            var response = await query.ReadNextAsync();
+            if (response.Resource.Any())
+                return true;
+        }
+        return false;
+    }
+
     public async Task<bool> IsFavoritedAsync(string userId, string listingId)
     {
         try
@@ -131,7 +174,7 @@ public class UserRepository : IUserRepository
         }
     }
 
-    public async Task RemoveFavoriteAsync(string userId, string listingId)
+    public async Task DeleteFavoriteAsync(string userId, string listingId)
     {
         try
         {
@@ -146,25 +189,31 @@ public class UserRepository : IUserRepository
         }
     }
 
-    public async Task RemoveUserAsync(string userId)
-    {
-        try
-        {
-            var result = await _container.DeleteItemAsync<UserDataModel>(
-                id: userId,
-                partitionKey: new PartitionKey(userId)
-            );
-        }
-        catch (CosmosException ex) when (ex.StatusCode == System.Net.HttpStatusCode.NotFound)
-        {
-            throw new NotFoundException($"user with id {userId} Not Found");
-        }
-    }
+    // public async Task DeleteUserAsync(string userId)
+    // {
+    //     try
+    //     {
+    //         var result = await _container.DeleteItemAsync<UserDataModel>(
+    //             id: userId,
+    //             partitionKey: new PartitionKey(userId)
+    //         );
+    //     }
+    //     catch (CosmosException ex) when (ex.StatusCode == System.Net.HttpStatusCode.NotFound)
+    //     {
+    //         throw new NotFoundException($"user with id {userId} Not Found");
+    //     }
+    // }
 
     public async Task<UserDataModel> UpdateUserAsync(UserDataModel updateUserDataModel)
     {
         try
         {
+            // retrieve when the user was created and add it in to keep that information otherwise its null
+            var oldUser = await GetUserByIdAsync(updateUserDataModel.Id);
+
+            updateUserDataModel.UpdatedAt = DateTime.Now;
+            updateUserDataModel.CreatedAt = oldUser.CreatedAt;
+
             var result = await _container.ReplaceItemAsync<UserDataModel>(
                 id: updateUserDataModel.Id,
                 item: updateUserDataModel,

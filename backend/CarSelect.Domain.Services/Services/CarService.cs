@@ -5,10 +5,11 @@ public class CarService : ICarService
     {
         _carRepo = carRepository;
     }
-    public async Task<CarModel> CreateCarAsync(CarModel carDataModel)
+    public async Task<CarModel> CreateCarAsync(CarModel carModel)
     {
-        carDataModel.Id = Guid.NewGuid();
-        var response = await _carRepo.CreateCarAsync(CarMapper.MapFromDomein(carDataModel));
+        carModel.Id = Guid.NewGuid();
+        var response = await _carRepo.CreateCarAsync(CarMapper.MapFromDomein(carModel));
+
         return CarMapper.MapToDomein(response);
     }
 
@@ -22,9 +23,9 @@ public class CarService : ICarService
         return cars;
     }
 
-    public async Task<IEnumerable<CarModel>> GetAllCarsByFilterAsync(CarFilter filter)
+    public async Task<IEnumerable<CarModel>> GetAllCarsByFilterAsync(CarFilterModel filter)
     {
-        var response = await _carRepo.GetAllCarsByFilterAsync(CarMapper.MapFromDomein(filter));
+        var response = await _carRepo.GetAllCarsByFilterAsync(CarFilterMapper.MapFromDomein(filter));
         List<CarModel> cars = new();
 
         foreach (CarDataModel car in response)
@@ -38,10 +39,9 @@ public class CarService : ICarService
         var result = await _carRepo.GetCarWithIdAsync(carId.ToString());
         return CarMapper.MapToDomein(result);
     }
-
-    public async Task RemoveCarAsync(Guid carId)
+    public async Task DeleteCarByIdAsync(Guid carId)
     {
-        await _carRepo.RemoveCarAsync(carId.ToString());
+        await _carRepo.DeleteCarByIdAsync(carId.ToString());
     }
 
     public async Task<CarModel> UpdateCarAsync(CarModel updateCar)

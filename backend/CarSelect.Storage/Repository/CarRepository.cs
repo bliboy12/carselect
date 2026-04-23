@@ -11,6 +11,8 @@ public class CarRepository : ICarRepository
     }
     public async Task<CarDataModel> CreateCarAsync(CarDataModel carDataModel)
     {
+        carDataModel.Id = Guid.NewGuid().ToString();
+
         var createdCar = await _container.CreateItemAsync(
             item: carDataModel,
             partitionKey: new PartitionKey(carDataModel.Id)
@@ -53,7 +55,8 @@ public class CarRepository : ICarRepository
         AddFilter(conditions, parameters, "c.model=@model", "@model", filter.Model);
         AddFilter(conditions, parameters, "c.color=@color", "@color", filter.Color);
         AddFilter(conditions, parameters, "c.trim=@trim", "@trim", filter.Trim);
-        AddFilter(conditions, parameters, "c.buildYear=@buildYear", "@buildYear", filter.BuildYear);
+        AddFilter(conditions, parameters, "c.buildYear >= @yearFrom", "@yearFrom", filter.YearFrom);
+        AddFilter(conditions, parameters, "c.buildYear <= @yearTo", "@yearTo", filter.YearTo);
         AddFilter(conditions, parameters, "c.fuel=@fuel", "@fuel", filter.Fuel);
         AddFilter(conditions, parameters, "c.transmission=@transmission", "@transmission", filter.Transmission);
         AddFilter(conditions, parameters, "c.kilometers >= @minKilometer", "@minKilometer", filter.MinKilometers);
@@ -103,7 +106,7 @@ public class CarRepository : ICarRepository
         }
     }
 
-    public async Task RemoveCarAsync(string carId)
+    public async Task DeleteCarByIdAsync(string carId)
     {
         try
         {

@@ -6,5 +6,5 @@ public interface ICarRepository
     //Task<IEnumerable<CarDataModel>> GetAllCarsWithOwnerIdAsync(int ownerId);
     Task<IEnumerable<CarDataModel>> GetAllCarsByFilterAsync(CarFilterDataModel filter);
     Task<CarDataModel> UpdateCarAsync(CarDataModel updateCar);
-    Task RemoveCarAsync(string carId);
+    Task DeleteCarByIdAsync(string carId);
 }

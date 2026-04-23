@@ -1,4 +1,5 @@
 using Microsoft.Azure.Cosmos;
+using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 
 public class ListingRepository : IListingRepository
@@ -10,17 +11,11 @@ public class ListingRepository : IListingRepository
         var client = new CosmosClient(cosmosOptions.Value.Connectionstring);
         _listingContainer = client.GetDatabase(cosmosOptions.Value.DatabaseName).GetContainer(listingOptions.Value.ContainerName);
         _favoriteContainer = client.GetDatabase(cosmosOptions.Value.DatabaseName).GetContainer(favoriteOptions.Value.ContainerName);
-
-    }
-    public Task<CarImageDataModel> AddCarImageAsync(CarImageDataModel carImageData)
-    {
-        throw new NotImplementedException();
     }
 
-    public async Task<ListingDataModel> AddListing(ListingDataModel listingData)
+    public async Task<ListingDataModel> CreateListingAsync(ListingDataModel listingData)
     {
-        // the reason for the partitionKey being SellerId is because this will be one of my more expensive Queries that I can retrieve quicker to do this.
-        // All the other expensive queries are cross-partition and can't do much to it.
+
         var createdListing = await _listingContainer.CreateItemAsync<ListingDataModel>(
             item: listingData,
             partitionKey: new PartitionKey(listingData.Id)
@@ -28,12 +23,23 @@ public class ListingRepository : IListingRepository
         return createdListing.Resource;
     }
 
-    public Task<IEnumerable<CarImageDataModel>> GetAllCarImagesByListingIdAsync(string listingId)
+    public async Task DeleteListingByIdAsync(string listingId)
     {
-        throw new NotImplementedException();
+        try
+        {
+
+            await _listingContainer.DeleteItemAsync<ListingDataModel>(
+                id: listingId,
+                partitionKey: new PartitionKey(listingId)
+            );
+        }
+        catch (CosmosException ce) when (ce.StatusCode == System.Net.HttpStatusCode.NotFound)
+        {
+            throw new NotFoundException($"listing with Id {listingId} Not Found");
+        }
     }
 
-    public async Task<IEnumerable<FavoriteDataModel>> GetAllFavoritesWithListingIdAsync(string userId, string listingId)
+    public async Task<IEnumerable<FavoriteDataModel>> GetAllFavoritesByListingIdAsync(string userId, string listingId)
     {
         var sql = new QueryDefinition($"SELECT * FROM c WHERE c.userId=@userId AND c.listingId=@listingId")
         .WithParameter("@userId", userId)
@@ -50,7 +56,7 @@ public class ListingRepository : IListingRepository
         return results;
     }
 
-    public async Task<IEnumerable<ListingDataModel>> GetAllListings()
+    public async Task<IEnumerable<ListingDataModel>> GetAllListingsAsync()
     {
         var sql = new QueryDefinition("SELECT * FROM c");
         var query = _listingContainer.GetItemQueryIterator<ListingDataModel>(sql);
@@ -66,7 +72,7 @@ public class ListingRepository : IListingRepository
         return results;
     }
 
-    public async Task<IEnumerable<ListingDataModel>> GetAllListingsBySellerId(string sellerId)
+    public async Task<IEnumerable<ListingDataModel>> GetAllListingsBySellerIdAsync(string sellerId)
     {
 
         var sql = new QueryDefinition("SELECT * FROM c WHERE c.sellerId=@sellerId").WithParameter("@sellerId", sellerId);
@@ -86,12 +92,7 @@ public class ListingRepository : IListingRepository
 
     }
 
-    public Task<CarImageDataModel?> GetFirstCarImageByListingIdAsync(string listingId)
-    {
-        throw new NotImplementedException();
-    }
-
-    public async Task<ListingDataModel> GetListingById(string listingId)
+    public async Task<ListingDataModel> GetListingByIdAsync(string listingId)
     {
         try
         {
@@ -108,14 +109,23 @@ public class ListingRepository : IListingRepository
         }
     }
 
-
-    public Task RemoveCarImageAsync(string carImageId)
+    public async Task<ListingDataModel> UpdateListingAsync(ListingDataModel listing)
     {
-        throw new NotImplementedException();
-    }
+        try
+        {
+            listing.UpdatedAt = DateTime.Now;
 
-    public Task<CarImageDataModel> UpdateCarImageAsync(CarImageDataModel carImageData)
-    {
-        throw new NotImplementedException();
+            var result = await _listingContainer.ReplaceItemAsync<ListingDataModel>(
+                id: listing.Id,
+                item: listing,
+                partitionKey: new PartitionKey(listing.Id)
+            );
+
+            return result.Resource;
+        }
+        catch (CosmosException ce) when (ce.StatusCode == System.Net.HttpStatusCode.NotFound)
+        {
+            throw new NotFoundException($"Listing with Id {listing.Id} Not Found");
+        }
     }
 }
