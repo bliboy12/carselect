@@ -17,14 +17,15 @@ const BrandPanel = () => {
 
       {/* Content sits on top */}
       <div className="relative z-10">
-        <p className="text-blue-500 font-semibold text-sm">● AutoSelect</p>
+        <p className="text-blue-500 font-semibold text-sm">● CarSelect</p>
         <div className="mt-6">
           <h2 className="text-4xl font-bold text-white leading-tight">
-            Koop en verkoop <span className="text-blue-400">slimmer</span>
+            buy and sell <span className="text-blue-400">smarter</span>
           </h2>
           <p className="text-gray-400 mt-4 text-sm leading-relaxed">
-            Toegang tot duizenden listings. Betaal veilig via Stripe. Sla
-            je favorieten op en bekijk je volledige aankoophistorie.
+            Access to thousands of listings. Pay safely through Strip.
+            Save your favorites and inspect your entire purchase history
+
           </p>
         </div>
       </div>

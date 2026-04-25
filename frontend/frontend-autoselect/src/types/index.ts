@@ -26,7 +26,8 @@ export interface Listing {
     sellerId: string,
     carId: string,
     price: number,
-    listedDate: string,
+    createdAt: string,
+    updatedAt: string,
     status: "active" | "sold" | "removed"
 }
 
