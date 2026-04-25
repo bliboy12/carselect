@@ -36,4 +36,13 @@ public class UserApiMapper
             IsAdmin = false
         };
     }
+    public static SellerResponseContract MapToContract(UserModel userModel)
+    {
+        return new SellerResponseContract
+        {
+            Id = userModel.Id,
+            FirstName = userModel.FirstName,
+            LastName = userModel.LastName
+        };
+    }
 }

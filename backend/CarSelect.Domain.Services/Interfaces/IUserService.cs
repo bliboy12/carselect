@@ -11,7 +11,7 @@ public interface IUserService
     Task RemoveUserAsync(Guid userId);
 
     // Favorites
-    Task<FavoriteModel> AddFavoriteAsync(FavoriteModel favoriteData);
+    Task<FavoriteModel> CreateFavoriteAsync(FavoriteModel favoriteData);
     Task<IEnumerable<FavoriteModel>> GetAllFavoritesByUserIdAsync(Guid userId);
     Task<bool> IsFavoritedAsync(Guid userId, Guid listingId); // Does a certain favorite exist
     Task RemoveFavoriteAsync(Guid userId, Guid listingId);

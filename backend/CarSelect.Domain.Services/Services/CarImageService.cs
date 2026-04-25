@@ -69,6 +69,7 @@ public class CarImageService : ICarImageService
     {
         // 1) we get the the Car Image object to able to find the URL we need to delete from the blob
         var carImage = await _carImageRepo.GetCarImageByIdAsync(listingId.ToString(), carImageId.ToString());
+
         if (carImage is null)
             throw new NotFoundException($"carImage with Id {carImageId.ToString()} Not Found");
 
@@ -87,5 +88,54 @@ public class CarImageService : ICarImageService
             await _blobStorageRepo.DeleteImageAsync(carImage.ImageUrl);
             await _carImageRepo.DeleteCarImageByIdAsync(listingId.ToString(), carImage.Id.ToString());
         }
+    }
+
+    public async Task<IEnumerable<CarImageModel>> GetMainImagesOfAllListingsAsync()
+    {
+        var results = await _carImageRepo.GetMainImagesOfAllListingsAsync();
+        List<CarImageModel> carImages = new();
+
+        foreach (CarImageDataModel carImage in results)
+            carImages.Add(CarImageMapper.MapToDomein(carImage));
+
+        return carImages;
+    }
+    public async Task<CarImageModel?> GetFirstImageByListingId(Guid listingId)
+    {
+        var result = await _carImageRepo.GetMainImageByListingId(listingId.ToString());
+        if (result == null)
+            return null;
+
+        return CarImageMapper.MapToDomein(result);
+    }
+
+    public async Task<CarImageModel> SetMainImageAsync(Guid listingId, Guid carImageId)
+    {
+        // we get the full data of the new carImage that we want to make isMainImage=true to 
+        var getNewMain = await _carImageRepo.GetCarImageByIdAsync(listingId.ToString(), carImageId.ToString());
+        CarImageModel newMainImage = CarImageMapper.MapToDomein(getNewMain);
+
+        if (newMainImage.IsMainImage)
+            return newMainImage;
+
+        // we also get the old carImage that was the MainImage to turn back to false
+        // we can't have 2 images be the mainImage.
+        var currentMainImage = await _carImageRepo.GetMainImageByListingId(listingId.ToString());
+
+        newMainImage.IsMainImage = true;
+
+        // If there didn't exist a carImage that wasn't a mainImage we make the new CarImage the mainImage
+        if (currentMainImage == null)
+        {
+            var resultNoMainImage = await _carImageRepo.UpdateCarImage(CarImageMapper.MapFromDomein(newMainImage));
+            return CarImageMapper.MapToDomein(resultNoMainImage);
+        }
+
+        CarImageModel currentCarImageMain = CarImageMapper.MapToDomein(currentMainImage);
+        currentCarImageMain.IsMainImage = false;
+        // if a mainImage already existed then we run a Transactional Batch to perform both updating the newMainImage and turning the old Main Image off (through updating)
+        var result = await _carImageRepo.SetMainImageAsync(CarImageMapper.MapFromDomein(newMainImage), CarImageMapper.MapFromDomein(currentCarImageMain));
+
+        return CarImageMapper.MapToDomein(result);
     }
 }

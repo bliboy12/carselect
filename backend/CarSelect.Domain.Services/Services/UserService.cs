@@ -5,14 +5,18 @@ public class UserService : IUserService
     {
         _repo = repo;
     }
-    public async Task<FavoriteModel> AddFavoriteAsync(FavoriteModel favoriteData)
+    public async Task<FavoriteModel> CreateFavoriteAsync(FavoriteModel favoriteData)
     {
-        var result = await _repo.AddFavoriteAsync(FavoriteMapper.MapFromDomein(favoriteData));
+        var result = await _repo.CreateFavoriteAsync(FavoriteMapper.MapFromDomein(favoriteData));
         return FavoriteMapper.MapToDomein(result);
     }
 
     public async Task<UserModel> CreateUserAsync(UserModel userDataModel)
     {
+        // Needs to be handled without throwing an exception!!
+        if (await EmailExists(userDataModel.Email))
+            throw new ArgumentException("Email Already Exists");
+
         var result = await _repo.CreateUserAsync(UserMapper.MapFromDomein(userDataModel));
         return UserMapper.MapToDomein(result);
     }

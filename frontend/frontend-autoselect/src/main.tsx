@@ -6,7 +6,7 @@ import RootLayout from './Layout/RootLayout.tsx'
 import LoginPage from './pages/LoginPage.tsx'
 import RegisterPage from './pages/RegisterPage.tsx'
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
-import CarsPage from './pages/CarsPage.tsx'
+import HomePage from './pages/HomePage.tsx'
 
 const query = new QueryClient();
 
@@ -15,16 +15,16 @@ const router = createBrowserRouter([
     element: <RootLayout/>,
     children: [
       {
+        element: <HomePage/>,
+        path: "/"
+      },
+      {
         element: <LoginPage/>,
         path: "/login"
       },
       {
         element: <RegisterPage/>,
         path: "/register"
-      },
-      {
-        element: <CarsPage/>,
-        path: "/cars"
       }
     ]
   }

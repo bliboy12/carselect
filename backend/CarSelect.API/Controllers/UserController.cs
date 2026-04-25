@@ -12,8 +12,15 @@ public class UserController : ControllerBase
     [HttpPost]
     public async Task<ActionResult<UserResponseContract>> CreateUserAsync([FromBody] UserRequestContract userRequest)
     {
-        var request = await _service.CreateUserAsync(UserApiMapper.MapToDomein(userRequest));
-        return UserApiMapper.MapToResponse(request);
+        try
+        {
+            var request = await _service.CreateUserAsync(UserApiMapper.MapToDomein(userRequest));
+            return UserApiMapper.MapToResponse(request);
+        }
+        catch (ArgumentException)
+        {
+            return BadRequest("Email Already Exists");
+        }
     }
     [HttpGet("{id}")]
     public async Task<ActionResult<UserResponseContract>> GetUserByIdAsync([FromRoute] Guid id)
@@ -83,4 +90,20 @@ public class UserController : ControllerBase
 
         return Ok(results);
     }
+    // WIP: when creating new favorite, we already have the userId, we just need listingId provided by the user.
+    // Seperate CreateFavoriteRequestContract or just [Frombody] Guid listingId ??
+    [HttpPost("{userId}/favorites")]
+    public async Task<ActionResult<FavoriteReponseContract>> CreateFavorite([FromBody] FavoriteRequestContract favoriteRequest)
+    {
+        var response = await _service.CreateFavoriteAsync(FavoriteApiMapper.MapToDomain(favoriteRequest));
+
+        return Ok(FavoriteApiMapper.MapToContract(response));
+    }
+
+    // WIP
+    // [HttpGet("{userId}/favorites")]
+    // public async Task<ActionResult<IEnumerable<FavoriteReponseContract>>> GetAllFavorites([FromRoute] Guid userId)
+    // {
+
+    // }
 }

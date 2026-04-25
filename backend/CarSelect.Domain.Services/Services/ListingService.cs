@@ -3,11 +3,13 @@ public class ListingService : IListingService
     private readonly ICarService _carService;
     private readonly IListingRepository _listingRepo;
     private readonly ICarImageService _carImageSerivce;
-    public ListingService(IListingRepository listingRepository, ICarImageService carImageService, ICarService carService)
+    private readonly IUserService _userService;
+    public ListingService(IListingRepository listingRepository, ICarImageService carImageService, ICarService carService, IUserService userService)
     {
         _listingRepo = listingRepository;
         _carImageSerivce = carImageService;
         _carService = carService;
+        _userService = userService;
     }
 
     public async Task<ListingModel> CreateListingAsync(ListingModel listingModel)
@@ -59,7 +61,23 @@ public class ListingService : IListingService
         List<ListingModel> listings = new();
 
         foreach (ListingDataModel listing in results)
-            listings.Add(ListingMapper.MapToDomein(listing));
+        {
+            ListingModel listingModel = ListingMapper.MapToDomein(listing);
+
+            // var sellerTask = _userService.GetUserByIdAsync(listingModel.SellerId);
+            // var carTask = _carService.GetCarWithIdAsync(listingModel.CarId);
+            // var carImageTask = _carImageSerivce.GetAllCarImagesByListingIdAsync(listingModel.Id);
+
+            // // Creates a task that will complete when all of the supplied tasks have completed
+            // await Task.WhenAll(sellerTask, carTask, carImageTask);
+
+            // // We await to ensure that we don't try to assign before we have received a response
+            // listingModel.Car = await carTask;
+            // listingModel.Seller = await sellerTask;
+            // listingModel.CarImages = await carImageTask;
+
+            listings.Add(listingModel);
+        }
 
         return listings;
     }
@@ -70,8 +88,24 @@ public class ListingService : IListingService
         List<ListingModel> listings = new();
 
         foreach (ListingDataModel listing in results)
-            listings.Add(ListingMapper.MapToDomein(listing));
+        {
+            ListingModel listingModel = ListingMapper.MapToDomein(listing);
 
+            var sellerTask = _userService.GetUserByIdAsync(listingModel.SellerId);
+            var carTask = _carService.GetCarWithIdAsync(listingModel.CarId);
+            var carImageTask = _carImageSerivce.GetAllCarImagesByListingIdAsync(listingModel.Id);
+
+            // Creates a task that will complete when all of the supplied tasks have completed
+            await Task.WhenAll(sellerTask, carTask, carImageTask);
+
+            // We await to ensure that we don't try to assign before we have received a response
+            listingModel.Car = await carTask;
+            listingModel.Seller = await sellerTask;
+            listingModel.CarImages = await carImageTask;
+
+            listings.Add(listingModel);
+
+        }
         return listings;
     }
 
@@ -79,7 +113,24 @@ public class ListingService : IListingService
     {
         var result = await _listingRepo.GetListingByIdAsync(listingId.ToString());
 
-        return ListingMapper.MapToDomein(result);
+        // The "n+1" problem ==> this is a problem when its a big catalog where you fetch for example:
+        // 20 listings -- which means --> +20 users, + +20 sellers, (+20 carImages * n, because could be multiple carimages)
+        // which results in a lot of calls. 
+        ListingModel listingModel = ListingMapper.MapToDomein(result);
+
+        var sellerTask = _userService.GetUserByIdAsync(listingModel.SellerId);
+        var carTask = _carService.GetCarWithIdAsync(listingModel.CarId);
+        var carImageTask = _carImageSerivce.GetAllCarImagesByListingIdAsync(listingId);
+
+        // Creates a task that will complete when all of the supplied tasks have completed
+        await Task.WhenAll(sellerTask, carTask, carImageTask);
+
+        // We await to ensure that we don't try to get until they have finished
+        listingModel.Car = await carTask;
+        listingModel.Seller = await sellerTask;
+        listingModel.CarImages = await carImageTask;
+
+        return listingModel;
     }
 
     public async Task<ListingModel> UpdateListingAsync(ListingModel listingModel)
