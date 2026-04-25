@@ -5,12 +5,13 @@ public class ListingApiMapper
         return new ListingResponseContract
         {
             Id = listingModel.Id,
-            SellerId = listingModel.SellerId,
-            CarId = listingModel.CarId,
+            Seller = UserApiMapper.MapToContract(listingModel.Seller),
+            Car = CarApiMapper.MapToContract(listingModel.Car),
             Price = listingModel.Price,
             CreatedAt = listingModel.CreatedAt,
             UpdatedAt = listingModel.UpdatedAt,
             Status = listingModel.Status.ToString(),
+            CarImages = listingModel.CarImages.Select(c => CarImageApiMapper.MapToContract(c))
         };
     }
     public static ListingModel MapToDomein(ListingResponseContract listingResponse)
@@ -18,8 +19,8 @@ public class ListingApiMapper
         return new ListingModel
         {
             Id = listingResponse.Id,
-            SellerId = listingResponse.SellerId,
-            CarId = listingResponse.CarId,
+            SellerId = listingResponse.Seller.Id,
+            CarId = listingResponse.Car.Id,
             Price = listingResponse.Price,
             CreatedAt = listingResponse.CreatedAt,
             UpdatedAt = listingResponse.UpdatedAt,

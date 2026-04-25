@@ -8,7 +8,7 @@ public class ListingModel
     public DateTime CreatedAt { get; set; }
     public DateTime UpdatedAt { get; set; }
     public ListingStatus Status { get; set; }
-    public UserModel? Seller { get; set; } = null!;
+    public UserModel Seller { get; set; } = new();
 
-    public List<CarImageModel> CarImages { get; set; } = new();
+    public IEnumerable<CarImageModel> CarImages { get; set; } = [];
 }

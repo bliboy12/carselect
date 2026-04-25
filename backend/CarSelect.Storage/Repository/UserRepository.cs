@@ -9,7 +9,7 @@ public class UserRepository : IUserRepository
         var client = new CosmosClient(cosmosOptions.Value.Connectionstring);
         _container = client.GetDatabase(cosmosOptions.Value.DatabaseName).GetContainer(userOptions.Value.ContainerName);
     }
-    public async Task<FavoriteDataModel> AddFavoriteAsync(FavoriteDataModel favoriteData)
+    public async Task<FavoriteDataModel> CreateFavoriteAsync(FavoriteDataModel favoriteData)
     {
         var createdFavorite = await _container.CreateItemAsync<FavoriteDataModel>(
             item: favoriteData,

@@ -24,6 +24,18 @@ public class ListingController : ControllerBase
         return Ok(listings);
     }
 
+    [HttpGet("mainImages")]
+    public async Task<ActionResult<CarImageResponseContract>> GetMainImagesOfAllListingsAsync()
+    {
+        var results = await _carImageService.GetMainImagesOfAllListingsAsync();
+        List<CarImageResponseContract> carImages = new();
+
+        foreach (CarImageModel carImage in results)
+            carImages.Add(CarImageApiMapper.MapToContract(carImage));
+
+        return Ok(carImages);
+    }
+
     [HttpGet("{listingId}")]
     public async Task<ActionResult<ListingResponseContract>> GetListingByIdAsync([FromRoute] Guid listingId)
     {
@@ -91,6 +103,7 @@ public class ListingController : ControllerBase
             return NotFound(nfe.Message);
         }
     }
+
     [HttpPost("{listingId}/images")]
     public async Task<ActionResult<IEnumerable<CarImageResponseContract>>> CreateCarImageAsync([FromRoute] Guid listingId, [FromForm] IEnumerable<IFormFile> files)
     {
@@ -109,6 +122,14 @@ public class ListingController : ControllerBase
         }
         return Ok(carImages);
     }
+    [HttpPut("{listingId}/images/{imageId}")]
+    public async Task<ActionResult<CarImageResponseContract>> UpdateCarImageToMainImage([FromRoute] Guid listingId, [FromRoute] Guid imageId)
+    {
+        var result = await _carImageService.SetMainImageAsync(listingId, imageId);
+
+        return CarImageApiMapper.MapToContract(result);
+    }
+
     [HttpDelete("{listingId}/images/{imageId}")]
     public async Task<ActionResult> DeleteCarImageByIdAsync([FromRoute] Guid listingId, [FromRoute] Guid imageId)
     {

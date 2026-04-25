@@ -13,7 +13,7 @@ public interface IUserRepository
     //Task DeleteUserAsync(string userId);
 
     // Favorites
-    Task<FavoriteDataModel> AddFavoriteAsync(FavoriteDataModel favoriteData);
+    Task<FavoriteDataModel> CreateFavoriteAsync(FavoriteDataModel favoriteData);
     Task<IEnumerable<FavoriteDataModel>> GetAllFavoritesByUserIdAsync(string userId);
     Task<bool> IsFavoritedAsync(string userId, string listingId); // Does a certain favorite exist
     Task DeleteFavoriteAsync(string userId, string listingId);

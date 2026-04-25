@@ -27,7 +27,6 @@ public class ListingRepository : IListingRepository
     {
         try
         {
-
             await _listingContainer.DeleteItemAsync<ListingDataModel>(
                 id: listingId,
                 partitionKey: new PartitionKey(listingId)

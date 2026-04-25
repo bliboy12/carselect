@@ -3,6 +3,14 @@ using System.Text.Json.Serialization;
 
 var builder = WebApplication.CreateBuilder(args);
 
+builder.Services.AddCors(options =>
+    options.AddPolicy("AllowFrontend", policy =>
+    {
+        policy.WithOrigins("http://localhost:5173")
+        .AllowAnyHeader()
+        .AllowAnyMethod();
+    })
+);
 builder.Services.Configure<CarImageRepositoryOptions>(
     builder.Configuration.GetSection("CarImageRepositoryOptions")
 );
@@ -63,6 +71,7 @@ builder.Services.AddControllers().AddJsonOptions(options => options.JsonSerializ
 var app = builder.Build();
 
 app.UseRouting();
+app.UseCors("AllowFrontend");
 app.MapControllers();
 
 app.MapGet("/", () => "Hello World!");
