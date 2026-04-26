@@ -90,7 +90,7 @@ public class CarRepository : ICarRepository
     //     throw new NotImplementedException();
     // }
 
-    public async Task<CarDataModel> GetCarWithIdAsync(string carId)
+    public async Task<CarDataModel> GetCarByIdAsync(string carId)
     {
         try
         {
@@ -105,7 +105,6 @@ public class CarRepository : ICarRepository
             throw new NotFoundException($"car with Id {carId} Not Found");
         }
     }
-
     public async Task DeleteCarByIdAsync(string carId)
     {
         try
@@ -117,7 +116,7 @@ public class CarRepository : ICarRepository
         }
         catch (CosmosException)
         {
-            throw new NotFoundException($"Car with id {carId} was not found");
+            throw new NotFoundException($"Car with id {carId} Not Found");
         }
     }
 

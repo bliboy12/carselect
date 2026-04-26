@@ -28,7 +28,13 @@ public class ListingService : IListingService
             listingModel.UpdatedAt = listingModel.CreatedAt;
 
             var listingResult = await _listingRepo.CreateListingAsync(ListingMapper.MapFromDomein(listingModel));
-            return ListingMapper.MapToDomein(listingResult);
+            var userResult = await _userService.GetUserByIdAsync(listingModel.SellerId);
+
+            ListingModel listingData = ListingMapper.MapToDomein(listingResult);
+            listingData.Car = carResult;
+            listingData.Seller = userResult;
+
+            return listingData;
         }
         catch (Exception ex)
         {
@@ -40,7 +46,14 @@ public class ListingService : IListingService
 
     public async Task DeletelistingById(Guid listingId)
     {
+        // We get the car ID from this listing AND delete it
+        ListingModel listingModel = await GetListingByIdAsync(listingId);
+        await _carService.DeleteCarByIdAsync(listingModel.CarId);
+
+        // Remove all the images associated with the listingId
         await _carImageSerivce.DeleteAllImagesByListingIdAsync(listingId);
+
+        // After deleting the car images, the listing needs to be deleted
         await _listingRepo.DeleteListingByIdAsync(listingId.ToString());
     }
 
@@ -58,28 +71,30 @@ public class ListingService : IListingService
     public async Task<IEnumerable<ListingModel>> GetAllListingsAsync()
     {
         var results = await _listingRepo.GetAllListingsAsync();
-        List<ListingModel> listings = new();
 
-        foreach (ListingDataModel listing in results)
+        // Going through each listing in results in async way
+        IEnumerable<Task<ListingModel>> listingTasks = results.Select(async listing =>
         {
             ListingModel listingModel = ListingMapper.MapToDomein(listing);
 
-            // var sellerTask = _userService.GetUserByIdAsync(listingModel.SellerId);
-            // var carTask = _carService.GetCarWithIdAsync(listingModel.CarId);
-            // var carImageTask = _carImageSerivce.GetAllCarImagesByListingIdAsync(listingModel.Id);
+            var sellerTask = _userService.GetUserByIdAsync(listingModel.SellerId);
+            var carTask = _carService.GetCarByIdAsync(listingModel.CarId);
+            var carImageTask = _carImageSerivce.GetAllCarImagesByListingIdAsync(listingModel.Id);
 
-            // // Creates a task that will complete when all of the supplied tasks have completed
-            // await Task.WhenAll(sellerTask, carTask, carImageTask);
+            // Creates a task that will complete when all of the supplied tasks have completed
+            await Task.WhenAll(sellerTask, carTask, carImageTask);
 
-            // // We await to ensure that we don't try to assign before we have received a response
-            // listingModel.Car = await carTask;
-            // listingModel.Seller = await sellerTask;
-            // listingModel.CarImages = await carImageTask;
+            // We await to ensure that we don't try to assign before we have received a response
+            listingModel.Car = await carTask;
+            listingModel.Seller = await sellerTask;
+            listingModel.CarImages = await carImageTask;
 
-            listings.Add(listingModel);
-        }
-
-        return listings;
+            return listingModel;
+        });
+        // then we tell it to complete the task of listingTasks which holds all the looped over tasks, in one go.
+        // making a DB call in one go, so if there is 60 listings that would mean 60 DB calls
+        // Which isn't good, need to be changed!!
+        return await Task.WhenAll(listingTasks);
     }
 
     public async Task<IEnumerable<ListingModel>> GetAllListingsBySellerIdAsync(Guid sellerId)
@@ -92,7 +107,7 @@ public class ListingService : IListingService
             ListingModel listingModel = ListingMapper.MapToDomein(listing);
 
             var sellerTask = _userService.GetUserByIdAsync(listingModel.SellerId);
-            var carTask = _carService.GetCarWithIdAsync(listingModel.CarId);
+            var carTask = _carService.GetCarByIdAsync(listingModel.CarId);
             var carImageTask = _carImageSerivce.GetAllCarImagesByListingIdAsync(listingModel.Id);
 
             // Creates a task that will complete when all of the supplied tasks have completed
@@ -112,14 +127,14 @@ public class ListingService : IListingService
     public async Task<ListingModel> GetListingByIdAsync(Guid listingId)
     {
         var result = await _listingRepo.GetListingByIdAsync(listingId.ToString());
+        ListingModel listingModel = ListingMapper.MapToDomein(result);
 
         // The "n+1" problem ==> this is a problem when its a big catalog where you fetch for example:
         // 20 listings -- which means --> +20 users, + +20 sellers, (+20 carImages * n, because could be multiple carimages)
         // which results in a lot of calls. 
-        ListingModel listingModel = ListingMapper.MapToDomein(result);
 
+        var carTask = _carService.GetCarByIdAsync(listingModel.CarId);
         var sellerTask = _userService.GetUserByIdAsync(listingModel.SellerId);
-        var carTask = _carService.GetCarWithIdAsync(listingModel.CarId);
         var carImageTask = _carImageSerivce.GetAllCarImagesByListingIdAsync(listingId);
 
         // Creates a task that will complete when all of the supplied tasks have completed

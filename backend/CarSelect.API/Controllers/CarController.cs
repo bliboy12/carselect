@@ -27,7 +27,7 @@ public class CarController : ControllerBase
     {
         try
         {
-            var result = await _service.GetCarWithIdAsync(id);
+            var result = await _service.GetCarByIdAsync(id);
             return Ok(CarApiMapper.MapToContract(result));
         }
         catch (NotFoundException nfe)
@@ -63,10 +63,11 @@ public class CarController : ControllerBase
 
     // Car can't have a endpoint to delete on its own. If a car needs to be deleted, you'll have to delete the listing associated with it.
     // So only in listing can a car+listing be deleted.
-    // [HttpDelete("{id}")]
-    // public async Task<ActionResult> DeleteCarByIdAsync([FromRoute] Guid id)
-    // {
-    //     await _service.DeleteCarByIdAsync(id);
-    //     return Ok();
-    // }
+    // ONLY  FOR DEVELOPMENT !!!!!
+    [HttpDelete("{id}")]
+    public async Task<ActionResult> DeleteCarByIdAsync([FromRoute] Guid id)
+    {
+        await _service.DeleteCarByIdAsync(id);
+        return Ok();
+    }
 }
