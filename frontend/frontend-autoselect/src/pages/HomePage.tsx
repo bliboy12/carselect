@@ -1,35 +1,34 @@
 import { axiosCars, axiosListings } from "../api/CarSelectApi";
 import { useQuery } from "@tanstack/react-query";
-import { type CarInfo, type Listing } from "../types";
+import { type CarImage, type CarInfo, type Listing } from "../types";
+import ListingCard from "../components/Listings/ListingCard";
 
 interface listingInfoProps {
     listings: Listing[],
 }
 
+interface listingCardProp {
+    listing: Listing,
+    car: CarInfo,
+    carImages: CarImage
+}
 
 const HomePage = () => {
 
-    const {data} = useQuery({
+    const { data } = useQuery({
         queryKey: ["GetAllListings"],
         queryFn: async () => {
-            return await axiosListings.get<Listing[]>("/")}
-    })
-    const result = data?.data[0];
-
-    const carData = useQuery({
-        queryKey: ["GetAllCars", result?.carId],
-        queryFn: async () => {
-            return await axiosCars.get<CarInfo>(`/${result?.carId}`);
+            return await axiosListings.get<Listing[]>("/")
         },
-        enabled: !!result?.carId
+        refetchOnWindowFocus: false,
     })
 
-    const car = carData.data?.data;
-    console.log(`ID: ${result?.id }, carId: ${result?.carId}, CreatedAt: ${result?.createdAt}`);
-    console.log(`\nBrand: ${car?.brand}, Model: ${car?.model}, Trim: ${car?.trim}, Color: ${car?.color}, Buildyear: ${car?.buildYear}, Transmission: ${car?.transmission}, Drive: ${car?.drive}`);
+    const listings = data?.data;
+
+
     return (
         <div>
-            <p>Test case</p>
+            {listings?.map((listing) => (<ListingCard key={listing.id} listing={listing} />))}
         </div>
     );
 }

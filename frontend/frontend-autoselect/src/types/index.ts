@@ -10,6 +10,7 @@ export interface CarInfo {
     kilometers: number,
     doors: number,
     drive: "fwd" | "rwd" | "awd" | "4wd"
+
 }
 
 export interface User {
@@ -23,12 +24,13 @@ export interface User {
 
 export interface Listing {
     id: string,
-    sellerId: string,
-    carId: string,
+    seller: Seller,
+    car: CarInfo,
     price: number,
     createdAt: string,
     updatedAt: string,
     status: "active" | "sold" | "removed"
+    carImages: CarImage[]
 }
 
 export interface Reviews {
@@ -43,10 +45,16 @@ export interface Reviews {
 export interface CarImage {
     id: string,
     listingId: string,
-    imageUrl: string
+    imageUrl: string,
+    isMainImage: boolean
 }
 
 export interface Favorites {
     userId: string,
     listingId: string
 }
+
+export interface Seller {
+    firstName: string,
+    lastName: string
+};

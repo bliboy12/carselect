@@ -1,20 +1,24 @@
-import type { CarImage, CarInfo, Listing } from "../../types";
+import type { Listing } from "../../types";
+import bmw from "../../assets/bmw-x5.png";
 
 
 interface listingCardProp {
-    listing: Listing,
-    car: CarInfo,
-    carImage: CarImage
-}
+    listing: Listing
+};
 
-const ListingCard = ({listing, car, carImage}: listingCardProp) => {
+const ListingCard = ({ listing }: listingCardProp) => {
 
+    const { car, carImages, status, price } = listing;
+
+    const carImage = carImages.find(c => c.isMainImage == true);
+
+    // CarImage is hardcoded, needs to be replaced!
     return (
         <div className="group bg-gray-900 border border-gray-800 rounded-2xl overflow-hidden hover:border-gray-600 hover:shadow-xl hover:shadow-black/40 transition-all duration-200 cursor-pointer">
             <div className="relative aspect-video bg-gray-800 overflow-hidden">
-                <img src={carImage.imageUrl}/>
+                <img src={carImage?.imageUrl} className="w-full h-full object-cover " />
                 {/* Sold overlay */}
-                {listing.status === "sold" && (
+                {status === "sold" && (
                     <div className="absolute inset-0 bg-gray-950/75 flex items-center justify-center">
                         <span className="bg-gray-800 text-gray-300 text-xs font-semibold px-4 py-1.5 rounded-full border border-gray-600 tracking-wide uppercase">
                             Sold
@@ -26,19 +30,19 @@ const ListingCard = ({listing, car, carImage}: listingCardProp) => {
             <div className="p-5 flex flex-col gap-4">
                 <div>
                     <div>
-                        <h3>{car.brand} {car.model}</h3>
-                        <p>{car.trim} {car.buildYear}</p>
+                        <h3>{car.brand}{" "}{car.model}</h3>
+                        <p>{car.trim}{" "}{car.buildYear}</p>
                     </div>
-                    <span>{listing.price}</span>
+                    <span>{price}</span>
                 </div>
-                <br/>
+                <br />
                 <div>
-                    <span>{car.kilometers}</span>
-                    <span>{car.fuel}</span>
-                    <span>{car.transmission}</span>
-                    <span>{car.doors}</span>
+                    <span>{car.kilometers}{" "}</span>
+                    <span>{car.fuel}{" "}</span>
+                    <span>{car.transmission}{" "}</span>
+                    <span>{car.doors}{" "}</span>
                 </div>
-            </div> 
+            </div>
         </div>
     );
 }
