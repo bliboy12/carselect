@@ -34,11 +34,12 @@ public class CarService : ICarService
         return cars;
     }
 
-    public async Task<CarModel> GetCarWithIdAsync(Guid carId)
+    public async Task<CarModel> GetCarByIdAsync(Guid carId)
     {
-        var result = await _carRepo.GetCarWithIdAsync(carId.ToString());
+        var result = await _carRepo.GetCarByIdAsync(carId.ToString());
         return CarMapper.MapToDomein(result);
     }
+
     public async Task DeleteCarByIdAsync(Guid carId)
     {
         await _carRepo.DeleteCarByIdAsync(carId.ToString());

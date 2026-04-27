@@ -12,18 +12,18 @@ const query = new QueryClient();
 
 const router = createBrowserRouter([
   {
-    element: <RootLayout/>,
+    element: <RootLayout />,
     children: [
       {
-        element: <HomePage/>,
+        element: <HomePage />,
         path: "/"
       },
       {
-        element: <LoginPage/>,
+        element: <LoginPage />,
         path: "/login"
       },
       {
-        element: <RegisterPage/>,
+        element: <RegisterPage />,
         path: "/register"
       }
     ]
@@ -33,7 +33,7 @@ const router = createBrowserRouter([
 createRoot(document.getElementById('root')!).render(
   <StrictMode>
     <QueryClientProvider client={query}>
-      <RouterProvider router={router}/>
+      <RouterProvider router={router} />
     </QueryClientProvider>
   </StrictMode>,
 )

@@ -85,8 +85,10 @@ public class CarImageService : ICarImageService
 
         foreach (CarImageModel carImage in getAllImages)
         {
+            Console.WriteLine($"---------------------- carImage Id: {carImage.Id} ---------- listingId: {carImage.ListingId} ");
             await _blobStorageRepo.DeleteImageAsync(carImage.ImageUrl);
             await _carImageRepo.DeleteCarImageByIdAsync(listingId.ToString(), carImage.Id.ToString());
+            Console.WriteLine($"DELETING SUCCESS  --- {carImage.Id}");
         }
     }
 

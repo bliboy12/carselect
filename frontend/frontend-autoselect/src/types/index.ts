@@ -10,6 +10,7 @@ export interface CarInfo {
     kilometers: number,
     doors: number,
     drive: "fwd" | "rwd" | "awd" | "4wd"
+
 }
 
 export interface User {

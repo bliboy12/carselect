@@ -3,6 +3,11 @@ import { useQuery } from "@tanstack/react-query";
 import { type CarInfo, type Listing } from "../types";
 import ListingCard from "../components/Listings/ListingCard";
 
+interface listingCardProp {
+    listing: Listing,
+    car: CarInfo,
+    carImages: CarImage
+}
 
 const HomePage = () => {
 

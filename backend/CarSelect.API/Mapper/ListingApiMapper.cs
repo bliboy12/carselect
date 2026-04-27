@@ -32,7 +32,6 @@ public class ListingApiMapper
         return new ListingModel
         {
             SellerId = listingRequest.SellerId,
-
             CarId = listingRequest.CarId,
             Price = listingRequest.Price,
             Status = (ListingStatus)listingRequest.Status,
