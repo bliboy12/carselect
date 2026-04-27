@@ -49,7 +49,7 @@ public class CarController : ControllerBase
     public async Task<ActionResult<CarResponseContract>> CreateCarAsync([FromBody] CarRequestContract carRequest)
     {
         var result = await _service.CreateCarAsync(CarApiMapper.MapToDomein(carRequest));
-        return Ok(CarApiMapper.MapToContract(result));
+        return CreatedAtAction("CreatedCar", CarApiMapper.MapToContract(result));
     }
     [HttpPut("{id}")]
     public async Task<ActionResult<CarResponseContract>> UpdateCarASync([FromRoute] Guid id, [FromBody] CarRequestContract updateCarRequest)

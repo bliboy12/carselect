@@ -15,7 +15,7 @@ public class UserController : ControllerBase
         try
         {
             var request = await _service.CreateUserAsync(UserApiMapper.MapToDomein(userRequest));
-            return UserApiMapper.MapToResponse(request);
+            return CreatedAtAction("CreateUser", UserApiMapper.MapToResponse(request));
         }
         catch (ArgumentException)
         {
