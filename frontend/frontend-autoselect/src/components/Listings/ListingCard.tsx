@@ -1,18 +1,20 @@
 import type { CarImage, CarInfo, Listing } from "../../types";
-
+import vehicle from "../../assets/car.jpg"
 
 interface listingCardProp {
     listing: Listing,
-    car: CarInfo,
-    carImage: CarImage
 }
 
-const ListingCard = ({listing, car, carImage}: listingCardProp) => {
+const ListingCard = (prop: listingCardProp) => {
+
+    const {listing} = prop;
+    const {car, user, carImages} = listing;
+    //const mainImage = carImages.find((c) => c.isMainImage === true);
 
     return (
-        <div className="group bg-gray-900 border border-gray-800 rounded-2xl overflow-hidden hover:border-gray-600 hover:shadow-xl hover:shadow-black/40 transition-all duration-200 cursor-pointer">
-            <div className="relative aspect-video bg-gray-800 overflow-hidden">
-                <img src={carImage.imageUrl}/>
+        <div className="group bg-gray-900 border border-gray-800 rounded-2xl overflow-hidden hover:border-gray-600 hover:shadow-xl hover:shadow-black/40 transition-all duration-200 cursor-pointer ">
+            <div className="relative aspect-4/3 bg-gray-800 overflow-hidden">
+                <img src={vehicle} className="w-full h-full object-cover"/>
                 {/* Sold overlay */}
                 {listing.status === "sold" && (
                     <div className="absolute inset-0 bg-gray-950/75 flex items-center justify-center">
@@ -25,8 +27,8 @@ const ListingCard = ({listing, car, carImage}: listingCardProp) => {
 
             <div className="p-5 flex flex-col gap-4">
                 <div>
-                    <div>
-                        <h3>{car.brand} {car.model}</h3>
+                    <div className="flex justify-between">
+                        <h3>{car.brand} test {car.model}</h3>
                         <p>{car.trim} {car.buildYear}</p>
                     </div>
                     <span>{listing.price}</span>

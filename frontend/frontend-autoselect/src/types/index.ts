@@ -23,12 +23,13 @@ export interface User {
 
 export interface Listing {
     id: string,
-    sellerId: string,
-    carId: string,
+    sellerId: User,
+    car: CarInfo,
     price: number,
     createdAt: string,
     updatedAt: string,
-    status: "active" | "sold" | "removed"
+    status: "active" | "sold" | "removed",
+    carImages: CarImage[]
 }
 
 export interface Reviews {
@@ -43,10 +44,27 @@ export interface Reviews {
 export interface CarImage {
     id: string,
     listingId: string,
-    imageUrl: string
+    imageUrl: string,
+    isMainImage: boolean
 }
 
 export interface Favorites {
     userId: string,
     listingId: string
 }
+
+export interface Filters {
+    search: string,
+    brand: string,
+    model: string,
+    color: string,
+    trim: string,
+    yearFrom: number,
+    yearTo: number,
+    fuel: "petrol" | "diesel" | "electric" | "hybrid",
+    transmission: "manual" | "automatic",
+    minKilometers: number,
+    maxKilometers: number,
+    doors: number,
+    drive: "fwd" | "rwd" | "awd" | "4wd"
+};
