@@ -24,12 +24,12 @@ export interface User {
 
 export interface Listing {
     id: string,
-    seller: Seller,
+    sellerId: User,
     car: CarInfo,
     price: number,
     createdAt: string,
     updatedAt: string,
-    status: "active" | "sold" | "removed"
+    status: "active" | "sold" | "removed",
     carImages: CarImage[]
 }
 
@@ -54,7 +54,18 @@ export interface Favorites {
     listingId: string
 }
 
-export interface Seller {
-    firstName: string,
-    lastName: string
+export interface Filters {
+    search: string,
+    brand: string,
+    model: string,
+    color: string,
+    trim: string,
+    yearFrom: number,
+    yearTo: number,
+    fuel: "petrol" | "diesel" | "electric" | "hybrid",
+    transmission: "manual" | "automatic",
+    minKilometers: number,
+    maxKilometers: number,
+    doors: number,
+    drive: "fwd" | "rwd" | "awd" | "4wd"
 };
