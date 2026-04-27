@@ -54,7 +54,7 @@ public class ListingController : ControllerBase
     public async Task<ActionResult<ListingResponseContract>> CreateListingAsync([FromBody] CreateListingRequestContract listingRequest)
     {
         var result = await _listingService.CreateListingAsync(ListingApiMapper.MapToDomein(listingRequest));
-        return Ok(ListingApiMapper.MapToContract(result));
+        return CreatedAtAction("CreateListing", ListingApiMapper.MapToContract(result));
     }
 
     // Question: is a user allowed to change the carId on a listing?
