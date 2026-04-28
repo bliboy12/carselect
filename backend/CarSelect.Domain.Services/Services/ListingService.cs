@@ -77,8 +77,8 @@ public class ListingService : IListingService
         {
             ListingModel listingModel = ListingMapper.MapToDomein(listing);
 
-            var sellerTask = _userService.GetUserByIdAsync(listingModel.SellerId);
             var carTask = _carService.GetCarByIdAsync(listingModel.CarId);
+            var sellerTask = _userService.GetUserByIdAsync(listingModel.SellerId);
             var carImageTask = _carImageSerivce.GetAllCarImagesByListingIdAsync(listingModel.Id);
 
             // Creates a task that will complete when all of the supplied tasks have completed
