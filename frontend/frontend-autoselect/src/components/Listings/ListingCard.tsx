@@ -1,4 +1,4 @@
-import type { CarImage, CarInfo, Listing } from "../../types";
+import type {Listing } from "../../types";
 import vehicle from "../../assets/car.jpg"
 
 interface listingCardProp {
@@ -7,11 +7,11 @@ interface listingCardProp {
 
 const ListingCard = (prop: listingCardProp) => {
 
-    const { listing } = prop;
-    const { car, carImages } = listing;
+    const {listing} = prop;
+    const {car} = listing;
     //const mainImage = carImages.find((c) => c.isMainImage === true);
 
-    const carImage = carImages.find(c => c.isMainImage == true);
+    //const carImage = carImages.find(c => c.isMainImage == true);
 
     new Intl.NumberFormat("de-DE", { style: "currency", currency: "EUR" }).format(listing.price);
 
