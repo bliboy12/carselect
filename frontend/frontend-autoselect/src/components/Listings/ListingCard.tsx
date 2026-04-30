@@ -7,19 +7,19 @@ interface listingCardProp {
 
 const ListingCard = (prop: listingCardProp) => {
 
-    const {listing} = prop;
-    const {car, user, carImages} = listing;
+    const { listing } = prop;
+    const { car, carImages } = listing;
     //const mainImage = carImages.find((c) => c.isMainImage === true);
 
     const carImage = carImages.find(c => c.isMainImage == true);
 
-    new Intl.NumberFormat("de-DE", {style: "currency", currency: "EUR"}).format(listing.price);
+    new Intl.NumberFormat("de-DE", { style: "currency", currency: "EUR" }).format(listing.price);
 
     // CarImage is hardcoded, needs to be replaced!
     return (
         <div className="group bg-gray-900 border border-gray-800 rounded-2xl overflow-hidden hover:border-gray-600 hover:shadow-xl hover:shadow-black/40 transition-all duration-200 cursor-pointer ">
             <div className="relative aspect-4/3 bg-gray-800 overflow-hidden">
-                <img src={vehicle} className="w-full h-full object-cover"/>
+                <img src={vehicle} className="w-full h-full object-cover" />
                 {/* Sold overlay */}
                 {status === "sold" && (
                     <div className="absolute inset-0 bg-gray-950/75 flex items-center justify-center">
@@ -30,7 +30,7 @@ const ListingCard = (prop: listingCardProp) => {
                 )}
             </div>
 
-            <div className="p-5 flex flex-col gap-4">
+            <div className="p-5 flex flex-col gap-5">
                 <div className="flex flex-col gap-1">
                     <div className="flex justify-between items-start">
                         <div>
