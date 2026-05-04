@@ -1,32 +1,67 @@
+using Microsoft.Azure.Cosmos;
+using Microsoft.Extensions.Options;
+
 public class ReviewRepository : IReviewRepository
 {
-    public Task<ReviewDataModel> AddReviewAsync(ReviewDataModel reviewDataModel)
+    private readonly Container _container;
+    public ReviewRepository(IOptions<ReviewRepositoryOptions> reviewOption, IOptions<CosmosOptions> cosmosOption)
     {
-        throw new NotImplementedException();
+        var client = new CosmosClient(cosmosOption.Value.Connectionstring);
+        _container = client.GetDatabase(cosmosOption.Value.DatabaseName).GetContainer(reviewOption.Value.ContainerName);
+    }
+    public async Task<ReviewDataModel> CreateReviewAsync(ReviewDataModel reviewDataModel)
+    {
+        reviewDataModel.Id = Guid.NewGuid().ToString();
+
+        var createdReview = await _container.CreateItemAsync(item: reviewDataModel, partitionKey: new PartitionKey(reviewDataModel.Id));
+        return createdReview.Resource;
     }
 
-    public Task<IEnumerable<ReviewDataModel>> GetAllReviewsByReviewerIdAsync(int reviewerId)
+    public async Task<IEnumerable<ReviewDataModel>> GetAllReviewsByReviewerIdAsync(string reviewerId)
     {
-        throw new NotImplementedException();
+        QueryDefinition sqlDef = new QueryDefinition("SELECT * FROM c WHERE c.reviewerId=@reviewerId").WithParameter("@reviewerId", reviewerId);
+        var query = _container.GetItemQueryIterator<ReviewDataModel>(sqlDef);
+
+        List<ReviewDataModel> results = new();
+
+        while (query.HasMoreResults)
+        {
+            var response = await query.ReadNextAsync();
+            results.AddRange(response.Resource);
+        }
+        return results;
     }
 
-    public Task<IEnumerable<ReviewDataModel>> GetAllReviewsBySellerIdAsync(int sellerId)
+    public async Task<IEnumerable<ReviewDataModel>> GetAllReviewsBySellerIdAsync(string sellerId)
     {
-        throw new NotImplementedException();
+        QueryDefinition sqlDef = new QueryDefinition("SELECT * FROM c WHERE c.sellerId=@sellerId").WithParameter("@sellerId", sellerId);
+        var query = _container.GetItemQueryIterator<ReviewDataModel>(sqlDef);
+
+        List<ReviewDataModel> results = new();
+
+        while (query.HasMoreResults)
+        {
+            var response = await query.ReadNextAsync();
+            results.AddRange(response.Resource);
+        }
+        return results;
     }
 
-    public Task<ReviewDataModel?> GetReviewByIdAsync(int reviewId)
+    public async Task<ReviewDataModel?> GetReviewByIdAsync(string reviewId)
     {
-        throw new NotImplementedException();
+        var result = await _container.ReadItemAsync<ReviewDataModel>(id: reviewId, partitionKey: new PartitionKey(reviewId));
+
+        return result.Resource;
     }
 
-    public Task RemoveReviewByIdAsync(int reviewId)
+    public async Task DeleteReviewByIdAsync(string reviewId)
     {
-        throw new NotImplementedException();
+        await _container.DeleteItemAsync<ReviewDataModel>(id: reviewId, new PartitionKey(reviewId));
     }
 
-    public Task<ReviewDataModel> UpdateReviewByIdAsync(ReviewDataModel reviewId)
+    public async Task<ReviewDataModel> UpdateReviewByIdAsync(string reviewId, ReviewDataModel newReview)
     {
-        throw new NotImplementedException();
+        var result = await _container.ReplaceItemAsync<ReviewDataModel>(item: newReview, reviewId, new PartitionKey(reviewId));
+        return result.Resource;
     }
 }

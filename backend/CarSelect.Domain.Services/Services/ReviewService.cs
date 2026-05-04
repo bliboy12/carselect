@@ -1,32 +1,46 @@
 public class ReviewService : IReviewService
 {
-    public Task<ReviewModel> AddReviewAsync(ReviewModel reviewDataModel)
+    private readonly IReviewRepository _repo;
+    public ReviewService(IReviewRepository repo)
     {
-        throw new NotImplementedException();
+        _repo = repo;
+    }
+    public async Task<ReviewModel> CreateReviewAsync(ReviewModel reviewDataModel)
+    {
+        ReviewDataModel result = await _repo.CreateReviewAsync(reviewDataModel.MapFromDomein());
+        return result.MapToDomein();
     }
 
-    public Task<IEnumerable<ReviewModel>> GetAllReviewsByReviewerIdAsync(Guid reviewerId)
+    public async Task<IEnumerable<ReviewModel>> GetAllReviewsByReviewerIdAsync(Guid reviewerId)
     {
-        throw new NotImplementedException();
+        IEnumerable<ReviewDataModel> results = await _repo.GetAllReviewsByReviewerIdAsync(reviewerId.ToString());
+        List<ReviewModel> reviews = results.Select((r) => r.MapToDomein()).ToList();
+
+        return reviews;
     }
 
-    public Task<IEnumerable<ReviewModel>> GetAllReviewsBySellerIdAsync(Guid sellerId)
+    public async Task<IEnumerable<ReviewModel>> GetAllReviewsBySellerIdAsync(Guid sellerId)
     {
-        throw new NotImplementedException();
+        IEnumerable<ReviewDataModel> results = await _repo.GetAllReviewsByReviewerIdAsync(sellerId.ToString());
+        List<ReviewModel> reviews = results.Select((r) => r.MapToDomein()).ToList();
+
+        return reviews;
     }
 
-    public Task<ReviewModel?> GetReviewByIdAsync(Guid reviewId)
+    public async Task<ReviewModel?> GetReviewByIdAsync(Guid reviewId)
     {
-        throw new NotImplementedException();
+        ReviewDataModel? result = await _repo.GetReviewByIdAsync(reviewId.ToString());
+        return result?.MapToDomein();
     }
 
-    public Task RemoveReviewByIdAsync(Guid reviewId)
+    public async Task DeleteReviewByIdAsync(Guid reviewId)
     {
-        throw new NotImplementedException();
+        await _repo.DeleteReviewByIdAsync(reviewId.ToString());
     }
 
-    public Task<ReviewModel> UpdateReviewByIdAsync(Guid reviewId)
+    public async Task<ReviewModel> UpdateReviewByIdAsync(Guid reviewId, ReviewModel newReview)
     {
-        throw new NotImplementedException();
+        ReviewDataModel result = await _repo.UpdateReviewByIdAsync(reviewId.ToString(), newReview.MapFromDomein());
+        return result.MapToDomein();
     }
 }

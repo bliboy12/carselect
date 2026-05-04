@@ -1,9 +1,9 @@
 public interface IReviewRepository
 {
-    Task<ReviewDataModel> AddReviewAsync(ReviewDataModel reviewDataModel);
-    Task<ReviewDataModel?> GetReviewByIdAsync(int reviewId);
-    Task<IEnumerable<ReviewDataModel>> GetAllReviewsBySellerIdAsync(int sellerId);
-    Task<IEnumerable<ReviewDataModel>> GetAllReviewsByReviewerIdAsync(int reviewerId);
-    Task<ReviewDataModel> UpdateReviewByIdAsync(ReviewDataModel reviewId);
-    Task RemoveReviewByIdAsync(int reviewId);
+    Task<ReviewDataModel> CreateReviewAsync(ReviewDataModel reviewDataModel);
+    Task<ReviewDataModel?> GetReviewByIdAsync(string reviewId);
+    Task<IEnumerable<ReviewDataModel>> GetAllReviewsBySellerIdAsync(string sellerId);
+    Task<IEnumerable<ReviewDataModel>> GetAllReviewsByReviewerIdAsync(string reviewerId);
+    Task<ReviewDataModel> UpdateReviewByIdAsync(string reviewId, ReviewDataModel newReview);
+    Task DeleteReviewByIdAsync(string reviewId);
 }

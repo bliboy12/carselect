@@ -4,24 +4,34 @@ using Microsoft.AspNetCore.Mvc;
 [Route("api/reviews")]
 public class ReviewController
 {
-    [HttpGet("{reviewId}")]
-    public ReviewResponseContract GetReviewWithId([FromRoute] int reviewId)
+    private readonly IReviewService _service;
+    public ReviewController(IReviewService service)
     {
-        throw new NotImplementedException();
+        _service = service;
+    }
+    [HttpGet("{reviewId}")]
+    public async Task<ActionResult<ReviewResponseContract?>> GetReviewWithIdAsync([FromRoute] Guid reviewId)
+    {
+        var result = await _service.GetReviewByIdAsync(reviewId);
+        if (result == null)
+            throw new NotFoundException($"Review with Id {reviewId} Not Found");
+        return result.MapToContract();
     }
     [HttpPut("{reviewId}")]
-    public ReviewResponseContract updateReview([FromRoute] int reviewId, [FromBody] ReviewRequestContract updateReviewRequest)
+    public async Task<ReviewResponseContract> updateReviewByIdAsync([FromRoute] Guid reviewId, [FromBody] ReviewRequestContract newReview)
     {
-        throw new NotImplementedException();
+        var result = await _service.UpdateReviewByIdAsync(reviewId, newReview.MapToDomain());
+        return result.MapToContract();
     }
     [HttpPost]
-    public ReviewResponseContract CreateReview([FromBody] ReviewRequestContract reviewRequest)
+    public async Task<ReviewResponseContract> CreateReviewAsync([FromBody] ReviewRequestContract reviewRequest)
     {
-        throw new NotImplementedException();
+        var newReview = await _service.CreateReviewAsync(reviewRequest.MapToDomain());
+        return newReview.MapToContract();
     }
     [HttpDelete("{reviewId}")]
-    public void RemoveReview([FromRoute] int reviewId)
+    public async Task DeleteReviewAsync([FromRoute] Guid reviewId)
     {
-        throw new NotImplementedException();
+        await _service.DeleteReviewByIdAsync(reviewId);
     }
 }
