@@ -7,4 +7,5 @@ public interface ICarService
     Task<IEnumerable<CarModel>> GetAllCarsByFilterAsync(CarFilterModel filter);
     Task<CarModel> UpdateCarAsync(CarModel updateCar);
     Task DeleteCarByIdAsync(Guid carId);
+    Task<IEnumerable<CarMakesModel>> GetAllCarMakes();
 }

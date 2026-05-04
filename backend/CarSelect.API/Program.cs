@@ -1,4 +1,5 @@
 
+using System.Net.Http.Headers;
 using System.Text.Json.Serialization;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -47,12 +48,21 @@ builder.Services.Configure<BlobStorageRepositoryOptions>(
     builder.Configuration.GetSection("BlobStorageRepositoryOptions")
 );
 
+
 builder.Services.AddScoped<ICarService, CarService>();
 builder.Services.AddScoped<IListingService, ListingService>();
 builder.Services.AddScoped<ITransactionService, TransactionService>();
 builder.Services.AddScoped<IReviewService, ReviewService>();
 builder.Services.AddScoped<IUserService, UserService>();
 builder.Services.AddScoped<ICarImageService, CarImageService>();
+
+builder.Services.AddHttpClient<ICarService, CarService>(client =>
+{
+    client.BaseAddress = new Uri("https://vpic.nhtsa.dot.gov/api/vehicles/");
+    client.DefaultRequestHeaders.Accept.Add(
+        new MediaTypeWithQualityHeaderValue("application/json")
+        );
+});
 
 builder.Services.AddScoped<ICarRepository, CarRepository>();
 builder.Services.AddScoped<IListingRepository, ListingRepository>();

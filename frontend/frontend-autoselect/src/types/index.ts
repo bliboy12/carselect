@@ -54,18 +54,17 @@ export interface Favorites {
     listingId: string
 }
 
-export interface Filters {
-    search: string,
-    brand: string,
-    model: string,
-    color: string,
-    trim: string,
-    yearFrom: number,
-    yearTo: number,
-    fuel: "petrol" | "diesel" | "electric" | "hybrid",
-    transmission: "manual" | "automatic",
-    minKilometers: number,
-    maxKilometers: number,
-    doors: number,
-    drive: "fwd" | "rwd" | "awd" | "4wd"
+export interface CarFilter {
+    brand?: string,
+    model?: string,
+    color?: string,
+    trim?: string,
+    yearFrom?: string,
+    yearTo?: string,
+    fuel?: "petrol" | "diesel" | "electric" | "hybrid",
+    transmission?: "manual" | "automatic",
+    minKilometers?: string,
+    maxKilometers?: string,
+    doors?: string,
+    drive?: "fwd" | "rwd" | "awd" | "4wd"
 };
