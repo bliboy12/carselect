@@ -1,4 +1,5 @@
 
+using System.Net.Http.Headers;
 using Microsoft.AspNetCore.Mvc;
 
 [ApiController]
@@ -9,6 +10,13 @@ public class CarController : ControllerBase
     public CarController(ICarService carService)
     {
         _service = carService;
+    }
+    [HttpGet("makes")]
+    public async Task<ActionResult<IEnumerable<CarMakesResponseContract>>> GetAllMakes()
+    {
+        var response = await _service.GetAllCarMakes();
+        List<CarMakesResponseContract> carMakes = response.Select((c) => c.MapToContract()).ToList();
+        return carMakes;
     }
     [HttpGet]
     public async Task<ActionResult<IEnumerable<CarResponseContract>>> GetAllCarsAsync()
@@ -35,7 +43,7 @@ public class CarController : ControllerBase
             return NotFound(nfe.Message);
         }
     }
-    [HttpGet("search")]
+    [HttpPost("search")]
     public async Task<ActionResult<IEnumerable<CarResponseContract>>> GetAllCarsByFilterAsync([FromQuery] CarFilterRequestContract carFilterRequest)
     {
         var results = await _service.GetAllCarsByFilterAsync(CarFilterApiMapper.MapToDomein(carFilterRequest));

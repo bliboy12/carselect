@@ -1,9 +1,13 @@
+using System.Text.Json;
+
 public class CarService : ICarService
 {
     private readonly ICarRepository _carRepo;
-    public CarService(ICarRepository carRepository)
+    private readonly HttpClient _client;
+    public CarService(ICarRepository carRepository, HttpClient httpClient)
     {
         _carRepo = carRepository;
+        _client = httpClient;
     }
     public async Task<CarModel> CreateCarAsync(CarModel carModel)
     {
@@ -49,5 +53,17 @@ public class CarService : ICarService
     {
         var response = await _carRepo.UpdateCarAsync(CarMapper.MapFromDomein(updateCar));
         return CarMapper.MapToDomein(response);
+    }
+    public async Task<IEnumerable<CarMakesModel>> GetAllCarMakes()
+    {
+        var response = await _client.GetAsync($"GetAllMakes?format=json");
+
+        if (response.IsSuccessStatusCode)
+        {
+            var json = await response.Content.ReadAsStringAsync();
+            var deserialized = JsonSerializer.Deserialize<NhtsaMakes>(json);
+            return deserialized?.Results;
+        }
+        return null;
     }
 }
