@@ -1,6 +1,6 @@
-public class ReviewMapper
+public static class ReviewMapper
 {
-    public ReviewModel MapToDomein(ReviewDataModel reviewDataModel)
+    public static ReviewModel MapToDomein(this ReviewDataModel reviewDataModel)
     {
         return new ReviewModel
         {
@@ -12,7 +12,7 @@ public class ReviewMapper
             CreatedAt = reviewDataModel.CreatedAt
         };
     }
-    public ReviewDataModel MapFromDomein(ReviewModel reviewModel)
+    public static ReviewDataModel MapFromDomein(this ReviewModel reviewModel)
     {
         return new ReviewDataModel
         {
