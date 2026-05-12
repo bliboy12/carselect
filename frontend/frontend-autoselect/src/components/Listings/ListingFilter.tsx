@@ -1,9 +1,9 @@
 import { ChevronLeft, ChevronRight } from "lucide-react";
-import { useState } from "react";
+//import { useState } from "react";
 import type { CarFilter, CarInfo } from "../../types";
-import { useQuery } from "@tanstack/react-query";
-import { axiosCars } from "../../api/CarSelectApi";
-import { CarDummy } from "../../dummy/CarDummy";
+// import { useQuery } from "@tanstack/react-query";
+// import { axiosCars } from "../../api/axiosInstances";
+// import { CarDummy } from "../../dummy/CarDummy";
 
 
 interface ListingFilterProps {
@@ -67,8 +67,8 @@ const ListingFilter = ({ showFilter, onToggle, filter, setFilter, setOnSubmit, c
                     </div>
                     <div className="flex flex-col gap-1">
                         <label htmlFor="model" className={labelClass}>Model</label>
-                        <select id="model" className={`${inputClass} ${filter.brand === "All" || filter.brand === "" ? "opacity-50 cursor-not-allowed" : ""}`} disabled={filter.brand === "All" || filter.brand === ""} onChange={handleChange} value={filter.model}>
-                            <option value="">All</option>
+                        <select id="model" className={`${inputClass} ${filter.brand === "All" || filter.brand === undefined ? "opacity-50 cursor-not-allowed" : ""}`} disabled={filter.brand === "All" || filter.brand === ""} onChange={handleChange} value={filter.model}>
+                            <option value="All">All</option>
                             {filteredModels.map((m) => (<option key={m} value={m}>{m}</option>))}
                         </select>
                     </div>

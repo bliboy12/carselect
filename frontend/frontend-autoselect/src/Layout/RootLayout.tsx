@@ -5,7 +5,7 @@ import Navbar from "../components/NavBar";
 
 const RootLayout = () => {
     return (
-        <div>
+        <div className="bg-gray-950 min-h-screen">
             <Navbar/>
             <Outlet/>
         </div>

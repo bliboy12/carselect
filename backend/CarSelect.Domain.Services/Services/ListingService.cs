@@ -156,4 +156,24 @@ public class ListingService : IListingService
 
         return ListingMapper.MapToDomein(result);
     }
+    // This will be changed after refactoring the Database
+    public async Task<IEnumerable<ListingModel>> FilterListingsByCarAsync(CarFilterModel filter)
+    {
+        var listings = await GetAllListingsAsync();
+
+        return listings.Where(l =>
+            (string.IsNullOrEmpty(filter.Brand) || l.Car.Brand.ToLower() == filter.Brand) &&
+            (string.IsNullOrEmpty(filter.Model) || l.Car.Model.ToLower() == filter.Model) &&
+            (string.IsNullOrEmpty(filter.Color) || l.Car.Color.ToLower() == filter.Color) &&
+            (string.IsNullOrEmpty(filter.Trim) || l.Car.Trim.ToLower() == filter.Trim) &&
+            (filter.YearFrom == null || l.Car.BuildYear >= filter.YearFrom) &&
+            (filter.YearTo == null || l.Car.BuildYear <= filter.YearTo) &&
+            (filter.Fuel == null || l.Car.Fuel == filter.Fuel) &&
+            (filter.Transmission == null || l.Car.Transmission == filter.Transmission) &&
+            (filter.MinKilometers == null || l.Car.Kilometers >= filter.MinKilometers) &&
+            (filter.MaxKilometers == null || l.Car.Kilometers <= filter.MaxKilometers) &&
+            (filter.Doors == null || l.Car.Doors == filter.Doors) &&
+            (filter.Drive == null || l.Car.Drive == filter.Drive)
+        );
+    }
 }

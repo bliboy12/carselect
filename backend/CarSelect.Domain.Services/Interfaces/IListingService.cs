@@ -7,6 +7,9 @@ public interface IListingService
     Task<ListingModel> UpdateListingAsync(ListingModel listingModel);
     Task DeletelistingById(Guid listingId);
 
+    // Filter listings
+    Task<IEnumerable<ListingModel>> FilterListingsByCarAsync(CarFilterModel filter);
+
     // Car Images for the associated listing will be in a dedicated Service Class
     // Task<CarImageModel> CreateCarImageAsync(CarImageModel carImageData);
     // Task<CarImageModel> UpdateCarImageAsync(CarImageModel carImageData);

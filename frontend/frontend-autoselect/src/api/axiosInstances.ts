@@ -9,3 +9,6 @@ export const axiosListings = axios.create({
     baseURL: "http://localhost:5028/api/listings"
 });
 
+export const axiosUsers = axios.create({
+    baseURL: "http://localhost:5028/api/users"
+});

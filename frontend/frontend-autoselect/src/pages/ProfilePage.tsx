@@ -1,0 +1,154 @@
+import { useQuery } from "@tanstack/react-query";
+import { useNavigate } from "react-router-dom";
+import { getUserById, updateUser } from "../api/userApi";
+import { getListingsBySellerId } from "../api/listingApi";
+import ListingRow from "../components/Profile/ListingRow";
+import { useState } from "react";
+import {type User } from "../types";
+
+// TODO: replace with userId from JWT token once auth is set up
+const TEMP_USER_ID = "8cd1612e-8161-4c61-89d1-d0ba9e1153af";
+
+const ProfilePage = () => {
+    const navigate = useNavigate();
+
+    const { data: user, isLoading: userLoading, isError: userError } = useQuery({
+        queryKey: ["user", TEMP_USER_ID],
+        queryFn: () => getUserById(TEMP_USER_ID)
+    });
+
+    const [updatedUser, setUpdatedUser] = useState<User | undefined>(user);
+
+    function onUpdateUser() {
+        const { data: updateUser } = useQuery({
+            queryKey: ["updateUser", user?.id],
+            queryFn: () => updateUser(user!)
+        })
+
+        setUpdatedUser(updateUser);
+        return updateUser;
+    }
+
+    const { data: listings, isLoading: listingsLoading, isError: listingsError } = useQuery({
+        queryKey: ["listings", TEMP_USER_ID],
+        queryFn: () => getListingsBySellerId(TEMP_USER_ID)
+    });
+
+    const handleEdit = (id: string) => {
+        navigate(`/listings/edit/${id}`);
+    };
+
+    const handleDelete = (id: string) => {
+        // TODO: open confirmation modal then call delete endpoint
+        console.log("delete listing", id);
+    };
+
+    const initials = user ? `${user.firstName[0]}${user.lastName[0]}`.toUpperCase() : "...";
+
+    if (userLoading || listingsLoading) return <p>Loading...</p>;
+    if (userError || listingsError) return <p>Something went wrong.</p>;
+
+    return (
+        <div className="max-w-4xl mx-auto px-6 py-10">
+
+            {/* Header */}
+            <div className="flex items-center gap-4 mb-8 pb-6 border-b border-gray-700">
+                <div className="w-16 h-16 rounded-full bg-blue-600 flex items-center justify-center text-white font-medium text-xl shrink-0">
+                    {initials}
+                </div>
+                <div>
+                    <p className="text-lg font-medium text-white">{user?.firstName} {user?.lastName}</p>
+                    <p className="text-sm text-gray-400">{user?.email}</p>
+                </div>
+            </div>
+
+            <div className="flex flex-col gap-6">
+
+                {/* Account Details */}
+                <div className="bg-gray-900 border border-gray-700 rounded-xl p-6">
+                    <p className="text-xs font-medium text-gray-400 uppercase tracking-wider mb-4">Account details</p>
+                    <div className="flex flex-col gap-4">
+                        <div className="grid grid-cols-2 gap-4">
+                            <div>
+                                <label className="block text-xs text-gray-400 mb-1.5">First name</label>
+                                <input type="text" value={updatedUser?.firstName} className="w-full bg-gray-800 border border-gray-700 rounded-lg px-3 py-2 text-sm text-white"/>
+                            </div>
+                            <div>
+                                <label className="block text-xs text-gray-400 mb-1.5">Last name</label>
+                                <input type="text" value={updatedUser?.lastName} className="w-full bg-gray-800 border border-gray-700 rounded-lg px-3 py-2 text-sm text-white" />
+                            </div>
+                        </div>
+                        <div>
+                            <label className="block text-xs text-gray-400 mb-1.5">Email address</label>
+                            <input type="email" value={updatedUser?.email} className="w-full bg-gray-800 border border-gray-700 rounded-lg px-3 py-2 text-sm text-white" />
+                        </div>
+                    </div>
+                    <div className="mt-4 flex justify-end">
+                        <button className="bg-blue-600 hover:bg-blue-500 text-white text-sm px-5 py-2 rounded-lg">
+                            Save changes
+                        </button>
+                    </div>
+                </div>
+
+                {/* Change Password */}
+                <div className="bg-gray-900 border border-gray-700 rounded-xl p-6">
+                    <p className="text-xs font-medium text-gray-400 uppercase tracking-wider mb-4">Change password</p>
+                    <div className="flex flex-col gap-4">
+                        <div>
+                            <label className="block text-xs text-gray-400 mb-1.5">Current password</label>
+                            <input type="password" placeholder="••••••••" className="w-full bg-gray-800 border border-gray-700 rounded-lg px-3 py-2 text-sm text-white" />
+                        </div>
+                        <div className="grid grid-cols-2 gap-4">
+                            <div>
+                                <label className="block text-xs text-gray-400 mb-1.5">New password</label>
+                                <input type="password" placeholder="••••••••" className="w-full bg-gray-800 border border-gray-700 rounded-lg px-3 py-2 text-sm text-white" />
+                            </div>
+                            <div>
+                                <label className="block text-xs text-gray-400 mb-1.5">Confirm password</label>
+                                <input type="password" placeholder="••••••••" className="w-full bg-gray-800 border border-gray-700 rounded-lg px-3 py-2 text-sm text-white" />
+                            </div>
+                        </div>
+                    </div>
+                    <div className="mt-4 flex justify-end">
+                        <button className="bg-blue-600 hover:bg-blue-500 text-white text-sm px-5 py-2 rounded-lg">
+                            Update password
+                        </button>
+                    </div>
+                </div>
+
+                {/* My Listings */}
+                <div className="bg-gray-900 border border-gray-700 rounded-xl p-6">
+                    <div className="flex items-center justify-between mb-4">
+                        <p className="text-xs font-medium text-gray-400 uppercase tracking-wider">My listings</p>
+                        <span className="text-xs text-gray-400">{listings?.length ?? 0} active</span>
+                    </div>
+                    <div className="flex flex-col divide-y divide-gray-700">
+                        {listings?.map(listing => (
+                            <ListingRow key={listing.id} listing={listing} onEdit={handleEdit} onDelete={handleDelete} />
+                        ))}
+                    </div>
+                    <div className="mt-4 pt-4 border-t border-gray-700">
+                        <button
+                            onClick={() => navigate("/listings/create")}
+                            className="w-full border border-blue-500 text-blue-500 hover:bg-blue-500/10 text-sm py-2 rounded-lg"
+                        >
+                            + Add new listing
+                        </button>
+                    </div>
+                </div>
+
+                {/* Danger Zone */}
+                <div className="bg-gray-900 border border-red-800 rounded-xl p-6">
+                    <p className="text-sm font-medium text-red-400 mb-1">Danger zone</p>
+                    <p className="text-xs text-gray-400 mb-4">Permanently delete your account and all associated data.</p>
+                    <button className="border border-red-700 text-red-400 hover:bg-red-900/30 text-sm px-4 py-2 rounded-lg">
+                        Delete account
+                    </button>
+                </div>
+
+            </div>
+        </div>
+    );
+};
+
+export default ProfilePage;

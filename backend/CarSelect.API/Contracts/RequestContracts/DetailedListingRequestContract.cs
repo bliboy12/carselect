@@ -1,4 +1,4 @@
-public class CreateListingRequestContract
+public class DetailedListingRequestContract
 {
     public required Guid SellerId { get; set; }
     public required CarRequestContract Car { get; set; }

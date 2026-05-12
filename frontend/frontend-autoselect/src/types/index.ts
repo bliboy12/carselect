@@ -15,16 +15,22 @@ export interface CarInfo {
 
 export interface User {
     id: string
-    firstname: string,
-    lastname: string,
+    firstName: string,
+    lastName: string,
     email: string,
     registerDate: string,
     isAdmin: boolean
 }
 
+export interface Seller {
+    id: string,
+    firstName: string,
+    lastName: string
+}
+
 export interface Listing {
     id: string,
-    sellerId: User,
+    seller: Seller,
     car: CarInfo,
     price: number,
     createdAt: string,
@@ -63,8 +69,8 @@ export interface CarFilter {
     yearTo?: string,
     fuel?: "petrol" | "diesel" | "electric" | "hybrid",
     transmission?: "manual" | "automatic",
-    minKilometers?: string,
-    maxKilometers?: string,
-    doors?: string,
+    minKilometers?: number,
+    maxKilometers?: number,
+    doors?: number,
     drive?: "fwd" | "rwd" | "awd" | "4wd"
 };

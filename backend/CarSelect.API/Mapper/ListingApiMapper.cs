@@ -38,7 +38,7 @@ public class ListingApiMapper
             CarImages = listingRequest.CarImages.Select(c => CarImageApiMapper.MapToDomein(c)).ToList()
         };
     }
-    public static ListingModel MapToDomein(CreateListingRequestContract listingRequest)
+    public static ListingModel MapToDomein(DetailedListingRequestContract listingRequest)
     {
         return new ListingModel
         {

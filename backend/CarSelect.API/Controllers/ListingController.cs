@@ -13,12 +13,37 @@ public class ListingController : ControllerBase
         _listingService = listingService;
     }
     [HttpGet]
-    public async Task<ActionResult<IEnumerable<ListingResponseContract>>> GetAllListingsAsync()
+    public async Task<ActionResult<IEnumerable<ListingResponseContract>>> GetAllListingsAsync([FromQuery] Guid? sellerId)
     {
+        if (sellerId.HasValue)
+        {
+            try
+            {
+                var filteredResponse = await _listingService.GetAllListingsBySellerIdAsync(sellerId.Value);
+                return Ok(filteredResponse);
+            }
+            catch (NotFoundException nfe)
+            {
+                return NotFound(nfe.Message);
+            }
+        }
+
         var response = await _listingService.GetAllListingsAsync();
         List<ListingResponseContract> listings = new();
 
         foreach (ListingModel listing in response)
+            listings.Add(ListingApiMapper.MapToContract(listing));
+
+        return Ok(listings);
+    }
+    [HttpPost("search")]
+    public async Task<ActionResult<IEnumerable<ListingResponseContract>>> FilterListingsByCarAsync([FromBody] CarFilterRequestContract carFilterRequest)
+    {
+        var filter = CarFilterApiMapper.MapToDomein(carFilterRequest);
+        var results = await _listingService.FilterListingsByCarAsync(filter);
+
+        List<ListingResponseContract> listings = new();
+        foreach (ListingModel listing in results)
             listings.Add(ListingApiMapper.MapToContract(listing));
 
         return Ok(listings);
@@ -51,7 +76,7 @@ public class ListingController : ControllerBase
     }
     // The adding of images to the listing will be called by a separate HttpPost 
     [HttpPost]
-    public async Task<ActionResult<ListingResponseContract>> CreateListingAsync([FromBody] CreateListingRequestContract listingRequest)
+    public async Task<ActionResult<ListingResponseContract>> CreateListingAsync([FromBody] DetailedListingRequestContract listingRequest)
     {
         var result = await _listingService.CreateListingAsync(ListingApiMapper.MapToDomein(listingRequest));
         return CreatedAtAction("CreateListing", ListingApiMapper.MapToContract(result));
