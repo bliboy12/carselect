@@ -22,6 +22,12 @@ export interface User {
     isAdmin: boolean
 }
 
+export interface UserRequest {
+    firstName: string,
+    lastName: string,
+    email: string
+}
+
 export interface Seller {
     id: string,
     firstName: string,
@@ -37,6 +43,27 @@ export interface Listing {
     updatedAt: string,
     status: "active" | "sold" | "removed",
     carImages: CarImage[]
+}
+
+export interface ListingRequest {
+    sellerId: string,
+    car: CarRequest,
+    price: number,
+    status: "active" | "sold" | "removed",
+    carImages: File[]
+}
+
+export interface CarRequest {
+    brand: string,
+    model: string,
+    color: string,
+    trim: string,
+    buildYear: number,
+    fuel: "petrol" | "diesel" | "electric" | "hybrid",
+    transmission: "manual" | "automatic",
+    kilometers: number,
+    doors: number,
+    drive: "fwd" | "rwd" | "awd" | "4wd"
 }
 
 export interface Reviews {

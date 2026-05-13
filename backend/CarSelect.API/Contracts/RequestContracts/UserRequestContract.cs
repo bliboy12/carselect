@@ -18,6 +18,5 @@ public class UserRequestContract
         get => _email;
         init => _email = value.Trim().ToLower();
     }
-    public required string Password { get; set; }
 
 }

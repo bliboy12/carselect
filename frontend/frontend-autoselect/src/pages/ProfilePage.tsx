@@ -1,10 +1,11 @@
-import { useQuery } from "@tanstack/react-query";
+import { useMutation, useQuery } from "@tanstack/react-query";
 import { useNavigate } from "react-router-dom";
-import { getUserById, updateUser } from "../api/userApi";
+import { getUserById, updateUserById } from "../api/userApi";
 import { getListingsBySellerId } from "../api/listingApi";
 import ListingRow from "../components/Profile/ListingRow";
-import { useState } from "react";
-import {type User } from "../types";
+import { useEffect } from "react";
+import type  { UserRequest } from "../types";
+import { useForm } from "react-hook-form";
 
 // TODO: replace with userId from JWT token once auth is set up
 const TEMP_USER_ID = "8cd1612e-8161-4c61-89d1-d0ba9e1153af";
@@ -17,22 +18,40 @@ const ProfilePage = () => {
         queryFn: () => getUserById(TEMP_USER_ID)
     });
 
-    const [updatedUser, setUpdatedUser] = useState<User | undefined>(user);
+    console.log(user?.firstName);
 
-    function onUpdateUser() {
-        const { data: updateUser } = useQuery({
-            queryKey: ["updateUser", user?.id],
-            queryFn: () => updateUser(user!)
-        })
+    const initials = user ? `${user.firstName[0]}${user.lastName[0]}`.toUpperCase() : "...";
 
-        setUpdatedUser(updateUser);
-        return updateUser;
-    }
+    const { register, handleSubmit, reset} = useForm<UserRequest>();
+
+    useEffect(() => {
+        if (user) {
+            reset({
+                firstName: user?.firstName,
+                lastName: user?.lastName,
+                email: user?.email,
+            });
+        }
+    }, [user, reset])
 
     const { data: listings, isLoading: listingsLoading, isError: listingsError } = useQuery({
         queryKey: ["listings", TEMP_USER_ID],
         queryFn: () => getListingsBySellerId(TEMP_USER_ID)
     });
+
+    const {mutate: saveUser, isPending } = useMutation({
+        mutationFn: (updateUser: UserRequest) => updateUserById(updateUser, TEMP_USER_ID),
+        onSuccess: () => { console.log("Success"); }
+    })
+
+    const onSubmit = (formData: UserRequest) => {
+        // saveUser(formData);
+        saveUser({
+            firstName: formData.firstName,
+            lastName: formData.lastName,
+            email: formData.email
+        });
+    }
 
     const handleEdit = (id: string) => {
         navigate(`/listings/edit/${id}`);
@@ -42,8 +61,6 @@ const ProfilePage = () => {
         // TODO: open confirmation modal then call delete endpoint
         console.log("delete listing", id);
     };
-
-    const initials = user ? `${user.firstName[0]}${user.lastName[0]}`.toUpperCase() : "...";
 
     if (userLoading || listingsLoading) return <p>Loading...</p>;
     if (userError || listingsError) return <p>Something went wrong.</p>;
@@ -71,21 +88,21 @@ const ProfilePage = () => {
                         <div className="grid grid-cols-2 gap-4">
                             <div>
                                 <label className="block text-xs text-gray-400 mb-1.5">First name</label>
-                                <input type="text" value={updatedUser?.firstName} className="w-full bg-gray-800 border border-gray-700 rounded-lg px-3 py-2 text-sm text-white"/>
+                                <input type="text" {...register("firstName")} className="w-full bg-gray-800 border border-gray-700 rounded-lg px-3 py-2 text-sm text-white"/>
                             </div>
                             <div>
                                 <label className="block text-xs text-gray-400 mb-1.5">Last name</label>
-                                <input type="text" value={updatedUser?.lastName} className="w-full bg-gray-800 border border-gray-700 rounded-lg px-3 py-2 text-sm text-white" />
+                                <input type="text" {...register("lastName")} className="w-full bg-gray-800 border border-gray-700 rounded-lg px-3 py-2 text-sm text-white" />
                             </div>
                         </div>
                         <div>
                             <label className="block text-xs text-gray-400 mb-1.5">Email address</label>
-                            <input type="email" value={updatedUser?.email} className="w-full bg-gray-800 border border-gray-700 rounded-lg px-3 py-2 text-sm text-white" />
+                            <input type="email" {...register("email")} className="w-full bg-gray-800 border border-gray-700 rounded-lg px-3 py-2 text-sm text-white" />
                         </div>
                     </div>
                     <div className="mt-4 flex justify-end">
-                        <button className="bg-blue-600 hover:bg-blue-500 text-white text-sm px-5 py-2 rounded-lg">
-                            Save changes
+                        <button disabled={isPending} className="bg-blue-600 hover:bg-blue-500 text-white text-sm px-5 py-2 rounded-lg" onClick={handleSubmit(onSubmit)}>
+                            {isPending ? "Saving..." : "Save changes"}
                         </button>
                     </div>
                 </div>

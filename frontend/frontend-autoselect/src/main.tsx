@@ -9,6 +9,7 @@ import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
 import HomePage from './pages/HomePage.tsx'
 import DetailListingPage from './pages/DetailListingPage.tsx'
 import ProfilePage from './pages/ProfilePage.tsx'
+import CreateListingPage from './pages/CreateListingPage.tsx'
 
 const query = new QueryClient();
 
@@ -35,6 +36,10 @@ const router = createBrowserRouter([
       {
         element: <ProfilePage />,
         path: "/profile"
+      },
+      {
+        element: <CreateListingPage />,
+        path: "listings/create"
       }
     ]
   }
