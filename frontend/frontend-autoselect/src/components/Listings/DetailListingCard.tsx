@@ -2,7 +2,7 @@ import { useState } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { Link, useParams } from "react-router";
 import { axiosListings } from "../../api/axiosInstances";
-import type { Listing } from "../../types";
+import type { ListingResponse } from "../../types";
 import DetailListingSkeleton from "./DetailListingCardSkeleton";
 import defaultCarImage from "../../assets/car.jpg"
 import { CiHeart } from "react-icons/ci";
@@ -15,7 +15,7 @@ const DetailListingCard = () => {
 
     const { data, isLoading, isError, error } = useQuery({
         queryKey: ["listing", id],
-        queryFn: async () => await axiosListings.get<Listing>(`/${id}`),
+        queryFn: async () => await axiosListings.get<ListingResponse>(`/${id}`),
         refetchOnMount: false,
         refetchOnReconnect: false,
         refetchOnWindowFocus: false
@@ -27,8 +27,9 @@ const DetailListingCard = () => {
         return <p>{error.message}</p>
     if (!data)
         return <p>Listing doesn't exist</p>
+    
 
-    const listing = data.data;
+    const listing = data.data;    
     const car = listing.car;
     const seller = listing.seller;
 

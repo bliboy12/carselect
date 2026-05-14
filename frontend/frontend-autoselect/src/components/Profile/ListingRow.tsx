@@ -1,9 +1,9 @@
-import type { Listing } from "../../types";
+import type { ListingResponse } from "../../types";
 import { FaRegEdit } from "react-icons/fa";
 import { MdDelete } from "react-icons/md";
 
 interface ListingRowProps {
-    listing: Listing,
+    listing: ListingResponse,
     onEdit: (id: string) => void,
     onDelete: (id: string) => void
 }

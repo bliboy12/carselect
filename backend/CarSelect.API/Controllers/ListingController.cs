@@ -130,19 +130,19 @@ public class ListingController : ControllerBase
     }
 
     [HttpPost("{listingId}/images")]
-    public async Task<ActionResult<IEnumerable<CarImageResponseContract>>> CreateCarImageAsync([FromRoute] Guid listingId, [FromForm] IEnumerable<IFormFile> files)
+    public async Task<ActionResult<IEnumerable<CarImageResponseContract>>> CreateCarImageAsync([FromRoute] Guid listingId, [FromForm] IEnumerable<CarImageRequestContract> files)
     {
         if (files == null || !files.Any())
             return BadRequest("No File(s) Provided");
 
         List<CarImageResponseContract> carImages = new();
 
-        foreach (IFormFile file in files)
+        foreach (CarImageRequestContract file in files)
         {
             // the 'using' is to insure that the stream is closed instead of waiting for the garabage collector to eventually close it on its own, which is unpredictable
-            using var stream = file.OpenReadStream();
+            using var stream = file.File.OpenReadStream();
 
-            var result = await _carImageService.CreateCarImageAsync(listingId, stream, file.FileName, file.ContentType);
+            var result = await _carImageService.CreateCarImageAsync(listingId, stream, file.File.FileName, file.File.ContentType, file.IsMainImage);
             carImages.Add(CarImageApiMapper.MapToContract(result));
         }
         return Ok(carImages);

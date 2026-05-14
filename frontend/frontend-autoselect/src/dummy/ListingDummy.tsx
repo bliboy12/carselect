@@ -1,4 +1,4 @@
-import { type Listing, type User, type CarImage } from "../types";
+import { type ListingResponse, type User, type CarImage } from "../types";
 
 const dummyUser: User = {
     id: "u1",
@@ -16,7 +16,7 @@ const dummyImage = (listingId: string): CarImage[] => [{
     isMainImage: true
 }]
 
-export const dummyListings: Listing[] = [
+export const dummyListings: ListingResponse[] = [
     {
         id: "l1",
         seller: dummyUser,

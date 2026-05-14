@@ -8,7 +8,7 @@ import ListingFilter from "../components/Listings/ListingFilter";
 //import { dummyListings } from "../dummy/ListingDummy";
 import { useState } from "react";
 import { axiosListings } from "../api/axiosInstances";
-import type { CarFilter, Listing } from "../types";
+import type { CarFilter, ListingResponse } from "../types";
 import ListingCardSkeleton from "../components/Listings/ListingCardSkeleton";
 import { Link } from "react-router";
 
@@ -46,7 +46,7 @@ const HomePage = () => {
     const {data, isLoading, isError, error} = useQuery({
         queryKey: ["GetAllListings", onSubmit],
         queryFn: async () => {
-            return await axiosListings.post<Listing[]>("/search", onSubmit)}
+            return await axiosListings.post<ListingResponse[]>("/search", onSubmit)}
     })
 
 

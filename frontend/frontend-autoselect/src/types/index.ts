@@ -34,7 +34,7 @@ export interface Seller {
     lastName: string
 }
 
-export interface Listing {
+export interface ListingResponse {
     id: string,
     seller: Seller,
     car: CarInfo,
@@ -50,7 +50,13 @@ export interface ListingRequest {
     car: CarRequest,
     price: number,
     status: "active" | "sold" | "removed",
-    carImages: File[]
+}
+
+export interface ListingUpdateRequest {
+    sellerId: string,
+    carId: string,
+    price: number,
+    status: "active" | "sold" | "removed",
 }
 
 export interface CarRequest {
@@ -66,6 +72,10 @@ export interface CarRequest {
     drive: "fwd" | "rwd" | "awd" | "4wd"
 }
 
+export interface CarUpdateRequest extends CarRequest {
+    id: string
+}
+
 export interface Reviews {
     id: string,
     sellerId: string,
@@ -73,6 +83,11 @@ export interface Reviews {
     rating: 1 | 2 | 3 | 4 | 5,
     comment: string,
     createdAt: string
+}
+
+export interface ImageRequest {
+    file: File,
+    isMainImage: boolean
 }
 
 export interface CarImage {

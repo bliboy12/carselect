@@ -18,8 +18,6 @@ const ProfilePage = () => {
         queryFn: () => getUserById(TEMP_USER_ID)
     });
 
-    console.log(user?.firstName);
-
     const initials = user ? `${user.firstName[0]}${user.lastName[0]}`.toUpperCase() : "...";
 
     const { register, handleSubmit, reset} = useForm<UserRequest>();

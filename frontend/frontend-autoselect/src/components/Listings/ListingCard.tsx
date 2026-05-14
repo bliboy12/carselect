@@ -1,8 +1,8 @@
-import type {Listing } from "../../types";
+import type {ListingResponse } from "../../types";
 import vehicle from "../../assets/car.jpg"
 
 interface listingCardProp {
-    listing: Listing,
+    listing: ListingResponse,
 }
 
 const ListingCard = (prop: listingCardProp) => {

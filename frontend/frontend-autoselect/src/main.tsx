@@ -10,6 +10,7 @@ import HomePage from './pages/HomePage.tsx'
 import DetailListingPage from './pages/DetailListingPage.tsx'
 import ProfilePage from './pages/ProfilePage.tsx'
 import CreateListingPage from './pages/CreateListingPage.tsx'
+import EditListingPage from './pages/EditListingPage.tsx'
 
 const query = new QueryClient();
 
@@ -40,6 +41,10 @@ const router = createBrowserRouter([
       {
         element: <CreateListingPage />,
         path: "listings/create"
+      },
+      {
+        element: <EditListingPage />,
+        path: "listings/:id/edit"
       }
     ]
   }

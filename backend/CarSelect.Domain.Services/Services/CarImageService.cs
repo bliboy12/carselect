@@ -9,7 +9,7 @@ public class CarImageService : ICarImageService
         _carImageRepo = carImageRepository;
         _blobStorageRepo = blobStorageRepository;
     }
-    public async Task<CarImageModel> CreateCarImageAsync(Guid listingId, Stream imageStream, string fileName, string contentType)
+    public async Task<CarImageModel> CreateCarImageAsync(Guid listingId, Stream imageStream, string fileName, string contentType, bool isMainImage)
     {
         var existingImages = await _carImageRepo.GetAllCarImagesByListingIdAsync(listingId.ToString());
         bool imageExists = false;
@@ -29,10 +29,8 @@ public class CarImageService : ICarImageService
             Id = Guid.NewGuid(),
             ListingId = listingId,
             ImageUrl = imageUrl,
-            IsMainImage = false
+            IsMainImage = isMainImage
         };
-        // chekcs to see if this is the first image to be added for this listingID
-        carImageModel.IsMainImage = !existingImages.Any();
 
         try
         {

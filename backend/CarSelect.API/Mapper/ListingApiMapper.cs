@@ -35,7 +35,7 @@ public class ListingApiMapper
             CarId = listingRequest.CarId,
             Price = listingRequest.Price,
             Status = (ListingStatus)listingRequest.Status,
-            CarImages = listingRequest.CarImages.Select(c => CarImageApiMapper.MapToDomein(c)).ToList()
+            //CarImages = listingRequest.CarImages.Select(c => CarImageApiMapper.MapToDomein(c)).ToList()
         };
     }
     public static ListingModel MapToDomein(DetailedListingRequestContract listingRequest)
@@ -47,7 +47,6 @@ public class ListingApiMapper
             Car = CarApiMapper.MapToDomein(listingRequest.Car),
             Price = listingRequest.Price,
             Status = (ListingStatus)listingRequest.Status,
-            CarImages = listingRequest.CarImages.Select(c => CarImageApiMapper.MapToDomein(c)).ToList()
         };
     }
 }
