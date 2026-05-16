@@ -15,4 +15,7 @@ public interface IUserService
     Task<IEnumerable<FavoriteModel>> GetAllFavoritesByUserIdAsync(Guid userId);
     Task<bool> IsFavoritedAsync(Guid userId, Guid listingId); // Does a certain favorite exist
     Task RemoveFavoriteAsync(Guid userId, Guid listingId);
+
+    // Give Admin
+    Task<UserModel> UpdateUserRoleAsync(Guid userId, bool isAdmin);
 }

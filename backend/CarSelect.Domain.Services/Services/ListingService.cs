@@ -176,4 +176,12 @@ public class ListingService : IListingService
             (filter.Drive == null || l.Car.Drive == filter.Drive)
         );
     }
+
+    public async Task DeleteAllListingsBySellerIdAsync(Guid sellerId)
+    {
+        var allListingsBySellerId = await _listingRepo.GetAllListingsBySellerIdAsync(sellerId.ToString());
+        var deleteListing = allListingsBySellerId.Select(async (l) => await _listingRepo.DeleteListingByIdAsync(l.Id));
+
+        await Task.WhenAll(deleteListing);
+    }
 }

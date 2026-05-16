@@ -227,4 +227,21 @@ public class UserRepository : IUserRepository
             throw new NotFoundException($"user with id {updateUserDataModel.Id} Not Found");
         }
     }
+
+    public async Task<UserDataModel> UpdateUserRoleAsync(string userId, bool isAdmin)
+    {
+        var patchOperations = new List<PatchOperation>
+        {
+            PatchOperation.Set("/isAdmin", isAdmin),
+            PatchOperation.Set("/UpdatedAt", DateTime.UtcNow)
+        };
+
+        var result = await _container.PatchItemAsync<UserDataModel>(
+            id: userId,
+            partitionKey: new PartitionKey(userId),
+            patchOperations
+        );
+
+        return result.Resource;
+    }
 }

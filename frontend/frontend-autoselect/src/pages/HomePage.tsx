@@ -44,7 +44,7 @@ const HomePage = () => {
     const [onSubmit, setOnSubmit] = useState<CarFilter>(defaultCarFilter);
 
     const {data, isLoading, isError, error} = useQuery({
-        queryKey: ["GetAllListings", onSubmit],
+        queryKey: ["GetAllListingsFiltered", onSubmit],
         queryFn: async () => {
             return await axiosListings.post<ListingResponse[]>("/search", onSubmit)}
     })
@@ -90,7 +90,7 @@ const HomePage = () => {
         <div className="flex min-h-dvh">
             <ListingFilter showFilter={showFilter} onToggle={() => setshowFilter((prev) => !prev)} filter={filter} setFilter={setFilter} setOnSubmit={setOnSubmit} cars={cars} />
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 p-5 gap-5 flex-1 h-full">
-                {data?.data.map((listing) => (<Link key={listing.id} to={`listings/${listing.id}`}><ListingCard key={listing.id} listing={listing} /></Link>))}
+                {data?.data.map((listing) => (<Link className="block h-full" key={listing.id} to={`listings/${listing.id}`}><ListingCard key={listing.id} listing={listing} /></Link>))}
             </div>
         </div>
     );

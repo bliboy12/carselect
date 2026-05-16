@@ -100,6 +100,14 @@ public class UserController : ControllerBase
         return Ok(FavoriteApiMapper.MapToContract(response));
     }
 
+    [HttpPatch("{userId}/role")]
+    public async Task<ActionResult<UserResponseContract>> UpdateUserRoleAsync([FromRoute] Guid userId, [FromBody] bool isAdmin)
+    {
+        var response = await _service.UpdateUserRoleAsync(userId, isAdmin);
+
+        return Ok(UserApiMapper.MapToContract(response));
+    }
+
     // WIP
     // [HttpGet("{userId}/favorites")]
     // public async Task<ActionResult<IEnumerable<FavoriteReponseContract>>> GetAllFavorites([FromRoute] Guid userId)

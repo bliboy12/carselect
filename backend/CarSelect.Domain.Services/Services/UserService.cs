@@ -129,4 +129,10 @@ public class UserService : IUserService
         UserDataModel userDataModel = await _repo.UpdateUserAsync(UserMapper.MapFromDomein(updateUserDataModel));
         return UserMapper.MapToDomein(userDataModel);
     }
+
+    public async Task<UserModel> UpdateUserRoleAsync(Guid userId, bool isAdmin)
+    {
+        UserDataModel userDataModel = await _repo.UpdateUserRoleAsync(userId.ToString(), isAdmin);
+        return UserMapper.MapToDomein(userDataModel);
+    }
 }

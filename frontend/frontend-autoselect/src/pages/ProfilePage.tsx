@@ -1,9 +1,9 @@
-import { useMutation, useQuery } from "@tanstack/react-query";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useNavigate } from "react-router-dom";
 import { getUserById, updateUserById } from "../api/userApi";
-import { getListingsBySellerId } from "../api/listingApi";
+import { deleteListingById, getListingsBySellerId } from "../api/listingApi";
 import ListingRow from "../components/Profile/ListingRow";
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import type  { UserRequest } from "../types";
 import { useForm } from "react-hook-form";
 
@@ -11,6 +11,13 @@ import { useForm } from "react-hook-form";
 const TEMP_USER_ID = "8cd1612e-8161-4c61-89d1-d0ba9e1153af";
 
 const ProfilePage = () => {
+
+    const queryClient = useQueryClient();
+
+    const [updatingUser, setUpdatingUser] = useState<boolean>(false);
+    const [isDeletingListingById, setIsDeletingListingById] = useState<string | null>(null);
+
+
     const navigate = useNavigate();
 
     const { data: user, isLoading: userLoading, isError: userError } = useQuery({
@@ -37,9 +44,24 @@ const ProfilePage = () => {
         queryFn: () => getListingsBySellerId(TEMP_USER_ID)
     });
 
-    const {mutate: saveUser, isPending } = useMutation({
-        mutationFn: (updateUser: UserRequest) => updateUserById(updateUser, TEMP_USER_ID),
-        onSuccess: () => { console.log("Success"); }
+    const {mutate: saveUser } = useMutation({
+        mutationFn: async (updateUser: UserRequest) => {
+            setUpdatingUser(true);
+            updateUserById(updateUser, TEMP_USER_ID)
+        },
+        // refresh the cached data to represent the new changes, only when on success
+        onSuccess: () => { queryClient.invalidateQueries({queryKey: ["user", TEMP_USER_ID]}) },
+        onSettled: () => setUpdatingUser(false)
+    })
+
+    const { mutate: deleteListing } = useMutation({
+        mutationFn: async (listingId: string) => {
+            setIsDeletingListingById(listingId);
+            await deleteListingById(listingId);
+        },
+        // refresh the cached data to represent the new changes, only when on success
+        onSuccess: () => { queryClient.invalidateQueries({queryKey: ["listings", TEMP_USER_ID]}) },
+        onSettled: () => setIsDeletingListingById(null)
     })
 
     const onSubmit = (formData: UserRequest) => {
@@ -55,8 +77,9 @@ const ProfilePage = () => {
         navigate(`/listings/edit/${id}`);
     };
 
-    const handleDelete = (id: string) => {
+    const handleDelete = async (id: string) => {
         // TODO: open confirmation modal then call delete endpoint
+        await deleteListing(id);
         console.log("delete listing", id);
     };
 
@@ -99,8 +122,8 @@ const ProfilePage = () => {
                         </div>
                     </div>
                     <div className="mt-4 flex justify-end">
-                        <button disabled={isPending} className="bg-blue-600 hover:bg-blue-500 text-white text-sm px-5 py-2 rounded-lg" onClick={handleSubmit(onSubmit)}>
-                            {isPending ? "Saving..." : "Save changes"}
+                        <button disabled={updatingUser} className="bg-blue-600 hover:bg-blue-500 text-white text-sm px-5 py-2 rounded-lg cursor-pointer" onClick={handleSubmit(onSubmit)}>
+                            {updatingUser ? "Saving..." : "Save changes"}
                         </button>
                     </div>
                 </div>
@@ -139,14 +162,11 @@ const ProfilePage = () => {
                     </div>
                     <div className="flex flex-col divide-y divide-gray-700">
                         {listings?.map(listing => (
-                            <ListingRow key={listing.id} listing={listing} onEdit={handleEdit} onDelete={handleDelete} />
+                            <ListingRow key={listing.id} listing={listing} onEdit={handleEdit} onDelete={handleDelete} isDeleting={isDeletingListingById === listing.id} />
                         ))}
                     </div>
                     <div className="mt-4 pt-4 border-t border-gray-700">
-                        <button
-                            onClick={() => navigate("/listings/create")}
-                            className="w-full border border-blue-500 text-blue-500 hover:bg-blue-500/10 text-sm py-2 rounded-lg"
-                        >
+                        <button onClick={() => navigate("/listings/create")} className="w-full border border-blue-500 text-blue-500 hover:bg-blue-500/10 text-sm py-2 rounded-lg">
                             + Add new listing
                         </button>
                     </div>

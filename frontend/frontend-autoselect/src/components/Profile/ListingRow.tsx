@@ -6,9 +6,10 @@ interface ListingRowProps {
     listing: ListingResponse,
     onEdit: (id: string) => void,
     onDelete: (id: string) => void
+    isDeleting: boolean
 }
 
-const ListingRow = ({ listing, onEdit, onDelete }: ListingRowProps) => {
+const ListingRow = ({ listing, onEdit, onDelete, isDeleting }: ListingRowProps) => {
 
     const mainImage = listing.carImages.find(img => img.isMainImage);
     const car = listing.car;
@@ -42,19 +43,11 @@ const ListingRow = ({ listing, onEdit, onDelete }: ListingRowProps) => {
 
             {/* Actions */}
             <div className="flex items-center gap-2 shrink-0">
-                <button
-                    onClick={() => onEdit(listing.id)}
-                    aria-label="Edit listing"
-                    className="w-8 h-8 flex items-center justify-center rounded-lg border border-gray-700 text-gray-400 hover:text-white hover:border-gray-500 transition-colors"
-                >
+                <button onClick={() => onEdit(listing.id)} aria-label="Edit listing" className={`w-8 h-8 flex items-center justify-center rounded-lg border border-gray-700 text-gray-400 hover:text-white hover:border-gray-500 transition-colors ${isDeleting ? "opacity-50 cursor-not-allowed" : "cursor-pointer"}`}>
                     <FaRegEdit size={14} />
                 </button>
-                <button
-                    onClick={() => onDelete(listing.id)}
-                    aria-label="Delete listing"
-                    className="w-8 h-8 flex items-center justify-center rounded-lg border border-red-800 text-red-400 hover:text-red-300 hover:border-red-600 transition-colors"
-                >
-                    <MdDelete size={14} />
+                <button onClick={() => onDelete(listing.id)} aria-label="Delete listing" className={`w-8 h-8 flex items-center justify-center rounded-lg border border-red-800 text-red-400 hover:text-red-300 hover:border-red-600 transition-colors ${isDeleting ? "opacity-50 cursor-not-allowed" : "cursor-pointer"}`} >
+                    {isDeleting ? "..." : <MdDelete size={14} />}
                 </button>
             </div>
 

@@ -11,6 +11,7 @@ import DetailListingPage from './pages/DetailListingPage.tsx'
 import ProfilePage from './pages/ProfilePage.tsx'
 import CreateListingPage from './pages/CreateListingPage.tsx'
 import EditListingPage from './pages/EditListingPage.tsx'
+import AdminPage from './pages/AdminPage.tsx'
 
 const query = new QueryClient();
 
@@ -45,6 +46,10 @@ const router = createBrowserRouter([
       {
         element: <EditListingPage />,
         path: "listings/:id/edit"
+      },
+      {
+        element: <AdminPage />,
+        path: "/adminpanel"
       }
     ]
   }

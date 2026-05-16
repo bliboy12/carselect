@@ -2,6 +2,11 @@ import type { ImageRequest, ListingResponse, ListingRequest, ListingUpdateReques
 import { axiosListings } from "./axiosInstances";
 
 
+export const getAllListings = async (): Promise<ListingResponse[]> => {
+    const response = await axiosListings.get<ListingResponse[]>(`/`);
+    return response.data;
+}
+
 export const getListingsBySellerId = async (sellerId: string): Promise<ListingResponse[]> => {
     const response = await axiosListings.get<ListingResponse[]>(`?sellerId=${sellerId}`);
     return response.data;
@@ -38,6 +43,6 @@ export const DeleteImageById = async (listingId: string, imageId: string): Promi
     await axiosListings.delete<void>(`${listingId}/images/${imageId}`);
 }
 
-export const DeleteListingById = async (listingId: string): Promise<void> => {
+export const deleteListingById = async (listingId: string): Promise<void> => {
     await axiosListings.delete<void>(`${listingId}`);
 }

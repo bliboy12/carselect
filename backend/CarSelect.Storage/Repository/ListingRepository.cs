@@ -37,7 +37,6 @@ public class ListingRepository : IListingRepository
             throw new NotFoundException($"listing with Id {listingId} Not Found");
         }
     }
-
     public async Task<IEnumerable<FavoriteDataModel>> GetAllFavoritesByListingIdAsync(string userId, string listingId)
     {
         var sql = new QueryDefinition($"SELECT * FROM c WHERE c.userId=@userId AND c.listingId=@listingId")
