@@ -1,19 +1,24 @@
-import { useState } from "react";
-import { useQuery } from "@tanstack/react-query";
+import { useEffect, useState } from "react";
+import { useMutation, useQuery } from "@tanstack/react-query";
 import { Link, useParams } from "react-router";
 import { axiosListings } from "../../api/axiosInstances";
 import type { ListingResponse } from "../../types";
 import DetailListingSkeleton from "./DetailListingCardSkeleton";
 import defaultCarImage from "../../assets/car.jpg"
 import { CiHeart } from "react-icons/ci";
+import { FaHeart } from "react-icons/fa";
+import { createFavorite, deleteFavorite, isFavorited } from "../../api/favoriteApi";
 
+
+const TEMP_USER_ID = "a2a1616d-45a8-478b-ad0e-aa2d82773c31";
 
 const DetailListingCard = () => {
 
     const { id } = useParams();
     const [activeImage, setActiveImage] = useState(0);
+    const [isFavorite, setIsFavorite] = useState<boolean>(false);
 
-    const { data, isLoading, isError, error } = useQuery({
+    const { data: dataListing, isLoading, isError, error } = useQuery({
         queryKey: ["listing", id],
         queryFn: async () => await axiosListings.get<ListingResponse>(`/${id}`),
         refetchOnMount: false,
@@ -21,15 +26,48 @@ const DetailListingCard = () => {
         refetchOnWindowFocus: false
     });
 
+    const { data: favoriteStatus } = useQuery({
+        queryKey: ["isFavorite", id],
+        queryFn: () => isFavorited(TEMP_USER_ID, id!),
+        enabled: !!id
+    });
+
+    useEffect(() => {
+        if (favoriteStatus !== undefined)
+            setIsFavorite(favoriteStatus);
+    }, [favoriteStatus]);
+
+    const { mutate: createFavoriteMutation } = useMutation({
+        mutationFn: async () => {
+            const response = await createFavorite(TEMP_USER_ID, id!);
+            return response;
+        },
+        onSuccess: () => {setIsFavorite(true);}
+    })
+
+    const { mutate: deleteFavoriteMutation } = useMutation({
+        mutationFn: async () => {
+            await deleteFavorite(TEMP_USER_ID, id!);
+        },
+        onSuccess: () => { setIsFavorite(false); }
+    })
+
+    const handleFavorite = () => {
+        if (isFavorite)
+            deleteFavoriteMutation();
+        else
+            createFavoriteMutation();
+    }
+
     if (isLoading)
         return (<DetailListingSkeleton />)
     if (isError)
         return <p>{error.message}</p>
-    if (!data)
+    if (!dataListing)
         return <p>Listing doesn't exist</p>
     
 
-    const listing = data.data;    
+    const listing = dataListing.data;    
     const car = listing.car;
     const seller = listing.seller;
 
@@ -122,8 +160,8 @@ const DetailListingCard = () => {
                         </div>
 
                         {/* Save Listing */}
-                        <button className="w-full flex items-center justify-center gap-2 py-2.5 rounded-xl border border-gray-700 text-gray-300 hover:border-gray-500 hover:text-gray-100 transition-colors text-sm">
-                            <CiHeart className="size-5"/>
+                        <button onClick={() => handleFavorite()} className="w-full flex items-center justify-center gap-2 py-2.5 rounded-xl border border-gray-700 text-gray-300 hover:border-gray-500 hover:text-gray-100 transition-colors text-sm">
+                            {isFavorite ? <FaHeart className="size-5"/> : <CiHeart className="size-5" />}
                             Save listing
                         </button>
 

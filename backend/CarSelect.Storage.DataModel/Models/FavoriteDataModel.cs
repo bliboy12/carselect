@@ -8,7 +8,7 @@ public class FavoriteDataModel
 
     [JsonProperty("userId")]
     public string UserId { get; set; } = string.Empty;
-    
+
     [JsonProperty("listingId")]
     public string ListingId { get; set; } = string.Empty;
 }

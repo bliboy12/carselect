@@ -12,7 +12,7 @@ public class FavoriteMapper
     {
         return new FavoriteDataModel
         {
-            Id = $"{favoriteModel.UserId.ToString()}_{favoriteModel.ListingId.ToString()}",
+            Id = $"{favoriteModel.UserId}_{favoriteModel.ListingId}",
             UserId = favoriteModel.UserId.ToString(),
             ListingId = favoriteModel.ListingId.ToString(),
         };

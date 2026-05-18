@@ -12,6 +12,7 @@ import ProfilePage from './pages/ProfilePage.tsx'
 import CreateListingPage from './pages/CreateListingPage.tsx'
 import EditListingPage from './pages/EditListingPage.tsx'
 import AdminPage from './pages/AdminPage.tsx'
+import FavoritesPage from './pages/FavoritesPage.tsx'
 
 const query = new QueryClient();
 
@@ -50,6 +51,10 @@ const router = createBrowserRouter([
       {
         element: <AdminPage />,
         path: "/adminpanel"
+      },
+      {
+        element: <FavoritesPage />,
+        path: "/favorites"
       }
     ]
   }

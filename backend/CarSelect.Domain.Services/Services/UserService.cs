@@ -1,14 +1,10 @@
 public class UserService : IUserService
 {
     private readonly IUserRepository _repo;
+
     public UserService(IUserRepository repo)
     {
         _repo = repo;
-    }
-    public async Task<FavoriteModel> CreateFavoriteAsync(FavoriteModel favoriteData)
-    {
-        var result = await _repo.CreateFavoriteAsync(FavoriteMapper.MapFromDomein(favoriteData));
-        return FavoriteMapper.MapToDomein(result);
     }
 
     public async Task<UserModel> CreateUserAsync(UserModel userDataModel)
@@ -21,16 +17,6 @@ public class UserService : IUserService
         return UserMapper.MapToDomein(result);
     }
 
-    public async Task<IEnumerable<FavoriteModel>> GetAllFavoritesByUserIdAsync(Guid userId)
-    {
-        IEnumerable<FavoriteDataModel> response = await _repo.GetAllFavoritesByUserIdAsync(userId.ToString());
-        List<FavoriteModel> favorites = new();
-
-        foreach (FavoriteDataModel favorite in response)
-            favorites.Add(FavoriteMapper.MapToDomein(favorite));
-
-        return favorites;
-    }
 
     public async Task<IEnumerable<UserModel>> GetAllUsers(bool newestFirst = true)
     {
@@ -101,15 +87,6 @@ public class UserService : IUserService
         return await _repo.EmailExists(email);
     }
 
-    public async Task<bool> IsFavoritedAsync(Guid userId, Guid listingId)
-    {
-        return await _repo.IsFavoritedAsync(userId.ToString(), listingId.ToString());
-    }
-
-    public async Task RemoveFavoriteAsync(Guid userId, Guid listingId)
-    {
-        await _repo.DeleteFavoriteAsync(userId.ToString(), listingId.ToString());
-    }
 
     public async Task RemoveUserAsync(Guid userId)
     {

@@ -54,6 +54,7 @@ public class CarService : ICarService
         var response = await _carRepo.UpdateCarAsync(CarMapper.MapFromDomein(updateCar));
         return CarMapper.MapToDomein(response);
     }
+    // This is from an external API, using this as a test case
     public async Task<IEnumerable<CarMakesModel>> GetAllCarMakes()
     {
         var response = await _client.GetAsync($"GetAllMakes?format=json");

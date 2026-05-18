@@ -5,7 +5,15 @@ public class FavoriteApiMapper
         return new FavoriteReponseContract
         {
             UserId = favoriteModel.UserId,
-            ListingId = favoriteModel.ListingId
+            Listing = ListingApiMapper.MapToContract(favoriteModel.Listing)
+        };
+    }
+    public static FavoritesReponseContract MapToContract(Guid userId, IEnumerable<FavoriteModel> favoriteModel)
+    {
+        return new FavoritesReponseContract
+        {
+            UserId = userId,
+            Listings = favoriteModel.Select((l) => ListingApiMapper.MapToContract(l.Listing))
         };
     }
     public static FavoriteModel MapToDomain(FavoriteRequestContract favoriteRequest)

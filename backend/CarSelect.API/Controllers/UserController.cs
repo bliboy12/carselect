@@ -5,9 +5,11 @@ using Microsoft.AspNetCore.Mvc;
 public class UserController : ControllerBase
 {
     private readonly IUserService _service;
-    public UserController(IUserService userService)
+    private readonly IFavoriteService _favoriteService;
+    public UserController(IUserService userService, IFavoriteService favoriteService)
     {
         _service = userService;
+        _favoriteService = favoriteService;
     }
     [HttpPost]
     public async Task<ActionResult<UserResponseContract>> CreateUserAsync([FromBody] UserRequestContract userRequest)
@@ -90,14 +92,39 @@ public class UserController : ControllerBase
 
         return Ok(results);
     }
+
     // WIP: when creating new favorite, we already have the userId, we just need listingId provided by the user.
     // Seperate CreateFavoriteRequestContract or just [Frombody] Guid listingId ??
     [HttpPost("{userId}/favorites")]
-    public async Task<ActionResult<FavoriteReponseContract>> CreateFavorite([FromBody] FavoriteRequestContract favoriteRequest)
+    public async Task<ActionResult<FavoriteReponseContract>> CreateFavoriteAsync([FromRoute] Guid userId, [FromBody] Guid listingId)
     {
-        var response = await _service.CreateFavoriteAsync(FavoriteApiMapper.MapToDomain(favoriteRequest));
+        var response = await _favoriteService.CreateFavoriteAsync(userId, listingId);
 
-        return Ok(FavoriteApiMapper.MapToContract(response));
+        return CreatedAtAction(nameof(GetAllFavoritesByUserIdAsync), FavoriteApiMapper.MapToContract(response));
+    }
+
+    [HttpGet("{userId}/favorites")]
+    public async Task<ActionResult<FavoritesReponseContract>> GetAllFavoritesByUserIdAsync([FromRoute] Guid userId)
+    {
+        IEnumerable<FavoriteModel> response = await _favoriteService.GetAllFavoritesByUserIdAsync(userId);
+
+        return Ok(FavoriteApiMapper.MapToContract(userId, response));
+    }
+
+    [HttpDelete("{userId}/favorites/{listingId}")]
+    public async Task<ActionResult> DeleteFavoriteByListingIdAsync([FromRoute] Guid userId, [FromRoute] Guid listingId)
+    {
+        await _favoriteService.DeleteFavoriteByListingIdAsync(userId, listingId);
+
+        return NoContent(); // 204;
+    }
+
+    [HttpGet("{userId}/favorites/{listingId}")]
+    public async Task<ActionResult<bool>> IsFavoritedAsync([FromRoute] Guid userId, [FromRoute] Guid listingId)
+    {
+        bool isFavorite = await _favoriteService.IsFavoritedAsync(userId, listingId);
+
+        return Ok(isFavorite);
     }
 
     [HttpPatch("{userId}/role")]

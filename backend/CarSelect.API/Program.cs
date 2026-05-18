@@ -55,6 +55,7 @@ builder.Services.AddScoped<ITransactionService, TransactionService>();
 builder.Services.AddScoped<IReviewService, ReviewService>();
 builder.Services.AddScoped<IUserService, UserService>();
 builder.Services.AddScoped<ICarImageService, CarImageService>();
+builder.Services.AddScoped<IFavoriteService, FavoriteService>();
 
 builder.Services.AddHttpClient<ICarService, CarService>(client =>
 {
@@ -70,6 +71,7 @@ builder.Services.AddScoped<ITransactionRepository, TransactionRepository>();
 builder.Services.AddScoped<IReviewRepository, ReviewRepository>();
 builder.Services.AddScoped<IUserRepository, UserRepository>();
 builder.Services.AddScoped<ICarImageRepository, CarImageRepository>();
+builder.Services.AddScoped<IFavoriteRepository, FavoriteRepository>();
 
 builder.Services.AddScoped<IBlobStorageRepository, BlobStorageRepository>();
 

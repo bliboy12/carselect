@@ -97,9 +97,14 @@ export interface CarImage {
     isMainImage: boolean
 }
 
-export interface Favorites {
+export interface FavoriteResponse {
     userId: string,
-    listingId: string
+    listing: ListingResponse
+}
+
+export interface FavoritesResponse {
+    userId: string,
+    listings: ListingResponse[]
 }
 
 export interface CarFilter {

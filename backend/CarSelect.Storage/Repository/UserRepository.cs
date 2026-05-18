@@ -9,15 +9,6 @@ public class UserRepository : IUserRepository
         var client = new CosmosClient(cosmosOptions.Value.Connectionstring);
         _container = client.GetDatabase(cosmosOptions.Value.DatabaseName).GetContainer(userOptions.Value.ContainerName);
     }
-    public async Task<FavoriteDataModel> CreateFavoriteAsync(FavoriteDataModel favoriteData)
-    {
-        var createdFavorite = await _container.CreateItemAsync<FavoriteDataModel>(
-            item: favoriteData,
-            partitionKey: new PartitionKey($"{favoriteData.Id}")
-        );
-
-        return createdFavorite.Resource;
-    }
 
     public async Task<UserDataModel> CreateUserAsync(UserDataModel userDataModel)
     {
@@ -33,18 +24,6 @@ public class UserRepository : IUserRepository
         return createdFavorite.Resource;
     }
 
-    public async Task<IEnumerable<FavoriteDataModel>> GetAllFavoritesByUserIdAsync(string userId)
-    {
-        var query = _container.GetItemQueryIterator<FavoriteDataModel>(new QueryDefinition("SELECT * FROM c WHERE userId=@userId").WithParameter("@userId", userId));
-
-        var results = new List<FavoriteDataModel>();
-        while (query.HasMoreResults)
-        {
-            var response = await query.ReadNextAsync();
-            results.AddRange(response.Resource);
-        }
-        return results;
-    }
 
     public async Task<IEnumerable<UserDataModel>> GetAllUsers(bool newestFirst = true)
     {
@@ -155,38 +134,6 @@ public class UserRepository : IUserRepository
                 return true;
         }
         return false;
-    }
-
-    public async Task<bool> IsFavoritedAsync(string userId, string listingId)
-    {
-        try
-        {
-            var result = await _container.ReadItemAsync<FavoriteDataModel>(
-                id: $"{userId}_{listingId}",
-                partitionKey: new PartitionKey($"{userId}_{listingId}")
-            );
-
-            return true;
-        }
-        catch (CosmosException ex) when (ex.StatusCode == System.Net.HttpStatusCode.NotFound)
-        {
-            return false;
-        }
-    }
-
-    public async Task DeleteFavoriteAsync(string userId, string listingId)
-    {
-        try
-        {
-            var result = await _container.DeleteItemAsync<FavoriteDataModel>(
-                id: $"{userId}_{listingId}",
-                partitionKey: new PartitionKey($"{userId}_{listingId}")
-            );
-        }
-        catch (CosmosException ex) when (ex.StatusCode == System.Net.HttpStatusCode.NotFound)
-        {
-            throw new NotFoundException($"favorite with id {userId}_{listingId} Not Found");
-        }
     }
 
     // public async Task DeleteUserAsync(string userId)
