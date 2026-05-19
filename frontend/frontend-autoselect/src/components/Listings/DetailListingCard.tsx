@@ -42,7 +42,7 @@ const DetailListingCard = () => {
             const response = await createFavorite(TEMP_USER_ID, id!);
             return response;
         },
-        onSuccess: () => {setIsFavorite(true);}
+        onSuccess: () => { setIsFavorite(true); }
     })
 
     const { mutate: deleteFavoriteMutation } = useMutation({
@@ -65,16 +65,16 @@ const DetailListingCard = () => {
         return <p>{error.message}</p>
     if (!dataListing)
         return <p>Listing doesn't exist</p>
-    
 
-    const listing = dataListing.data;    
+
+    const listing = dataListing.data;
     const car = listing.car;
     const seller = listing.seller;
 
     const carImages = listing.carImages.length > 0
         ? listing.carImages.map((img) => img.imageUrl)
         : Array.from({ length: 5 }, () => defaultCarImage);
-    
+
     console.log(`${seller.firstName}${seller.lastName}`.toUpperCase());
 
     const sellerInitials = `${seller.firstName[0]}${seller.lastName[0]}`.toUpperCase();
@@ -160,8 +160,8 @@ const DetailListingCard = () => {
                         </div>
 
                         {/* Save Listing */}
-                        <button onClick={() => handleFavorite()} className="w-full flex items-center justify-center gap-2 py-2.5 rounded-xl border border-gray-700 text-gray-300 hover:border-gray-500 hover:text-gray-100 transition-colors text-sm">
-                            {isFavorite ? <FaHeart className="size-5"/> : <CiHeart className="size-5" />}
+                        <button onClick={() => handleFavorite()} className="w-full flex items-center justify-center gap-2 py-2.5 rounded-xl border border-gray-700 text-gray-300 hover:border-gray-500 hover:text-gray-100 transition-colors text-sm cursor-pointer">
+                            {isFavorite ? <FaHeart className="size-5" /> : <CiHeart className="size-5" />}
                             Save listing
                         </button>
 
