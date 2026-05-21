@@ -5,11 +5,11 @@ public class ReviewService : IReviewService
     {
         _repo = repo;
     }
-    public async Task<ReviewModel> CreateReviewAsync(ReviewModel reviewDataModel)
-    {
-        ReviewDataModel result = await _repo.CreateReviewAsync(reviewDataModel.MapFromDomein());
-        return result.MapToDomein();
-    }
+    // public async Task<ReviewModel> CreateReviewAsync(ReviewModel reviewDataModel)
+    // {
+    //     ReviewDataModel result = await _repo.CreateReviewAsync(reviewDataModel.MapFromDomein());
+    //     return result.MapToDomein();
+    // }
 
     public async Task<IEnumerable<ReviewModel>> GetAllReviewsByReviewerIdAsync(Guid reviewerId)
     {
@@ -38,9 +38,9 @@ public class ReviewService : IReviewService
         await _repo.DeleteReviewByIdAsync(reviewId.ToString());
     }
 
-    public async Task<ReviewModel> UpdateReviewByIdAsync(Guid reviewId, ReviewModel newReview)
-    {
-        ReviewDataModel result = await _repo.UpdateReviewByIdAsync(reviewId.ToString(), newReview.MapFromDomein());
-        return result.MapToDomein();
-    }
+    // public async Task<ReviewModel> UpdateReviewByIdAsync(Guid reviewId, ReviewModel newReview)
+    // {
+    //     ReviewDataModel result = await _repo.UpdateReviewByIdAsync(reviewId.ToString(), newReview.MapFromDomein());
+    //     return result.MapToDomein();
+    // }
 }
