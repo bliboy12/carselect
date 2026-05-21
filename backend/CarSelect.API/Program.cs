@@ -13,6 +13,26 @@ builder.Services.AddCors(options =>
         .AllowAnyMethod();
     })
 );
+
+builder.Services.AddAuthentication("Bearer")
+    .AddJwtBearer("Bearer", options =>
+    {
+        options.Authority = "https://localhost:5001";
+        options.TokenValidationParameters.ValidateAudience = false;
+        options.BackchannelHttpHandler = new HttpClientHandler
+        {
+            ServerCertificateCustomValidationCallback = HttpClientHandler.DangerousAcceptAnyServerCertificateValidator
+        };
+    });
+builder.Services.AddAuthorization();
+
+
+// Azure SQL Connection
+builder.Services.AddDbContext<CarSelectDbContext>(options =>
+    options.UseSqlServer(builder.Configuration.GetConnectionString("SqlConnection")));
+
+
+
 builder.Services.Configure<CarImageRepositoryOptions>(
     builder.Configuration.GetSection("CarImageRepositoryOptions")
 );
@@ -75,9 +95,6 @@ builder.Services.AddHttpClient<ICarService, CarService>(client =>
         );
 });
 
-// Azure SQL Connection
-builder.Services.AddDbContext<CarSelectDbContext>(options =>
-    options.UseSqlServer(builder.Configuration.GetConnectionString("SqlConnection")));
 
 // Cosmos Implementations 
 builder.Services.AddScoped<ICarRepository, CarRepository>();
@@ -102,10 +119,13 @@ builder.Services.AddControllers();
 // Converts enums to strings and vice versa even ignoring capitilizations
 builder.Services.AddControllers().AddJsonOptions(options => options.JsonSerializerOptions.Converters.Add(new JsonStringEnumConverter()));
 
+
 var app = builder.Build();
 
 app.UseRouting();
 app.UseCors("AllowFrontend");
+app.UseAuthentication();
+app.UseAuthorization();
 app.MapControllers();
 
 app.MapGet("/", () => "Hello World!");
