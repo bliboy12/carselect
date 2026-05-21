@@ -11,6 +11,10 @@ public class UserSqlRepository : IUserSqlRepository
 
     public async Task<UserDataModelSQL> CreateUserAsync(UserDataModelSQL user)
     {
+        var emailExists = await EmailExists(user.Email);
+        if (emailExists)
+            throw new Exception("Email Already exists");
+
         user.Id = Guid.NewGuid();
         user.CreatedAt = DateTime.UtcNow;
         user.UpdatedAt = DateTime.UtcNow;

@@ -3,7 +3,6 @@ using Newtonsoft.Json;
 
 public class ReviewDataModelSQL
 {
-    public Guid Id { get; set; }
     public Guid SellerId { get; set; }
     public UserDataModelSQL Seller { get; set; } = null!;
     public Guid ReviewerId { get; set; }

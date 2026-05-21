@@ -43,17 +43,17 @@ public class CarSelectDbContext : DbContext
         // Review
         modelBuilder.Entity<ReviewDataModelSQL>(entity =>
         {
-            entity.HasKey(r => r.Id);
+            entity.HasKey(r => new { r.SellerId, r.ReviewerId });
 
             entity.HasOne(r => r.Seller)
-                  .WithMany()
-                  .HasForeignKey(r => r.SellerId)
-                  .OnDelete(DeleteBehavior.Restrict);
+                .WithMany()
+                .HasForeignKey(r => r.SellerId)
+                .OnDelete(DeleteBehavior.Restrict);
 
             entity.HasOne(r => r.Reviewer)
-                  .WithMany()
-                  .HasForeignKey(r => r.ReviewerId)
-                  .OnDelete(DeleteBehavior.Restrict);
+                .WithMany()
+                .HasForeignKey(r => r.ReviewerId)
+                .OnDelete(DeleteBehavior.Restrict);
 
             entity.Property(r => r.Rating).IsRequired();
             entity.Property(r => r.Comment).HasMaxLength(1000);

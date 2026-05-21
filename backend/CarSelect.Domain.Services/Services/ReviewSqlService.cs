@@ -25,20 +25,20 @@ public class ReviewSqlService : IReviewSqlService
         return results.Select(r => ReviewSqlMapper.MapToDomein(r)).ToList();
     }
 
-    public async Task<ReviewModel?> GetReviewByIdAsync(Guid reviewId)
+    public async Task<ReviewModel?> GetReviewByIdAsync(Guid reviewId, Guid sellerId)
     {
-        ReviewDataModelSQL? result = await _repo.GetReviewByIdAsync(reviewId);
+        ReviewDataModelSQL? result = await _repo.GetReviewByIdAsync(reviewId, sellerId);
         return result == null ? null : ReviewSqlMapper.MapToDomein(result);
     }
 
-    public async Task DeleteReviewByIdAsync(Guid reviewId)
+    public async Task DeleteReviewByIdAsync(Guid reviewId, Guid sellerId)
     {
-        await _repo.DeleteReviewByIdAsync(reviewId);
+        await _repo.DeleteReviewByIdAsync(reviewId, sellerId);
     }
 
-    public async Task<ReviewModel> UpdateReviewByIdAsync(Guid reviewId, ReviewModel newReview)
+    public async Task<ReviewModel> UpdateReviewByIdAsync(Guid reviewId, Guid sellerId, ReviewModel newReview)
     {
-        ReviewDataModelSQL result = await _repo.UpdateReviewByIdAsync(reviewId, ReviewSqlMapper.MapFromDomein(newReview));
+        ReviewDataModelSQL result = await _repo.UpdateReviewByIdAsync(reviewId, sellerId, ReviewSqlMapper.MapFromDomein(newReview));
         return ReviewSqlMapper.MapToDomein(result);
     }
 }

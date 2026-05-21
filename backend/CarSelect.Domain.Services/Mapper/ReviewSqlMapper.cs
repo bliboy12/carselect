@@ -4,7 +4,6 @@ public static class ReviewSqlMapper
     {
         return new ReviewModel
         {
-            Id = reviewDataModelSQL.Id,
             SellerId = reviewDataModelSQL.SellerId,
             ReviewerId = reviewDataModelSQL.ReviewerId,
             Rating = reviewDataModelSQL.Rating,
@@ -16,7 +15,6 @@ public static class ReviewSqlMapper
     {
         return new ReviewDataModelSQL
         {
-            Id = reviewModel.Id,
             SellerId = reviewModel.SellerId,
             ReviewerId = reviewModel.ReviewerId,
             Rating = reviewModel.Rating,

@@ -58,7 +58,7 @@ builder.Services.AddScoped<ICarImageService, CarImageService>();
 
 // Old Implemention (cosmos) - Needs to be removed when SQL Refactor is completed
 builder.Services.AddScoped<IUserService, UserService>();
-builder.Services.AddScoped<IReviewService, ReviewService>();
+// builder.Services.AddScoped<IReviewService, ReviewService>();
 builder.Services.AddScoped<IFavoriteService, FavoriteService>();
 
 
@@ -87,7 +87,7 @@ builder.Services.AddScoped<ICarImageRepository, CarImageRepository>();
 
 // Old Implemention (cosmos) - Needs to be removed when SQL Refactor is completed
 builder.Services.AddScoped<IUserRepository, UserRepository>();
-builder.Services.AddScoped<IReviewRepository, ReviewRepository>();
+// builder.Services.AddScoped<IReviewRepository, ReviewRepository>();
 builder.Services.AddScoped<IFavoriteRepository, FavoriteRepository>();
 
 // SQL Refactoring 

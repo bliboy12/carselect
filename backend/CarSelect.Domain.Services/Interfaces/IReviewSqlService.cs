@@ -5,9 +5,9 @@ public interface IReviewSqlService
     Task<IEnumerable<ReviewModel>> GetAllReviewsByReviewerIdAsync(Guid reviewerId);
     Task<IEnumerable<ReviewModel>> GetAllReviewsBySellerIdAsync(Guid sellerId);
 
-    Task<ReviewModel?> GetReviewByIdAsync(Guid reviewId);
+    Task<ReviewModel?> GetReviewByIdAsync(Guid reviewId, Guid sellerId);
 
-    Task DeleteReviewByIdAsync(Guid reviewId);
+    Task DeleteReviewByIdAsync(Guid reviewId, Guid sellerId);
 
-    Task<ReviewModel> UpdateReviewByIdAsync(Guid reviewId, ReviewModel newReview);
+    Task<ReviewModel> UpdateReviewByIdAsync(Guid reviewId, Guid sellerId, ReviewModel newReview);
 }

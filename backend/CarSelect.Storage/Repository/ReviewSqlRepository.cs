@@ -11,7 +11,7 @@ public class ReviewSqlRepository : IReviewSqlRepository
 
     public async Task<ReviewDataModelSQL> CreateReviewAsync(ReviewDataModelSQL review)
     {
-        review.Id = Guid.NewGuid();
+
         review.CreatedAt = DateTime.UtcNow;
 
         await _context.Reviews.AddAsync(review);
@@ -19,9 +19,9 @@ public class ReviewSqlRepository : IReviewSqlRepository
         return review;
     }
 
-    public async Task<ReviewDataModelSQL?> GetReviewByIdAsync(Guid reviewId)
+    public async Task<ReviewDataModelSQL?> GetReviewByIdAsync(Guid reviewId, Guid sellerId)
     {
-        return await _context.Reviews.FindAsync(reviewId);
+        return await _context.Reviews.FindAsync(reviewId, sellerId);
     }
 
     public async Task<IEnumerable<ReviewDataModelSQL>> GetAllReviewsByReviewerIdAsync(Guid reviewerId)
@@ -38,9 +38,9 @@ public class ReviewSqlRepository : IReviewSqlRepository
             .ToListAsync();
     }
 
-    public async Task DeleteReviewByIdAsync(Guid reviewId)
+    public async Task DeleteReviewByIdAsync(Guid reviewId, Guid sellerId)
     {
-        var review = await GetReviewByIdAsync(reviewId);
+        var review = await GetReviewByIdAsync(reviewId, sellerId);
         if (review == null)
             throw new NotFoundException($"Review with id {reviewId} Not Found");
 
@@ -48,9 +48,9 @@ public class ReviewSqlRepository : IReviewSqlRepository
         await _context.SaveChangesAsync();
     }
 
-    public async Task<ReviewDataModelSQL> UpdateReviewByIdAsync(Guid reviewId, ReviewDataModelSQL newReview)
+    public async Task<ReviewDataModelSQL> UpdateReviewByIdAsync(Guid reviewId, Guid sellerId, ReviewDataModelSQL newReview)
     {
-        var existing = await GetReviewByIdAsync(reviewId);
+        var existing = await GetReviewByIdAsync(reviewId, sellerId);
         if (existing == null)
             throw new NotFoundException($"Review with id {reviewId} Not Found");
 
