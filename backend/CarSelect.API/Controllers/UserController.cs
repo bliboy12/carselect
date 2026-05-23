@@ -1,12 +1,14 @@
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
+[Authorize]
 [ApiController]
 [Route("api/users")]
 public class UserController : ControllerBase
 {
-    private readonly IUserService _service;
-    private readonly IFavoriteService _favoriteService;
-    public UserController(IUserService userService, IFavoriteService favoriteService)
+    private readonly IUserSqlService _service;
+    private readonly IFavoriteSqlService _favoriteService;
+    public UserController(IUserSqlService userService, IFavoriteSqlService favoriteService)
     {
         _service = userService;
         _favoriteService = favoriteService;
@@ -100,7 +102,7 @@ public class UserController : ControllerBase
     {
         var response = await _favoriteService.CreateFavoriteAsync(userId, listingId);
 
-        return CreatedAtAction(nameof(GetAllFavoritesByUserIdAsync), FavoriteApiMapper.MapToContract(response));
+        return Ok(FavoriteApiMapper.MapToContract(response));
     }
 
     [HttpGet("{userId}/favorites")]

@@ -4,7 +4,6 @@ public static class ReivewApiMapper
     {
         return new ReviewResponseContract
         {
-            Id = reviewModel.Id,
             SellerId = reviewModel.SellerId,
             ReviewerId = reviewModel.ReviewerId,
             Rating = reviewModel.Rating,

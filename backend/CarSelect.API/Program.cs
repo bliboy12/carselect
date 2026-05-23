@@ -1,6 +1,7 @@
 
 using System.Net.Http.Headers;
 using System.Text.Json.Serialization;
+using Microsoft.EntityFrameworkCore;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -12,6 +13,32 @@ builder.Services.AddCors(options =>
         .AllowAnyMethod();
     })
 );
+
+builder.Services.AddAuthentication()
+    .AddJwtBearer(options =>
+    {
+        options.Authority = "https://localhost:5001";
+        options.TokenValidationParameters.ValidateAudience = false;
+
+        // TODO: MUST BE REMOVED BEFORE DEPLOYING
+        if (builder.Environment.IsDevelopment())
+        {
+            options.BackchannelHttpHandler = new HttpClientHandler
+            {
+                ServerCertificateCustomValidationCallback =
+                    HttpClientHandler.DangerousAcceptAnyServerCertificateValidator
+            };
+        }
+    });
+builder.Services.AddAuthorization();
+
+
+// Azure SQL Connection
+builder.Services.AddDbContext<CarSelectDbContext>(options =>
+    options.UseSqlServer(builder.Configuration.GetConnectionString("SqlConnection")));
+
+
+
 builder.Services.Configure<CarImageRepositoryOptions>(
     builder.Configuration.GetSection("CarImageRepositoryOptions")
 );
@@ -48,14 +75,23 @@ builder.Services.Configure<BlobStorageRepositoryOptions>(
     builder.Configuration.GetSection("BlobStorageRepositoryOptions")
 );
 
-
+// Cosmos Implementations 
 builder.Services.AddScoped<ICarService, CarService>();
 builder.Services.AddScoped<IListingService, ListingService>();
 builder.Services.AddScoped<ITransactionService, TransactionService>();
-builder.Services.AddScoped<IReviewService, ReviewService>();
-builder.Services.AddScoped<IUserService, UserService>();
 builder.Services.AddScoped<ICarImageService, CarImageService>();
+
+
+// Old Implemention (cosmos) - Needs to be removed when SQL Refactor is completed
+builder.Services.AddScoped<IUserService, UserService>();
+// builder.Services.AddScoped<IReviewService, ReviewService>();
 builder.Services.AddScoped<IFavoriteService, FavoriteService>();
+
+
+// SQL Service Refactor
+builder.Services.AddScoped<IUserSqlService, UserSqlService>();
+builder.Services.AddScoped<IReviewSqlService, ReviewSqlService>();
+builder.Services.AddScoped<IFavoriteSqlService, FavoriteSqlService>();
 
 builder.Services.AddHttpClient<ICarService, CarService>(client =>
 {
@@ -65,13 +101,22 @@ builder.Services.AddHttpClient<ICarService, CarService>(client =>
         );
 });
 
+
+// Cosmos Implementations 
 builder.Services.AddScoped<ICarRepository, CarRepository>();
 builder.Services.AddScoped<IListingRepository, ListingRepository>();
 builder.Services.AddScoped<ITransactionRepository, TransactionRepository>();
-builder.Services.AddScoped<IReviewRepository, ReviewRepository>();
-builder.Services.AddScoped<IUserRepository, UserRepository>();
 builder.Services.AddScoped<ICarImageRepository, CarImageRepository>();
+
+// Old Implemention (cosmos) - Needs to be removed when SQL Refactor is completed
+builder.Services.AddScoped<IUserRepository, UserRepository>();
+// builder.Services.AddScoped<IReviewRepository, ReviewRepository>();
 builder.Services.AddScoped<IFavoriteRepository, FavoriteRepository>();
+
+// SQL Refactoring 
+builder.Services.AddScoped<IUserSqlRepository, UserSqlRepository>();
+builder.Services.AddScoped<IReviewSqlRepository, ReviewSqlRepository>();
+builder.Services.AddScoped<IFavoriteSqlRepository, FavoriteSqlRepository>();
 
 builder.Services.AddScoped<IBlobStorageRepository, BlobStorageRepository>();
 
@@ -80,10 +125,13 @@ builder.Services.AddControllers();
 // Converts enums to strings and vice versa even ignoring capitilizations
 builder.Services.AddControllers().AddJsonOptions(options => options.JsonSerializerOptions.Converters.Add(new JsonStringEnumConverter()));
 
+
 var app = builder.Build();
 
 app.UseRouting();
 app.UseCors("AllowFrontend");
+app.UseAuthentication();
+app.UseAuthorization();
 app.MapControllers();
 
 app.MapGet("/", () => "Hello World!");

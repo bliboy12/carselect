@@ -4,5 +4,6 @@
   <Project Path="CarSelect.Domain.Model/CarSelect.Domain.Model.csproj" />
   <Project Path="CarSelect.Domain.Services/CarSelect.Domain.Services.csproj" />
   <Project Path="CarSelect.Storage/CarSelect.Storage.csproj" />
+  <Project Path="CarSelect.Identity/CarSelect.Identity.csproj" />
   <Project Path="CarSelect.Storage.DataModel/CarSelect.Storage.DataModel.csproj" />
 </Solution>

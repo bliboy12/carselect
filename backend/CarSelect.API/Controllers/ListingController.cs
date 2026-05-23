@@ -1,4 +1,4 @@
-using Microsoft.AspNetCore.Http.HttpResults;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 [ApiController]
@@ -74,7 +74,7 @@ public class ListingController : ControllerBase
             return NotFound(nfe.Message);
         }
     }
-    // The adding of images to the listing will be called by a separate HttpPost 
+    [Authorize]
     [HttpPost]
     public async Task<ActionResult<ListingResponseContract>> CreateListingAsync([FromBody] DetailedListingRequestContract listingRequest)
     {
@@ -82,7 +82,7 @@ public class ListingController : ControllerBase
         return CreatedAtAction("CreateListing", ListingApiMapper.MapToContract(result));
     }
 
-    // Question: is a user allowed to change the carId on a listing?
+    [Authorize]
     [HttpPut("{listingId}")]
     public async Task<ActionResult<ListingResponseContract>> UpdateListingAsync([FromRoute] Guid listingId, [FromBody] ListingRequestContract updateListing)
     {
@@ -92,6 +92,7 @@ public class ListingController : ControllerBase
 
         return Ok(ListingApiMapper.MapToContract(result));
     }
+    [Authorize]
     [HttpDelete("{listingId}")]
     public async Task<ActionResult> DeleteListingByIdAsync([FromRoute] Guid listingId)
     {
@@ -128,7 +129,7 @@ public class ListingController : ControllerBase
             return NotFound(nfe.Message);
         }
     }
-
+    [Authorize]
     [HttpPost("{listingId}/images")]
     public async Task<ActionResult<IEnumerable<CarImageResponseContract>>> CreateCarImageAsync([FromRoute] Guid listingId, [FromForm] IEnumerable<CarImageRequestContract> files)
     {
@@ -154,7 +155,7 @@ public class ListingController : ControllerBase
 
         return CarImageApiMapper.MapToContract(result);
     }
-
+    [Authorize]
     [HttpDelete("{listingId}/images/{imageId}")]
     public async Task<ActionResult> DeleteCarImageByIdAsync([FromRoute] Guid listingId, [FromRoute] Guid imageId)
     {
@@ -168,6 +169,7 @@ public class ListingController : ControllerBase
             return NotFound(nfe.Message);
         }
     }
+    [Authorize]
     [HttpDelete("{listingId}/images")]
     public async Task<ActionResult> DeleteAllImagesByListingIdAsync([FromRoute] Guid listingId)
     {
