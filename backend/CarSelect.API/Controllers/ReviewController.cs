@@ -1,5 +1,6 @@
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.RateLimiting;
 
 [Authorize]
 [ApiController]
@@ -11,6 +12,7 @@ public class ReviewController : ControllerBase
     {
         _service = service;
     }
+    [Authorize("AuthenticatedUser")]
     [HttpGet]
     public async Task<ActionResult<ReviewResponseContract>> GetReviewsAsync([FromQuery] Guid? sellerId, [FromQuery] Guid? reviewerId)
     {
@@ -26,19 +28,22 @@ public class ReviewController : ControllerBase
         }
         return BadRequest("Please provide with either sellerId or reviewerId");
     }
-
+    // TODO: not relevant, once you make a review you can't edit it. Must be deleted
     [HttpPut]
     public async Task<ActionResult<ReviewResponseContract>> UpdateReviewByIdAsync([FromQuery] Guid reviewerId, [FromQuery] Guid sellerId, [FromBody] ReviewRequestContract newReview)
     {
         var result = await _service.UpdateReviewByIdAsync(reviewerId, sellerId, newReview.MapToDomain());
         return Ok(result.MapToContract());
     }
+    [Authorize("AuthenticatedUser")]
+    [EnableRateLimiting("QuoteCreationLimiter")]
     [HttpPost]
     public async Task<ActionResult<ReviewResponseContract>> CreateReviewAsync([FromBody] ReviewRequestContract reviewRequest)
     {
         var newReview = await _service.CreateReviewAsync(reviewRequest.MapToDomain());
         return newReview.MapToContract();
     }
+    [Authorize("AuthenticatedUser")]
     [HttpDelete]
     public async Task<ActionResult> DeleteReviewAsync([FromQuery] Guid reviewerId, [FromQuery] Guid sellerId)
     {

@@ -1,7 +1,7 @@
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.RateLimiting;
 
-[Authorize]
 [ApiController]
 [Route("api/users")]
 public class UserController : ControllerBase
@@ -13,6 +13,7 @@ public class UserController : ControllerBase
         _service = userService;
         _favoriteService = favoriteService;
     }
+    [EnableRateLimiting("QuoteCreationLimiter")]
     [HttpPost]
     public async Task<ActionResult<UserResponseContract>> CreateUserAsync([FromBody] UserRequestContract userRequest)
     {
@@ -26,6 +27,7 @@ public class UserController : ControllerBase
             return BadRequest("Email Already Exists");
         }
     }
+    [Authorize("ReadPolicy")]
     [HttpGet("{id}")]
     public async Task<ActionResult<UserResponseContract>> GetUserByIdAsync([FromRoute] Guid id)
     {
@@ -40,7 +42,7 @@ public class UserController : ControllerBase
             return NotFound(nfe.Message);
         }
     }
-
+    [Authorize("AdminOnly")]
     [HttpGet]
     public async Task<ActionResult<IEnumerable<UserResponseContract>>> GetAllUsers()
     {
@@ -54,7 +56,8 @@ public class UserController : ControllerBase
         return users;
 
     }
-    [HttpPut("{id}")] // Needs 2 possibilities, one updatable params for a normal user and one for a admin (to be able to make the user an Admin)
+    [Authorize("AuthenticatedUser")]
+    [HttpPut("{id}")]
     public async Task<ActionResult<UserResponseContract>> UpdateUserAsync([FromRoute] Guid id, [FromBody] UserRequestContract updateUser)
     {
         try
@@ -70,6 +73,7 @@ public class UserController : ControllerBase
             return NotFound(efx.Message);
         }
     }
+    [Authorize("AdminOnly")]
     [HttpDelete("{id}")]
     public async Task<ActionResult> RemoveUserAsync([FromRoute] Guid id)
     {
@@ -83,6 +87,7 @@ public class UserController : ControllerBase
             return NotFound(efx.Message);
         }
     }
+    [Authorize("AdminOnly")]
     [HttpGet("search")] // Admin to search on a specific users first-, lastname
     public async Task<ActionResult<UserResponseContract>> GetAllUsersByNameAsync([FromQuery] string? firstName, [FromQuery] string? lastName)
     {
@@ -95,8 +100,7 @@ public class UserController : ControllerBase
         return Ok(results);
     }
 
-    // WIP: when creating new favorite, we already have the userId, we just need listingId provided by the user.
-    // Seperate CreateFavoriteRequestContract or just [Frombody] Guid listingId ??
+    [Authorize("AuthenticatedUser")]
     [HttpPost("{userId}/favorites")]
     public async Task<ActionResult<FavoriteReponseContract>> CreateFavoriteAsync([FromRoute] Guid userId, [FromBody] Guid listingId)
     {
@@ -105,6 +109,7 @@ public class UserController : ControllerBase
         return Ok(FavoriteApiMapper.MapToContract(response));
     }
 
+    [Authorize("AuthenticatedUser")]
     [HttpGet("{userId}/favorites")]
     public async Task<ActionResult<FavoritesReponseContract>> GetAllFavoritesByUserIdAsync([FromRoute] Guid userId)
     {
@@ -113,6 +118,7 @@ public class UserController : ControllerBase
         return Ok(FavoriteApiMapper.MapToContract(userId, response));
     }
 
+    [Authorize("AuthenticatedUser")]
     [HttpDelete("{userId}/favorites/{listingId}")]
     public async Task<ActionResult> DeleteFavoriteByListingIdAsync([FromRoute] Guid userId, [FromRoute] Guid listingId)
     {
@@ -120,7 +126,7 @@ public class UserController : ControllerBase
 
         return NoContent(); // 204;
     }
-
+    [Authorize("AuthenticatedUser")]
     [HttpGet("{userId}/favorites/{listingId}")]
     public async Task<ActionResult<bool>> IsFavoritedAsync([FromRoute] Guid userId, [FromRoute] Guid listingId)
     {
@@ -128,7 +134,7 @@ public class UserController : ControllerBase
 
         return Ok(isFavorite);
     }
-
+    [Authorize("AdminOnly")]
     [HttpPatch("{userId}/role")]
     public async Task<ActionResult<UserResponseContract>> UpdateUserRoleAsync([FromRoute] Guid userId, [FromBody] bool isAdmin)
     {
