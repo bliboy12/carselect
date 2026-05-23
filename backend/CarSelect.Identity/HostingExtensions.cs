@@ -4,6 +4,7 @@ using CarSelect.Identity.Models;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Serilog;
+using Duende.IdentityServer.EntityFramework.DbContexts;
 
 namespace CarSelect.Identity;
 
@@ -14,7 +15,14 @@ internal static class HostingExtensions
         builder.Services.AddRazorPages();
 
         builder.Services.AddDbContext<ApplicationDbContext>(options =>
-            options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
+            options.UseSqlServer(builder.Configuration.GetConnectionString("IdentityServer")));
+
+        builder.Services.AddDbContext<ConfigurationDbContext>(options =>
+            options.UseSqlServer(
+                builder.Configuration
+                    .GetConnectionString("IdentityServer"),
+                options => options.MigrationsAssembly(typeof(Program).Assembly.GetName().Name))
+        );
 
         builder.Services.AddIdentity<ApplicationUser, IdentityRole>()
             .AddEntityFrameworkStores<ApplicationDbContext>()
@@ -31,9 +39,7 @@ internal static class HostingExtensions
                 // see https://docs.duendesoftware.com/identityserver/v6/fundamentals/resources/
                 options.EmitStaticAudienceClaim = true;
             })
-            .AddInMemoryIdentityResources(Config.IdentityResources)
-            .AddInMemoryApiScopes(Config.ApiScopes)
-            .AddInMemoryClients(Config.Clients)
+            .AddConfigurationStore()
             .AddAspNetIdentity<ApplicationUser>();
 
         builder.Services.AddAuthentication()
@@ -62,6 +68,7 @@ internal static class HostingExtensions
 
         app.UseStaticFiles();
         app.UseRouting();
+        app.UseCors("AllowFrontend");
         app.UseIdentityServer();
         app.UseAuthorization();
 

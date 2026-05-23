@@ -1,7 +1,6 @@
 // Copyright (c) Duende Software. All rights reserved.
 // See LICENSE in the project root for license information.
 
-using IdentityModel;
 using Microsoft.AspNetCore.Authentication;
 using System.Text;
 using System.Text.Json;
@@ -18,7 +17,7 @@ public class ViewModel
         {
             if (encoded != null)
             {
-                var bytes = Base64Url.Decode(encoded);
+                var bytes = Base64UrlTextEncoder.Decode(encoded);
                 var value = Encoding.UTF8.GetString(bytes);
                 Clients = JsonSerializer.Deserialize<string[]>(value) ?? Enumerable.Empty<string>();
                 return;

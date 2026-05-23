@@ -13,6 +13,10 @@ import CreateListingPage from './pages/CreateListingPage.tsx'
 import EditListingPage from './pages/EditListingPage.tsx'
 import AdminPage from './pages/AdminPage.tsx'
 import FavoritesPage from './pages/FavoritesPage.tsx'
+import { AuthProvider } from "react-oidc-context";
+import { authConfig } from './auth/authConfig.ts'
+import CallbackPage from './pages/CallBackPage.tsx'
+
 
 const query = new QueryClient();
 
@@ -55,6 +59,10 @@ const router = createBrowserRouter([
       {
         element: <FavoritesPage />,
         path: "/favorites"
+      },
+      {
+        element: <CallbackPage />,
+        path: "/callback"
       }
     ]
   }
@@ -62,8 +70,10 @@ const router = createBrowserRouter([
 
 createRoot(document.getElementById('root')!).render(
   <StrictMode>
-    <QueryClientProvider client={query}>
-      <RouterProvider router={router} />
-    </QueryClientProvider>
+    <AuthProvider {...authConfig}>
+      <QueryClientProvider client={query}>
+        <RouterProvider router={router} />
+      </QueryClientProvider>
+    </AuthProvider>
   </StrictMode>,
 )

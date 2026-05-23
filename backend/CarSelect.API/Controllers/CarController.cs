@@ -1,7 +1,7 @@
-
-using System.Net.Http.Headers;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
+[Authorize]
 [ApiController]
 [Route("api/cars")]
 public class CarController : ControllerBase

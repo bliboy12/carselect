@@ -5,8 +5,7 @@ import { deleteFavorite, getAllFavoritesByUserId } from "../api/favoriteApi";
 import ListingCard from "../components/Listings/ListingCard";
 import { Link } from "react-router";
 import ListingCardSkeleton from "../components/Listings/ListingCardSkeleton";
-
-const TEMP_USER_ID = "a2a1616d-45a8-478b-ad0e-aa2d82773c31";
+import useCurrentUser from "../hooks/useCurrentUser";
 
 
 const FavoritesPage = () => {
@@ -14,9 +13,11 @@ const FavoritesPage = () => {
     const [favoriteListings, setFavoriteListings] = useState<ListingResponse[]>([]);
     const [deletingListingId, setDeletingListingId] = useState<string | null>(null);
 
+    const { userId } = useCurrentUser();
+
     const { data, isLoading, isError, error } = useQuery({
-        queryKey: ["favoriteListings", TEMP_USER_ID],
-        queryFn: () => getAllFavoritesByUserId(TEMP_USER_ID)
+        queryKey: ["favoriteListings", userId],
+        queryFn: () => getAllFavoritesByUserId(userId)
     })
 
     console.log(data);
@@ -29,7 +30,7 @@ const FavoritesPage = () => {
     const { mutate: deleteFavoriteByListingId } = useMutation({
         mutationFn: async (listingId: string) => {
             setDeletingListingId(listingId);
-            await deleteFavorite(TEMP_USER_ID, listingId);
+            await deleteFavorite(userId, listingId);
             return listingId;
         },
         onSuccess: (listingId: string) => {

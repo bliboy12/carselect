@@ -14,15 +14,21 @@ builder.Services.AddCors(options =>
     })
 );
 
-builder.Services.AddAuthentication("Bearer")
-    .AddJwtBearer("Bearer", options =>
+builder.Services.AddAuthentication()
+    .AddJwtBearer(options =>
     {
         options.Authority = "https://localhost:5001";
         options.TokenValidationParameters.ValidateAudience = false;
-        options.BackchannelHttpHandler = new HttpClientHandler
+
+        // TODO: MUST BE REMOVED BEFORE DEPLOYING
+        if (builder.Environment.IsDevelopment())
         {
-            ServerCertificateCustomValidationCallback = HttpClientHandler.DangerousAcceptAnyServerCertificateValidator
-        };
+            options.BackchannelHttpHandler = new HttpClientHandler
+            {
+                ServerCertificateCustomValidationCallback =
+                    HttpClientHandler.DangerousAcceptAnyServerCertificateValidator
+            };
+        }
     });
 builder.Services.AddAuthorization();
 

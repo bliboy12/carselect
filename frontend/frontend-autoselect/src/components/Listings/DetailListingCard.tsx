@@ -8,13 +8,15 @@ import defaultCarImage from "../../assets/car.jpg"
 import { CiHeart } from "react-icons/ci";
 import { FaHeart } from "react-icons/fa";
 import { createFavorite, deleteFavorite, isFavorited } from "../../api/favoriteApi";
+import useCurrentUser from "../../hooks/useCurrentUser";
 
-
-const TEMP_USER_ID = "a2a1616d-45a8-478b-ad0e-aa2d82773c31";
 
 const DetailListingCard = () => {
 
     const { id } = useParams();
+
+    const { userId } = useCurrentUser();
+
     const [activeImage, setActiveImage] = useState(0);
     const [isFavorite, setIsFavorite] = useState<boolean>(false);
 
@@ -28,7 +30,7 @@ const DetailListingCard = () => {
 
     const { data: favoriteStatus } = useQuery({
         queryKey: ["isFavorite", id],
-        queryFn: () => isFavorited(TEMP_USER_ID, id!),
+        queryFn: () => isFavorited(userId, id!),
         enabled: !!id
     });
 
@@ -39,7 +41,7 @@ const DetailListingCard = () => {
 
     const { mutate: createFavoriteMutation } = useMutation({
         mutationFn: async () => {
-            const response = await createFavorite(TEMP_USER_ID, id!);
+            const response = await createFavorite(userId, id!);
             return response;
         },
         onSuccess: () => { setIsFavorite(true); }
@@ -47,7 +49,7 @@ const DetailListingCard = () => {
 
     const { mutate: deleteFavoriteMutation } = useMutation({
         mutationFn: async () => {
-            await deleteFavorite(TEMP_USER_ID, id!);
+            await deleteFavorite(userId, id!);
         },
         onSuccess: () => { setIsFavorite(false); }
     })

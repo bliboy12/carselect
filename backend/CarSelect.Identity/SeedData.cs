@@ -1,10 +1,12 @@
 ﻿using System.Security.Claims;
-using IdentityModel;
+using Duende.IdentityModel;
 using CarSelect.Identity.Data;
 using CarSelect.Identity.Models;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Serilog;
+using Duende.IdentityServer.EntityFramework.DbContexts;
+using Duende.IdentityServer.EntityFramework.Mappers;
 
 namespace CarSelect.Identity;
 
@@ -14,73 +16,89 @@ public class SeedData
     {
         using (var scope = app.Services.GetRequiredService<IServiceScopeFactory>().CreateScope())
         {
+            // Apply migrations
             var context = scope.ServiceProvider.GetRequiredService<ApplicationDbContext>();
             context.Database.Migrate();
 
-            var userMgr = scope.ServiceProvider.GetRequiredService<UserManager<ApplicationUser>>();
-            var alice = userMgr.FindByNameAsync("alice").Result;
-            if (alice == null)
-            {
-                alice = new ApplicationUser
-                {
-                    UserName = "alice",
-                    Email = "AliceSmith@email.com",
-                    EmailConfirmed = true,
-                };
-                var result = userMgr.CreateAsync(alice, "Pass123$").Result;
-                if (!result.Succeeded)
-                {
-                    throw new Exception(result.Errors.First().Description);
-                }
+            var configContext = scope.ServiceProvider.GetRequiredService<ConfigurationDbContext>();
+            configContext.Database.Migrate();
 
-                result = userMgr.AddClaimsAsync(alice, new Claim[]{
-                            new Claim(JwtClaimTypes.Name, "Alice Smith"),
-                            new Claim(JwtClaimTypes.GivenName, "Alice"),
-                            new Claim(JwtClaimTypes.FamilyName, "Smith"),
-                            new Claim(JwtClaimTypes.WebSite, "http://alice.com"),
-                        }).Result;
-                if (!result.Succeeded)
-                {
-                    throw new Exception(result.Errors.First().Description);
-                }
-                Log.Debug("alice created");
-            }
-            else
+            // Seed clients and scopes — needed in both dev and production
+            Log.Debug("Overwriting db clients with Config.cs");
+            configContext.Clients.RemoveRange(configContext.Clients);
+            foreach (var client in Config.Clients)
+                configContext.Clients.Add(client.ToEntity());
+            configContext.SaveChanges();
+
+            Log.Debug("Adding IdentityResources");
+            foreach (var resource in Config.IdentityResources)
+                if (!configContext.IdentityResources.Any(db => resource.Name == db.Name))
+                    configContext.IdentityResources.Add(resource.ToEntity());
+            configContext.SaveChanges();
+
+            Log.Debug("Adding ApiScopes");
+            foreach (var resource in Config.ApiScopes)
+                if (!configContext.ApiScopes.Any(db => resource.Name == db.Name))
+                    configContext.ApiScopes.Add(resource.ToEntity());
+            configContext.SaveChanges();
+
+            // Seed roles — needed in both dev and production
+            var roleMgr = scope.ServiceProvider.GetRequiredService<RoleManager<IdentityRole>>();
+
+            if (!roleMgr.RoleExistsAsync("Admin").Result)
             {
-                Log.Debug("alice already exists");
+                roleMgr.CreateAsync(new IdentityRole("Admin")).Wait();
+                Log.Debug("Admin role created");
             }
 
-            var bob = userMgr.FindByNameAsync("bob").Result;
-            if (bob == null)
+            if (!roleMgr.RoleExistsAsync("User").Result)
             {
-                bob = new ApplicationUser
-                {
-                    UserName = "bob",
-                    Email = "BobSmith@email.com",
-                    EmailConfirmed = true
-                };
-                var result = userMgr.CreateAsync(bob, "Pass123$").Result;
-                if (!result.Succeeded)
-                {
-                    throw new Exception(result.Errors.First().Description);
-                }
-
-                result = userMgr.AddClaimsAsync(bob, new Claim[]{
-                            new Claim(JwtClaimTypes.Name, "Bob Smith"),
-                            new Claim(JwtClaimTypes.GivenName, "Bob"),
-                            new Claim(JwtClaimTypes.FamilyName, "Smith"),
-                            new Claim(JwtClaimTypes.WebSite, "http://bob.com"),
-                            new Claim("location", "somewhere")
-                        }).Result;
-                if (!result.Succeeded)
-                {
-                    throw new Exception(result.Errors.First().Description);
-                }
-                Log.Debug("bob created");
+                roleMgr.CreateAsync(new IdentityRole("User")).Wait();
+                Log.Debug("User role created");
             }
-            else
+
+            // Seed test admin user — development only
+            if (app.Environment.IsDevelopment())
             {
-                Log.Debug("bob already exists");
+                var userMgr = scope.ServiceProvider.GetRequiredService<UserManager<ApplicationUser>>();
+
+                var admin = userMgr.FindByNameAsync("admin").Result;
+                if (admin == null)
+                {
+                    admin = new ApplicationUser
+                    {
+                        UserName = "admin",
+                        Email = "admin@carselect.com",
+                        EmailConfirmed = true,
+                        FirstName = "Admin",
+                        LastName = "User",
+                        CreatedAt = DateTime.UtcNow,
+                        UpdateAt = DateTime.UtcNow
+                    };
+
+                    var result = userMgr.CreateAsync(admin, "Admin123$").Result;
+                    if (!result.Succeeded)
+                        throw new Exception(result.Errors.First().Description);
+
+                    result = userMgr.AddToRoleAsync(admin, "Admin").Result;
+                    if (!result.Succeeded)
+                        throw new Exception(result.Errors.First().Description);
+
+                    result = userMgr.AddClaimsAsync(admin, new Claim[]
+                    {
+                        new Claim(JwtClaimTypes.GivenName, admin.FirstName),
+                        new Claim(JwtClaimTypes.FamilyName, admin.LastName),
+                        new Claim(JwtClaimTypes.Role, "Admin")
+                    }).Result;
+                    if (!result.Succeeded)
+                        throw new Exception(result.Errors.First().Description);
+
+                    Log.Debug("Admin user created");
+                }
+                else
+                {
+                    Log.Debug("Admin user already exists");
+                }
             }
         }
     }

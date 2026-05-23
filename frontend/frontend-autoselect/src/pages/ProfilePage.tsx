@@ -6,13 +6,13 @@ import ListingRow from "../components/Profile/ListingRow";
 import { useEffect, useState } from "react";
 import type  { UserRequest } from "../types";
 import { useForm } from "react-hook-form";
+import useCurrentUser from "../hooks/useCurrentUser";
 
-// TODO: replace with userId from JWT token once auth is set up
-const TEMP_USER_ID = "8cd1612e-8161-4c61-89d1-d0ba9e1153af";
 
 const ProfilePage = () => {
 
     const queryClient = useQueryClient();
+    const { userId } = useCurrentUser();
 
     const [updatingUser, setUpdatingUser] = useState<boolean>(false);
     const [isDeletingListingById, setIsDeletingListingById] = useState<string | null>(null);
@@ -21,8 +21,8 @@ const ProfilePage = () => {
     const navigate = useNavigate();
 
     const { data: user, isLoading: userLoading, isError: userError } = useQuery({
-        queryKey: ["user", TEMP_USER_ID],
-        queryFn: () => getUserById(TEMP_USER_ID)
+        queryKey: ["user", userId],
+        queryFn: () => getUserById(userId)
     });
 
     const initials = user ? `${user.firstName[0]}${user.lastName[0]}`.toUpperCase() : "...";
@@ -40,17 +40,17 @@ const ProfilePage = () => {
     }, [user, reset])
 
     const { data: listings, isLoading: listingsLoading, isError: listingsError } = useQuery({
-        queryKey: ["listings", TEMP_USER_ID],
-        queryFn: () => getListingsBySellerId(TEMP_USER_ID)
+        queryKey: ["listings", userId],
+        queryFn: () => getListingsBySellerId(userId)
     });
 
     const {mutate: saveUser } = useMutation({
         mutationFn: async (updateUser: UserRequest) => {
             setUpdatingUser(true);
-            updateUserById(updateUser, TEMP_USER_ID)
+            updateUserById(updateUser, userId)
         },
         // refresh the cached data to represent the new changes, only when on success
-        onSuccess: () => { queryClient.invalidateQueries({queryKey: ["user", TEMP_USER_ID]}) },
+        onSuccess: () => { queryClient.invalidateQueries({queryKey: ["user", userId]}) },
         onSettled: () => setUpdatingUser(false)
     })
 
@@ -60,7 +60,7 @@ const ProfilePage = () => {
             await deleteListingById(listingId);
         },
         // refresh the cached data to represent the new changes, only when on success
-        onSuccess: () => { queryClient.invalidateQueries({queryKey: ["listings", TEMP_USER_ID]}) },
+        onSuccess: () => { queryClient.invalidateQueries({queryKey: ["listings", userId]}) },
         onSettled: () => setIsDeletingListingById(null)
     })
 
