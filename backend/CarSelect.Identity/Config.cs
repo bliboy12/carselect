@@ -14,7 +14,8 @@ public static class Config
     public static IEnumerable<ApiScope> ApiScopes =>
         new ApiScope[]
         {
-            new ApiScope("carselect.api")
+            new ApiScope("carselect.api.read", "CarSelect API Read"),
+            new ApiScope("carselect.api.write", "CarSelect API Write")
         };
 
     public static IEnumerable<Client> Clients =>
@@ -32,7 +33,7 @@ public static class Config
                 PostLogoutRedirectUris = {"http://localhost:5173"},
                 AllowedCorsOrigins = { "http://localhost:5173" },
                 AllowOfflineAccess = true, // allows the user to ask for a refresh token
-                AllowedScopes = { "openid", "profile", "carselect.api" }, // what is the frontend allowed to access
+                AllowedScopes = { "openid", "profile", "carselect.api.read", "carselect.api.write" }, // what is the frontend allowed to access
             },
 
             // Postman
@@ -41,7 +42,7 @@ public static class Config
                 ClientId = "postman-client",
                 AllowedGrantTypes = GrantTypes.ClientCredentials,
                 ClientSecrets = { new Secret("eenGrootGeheim".Sha256())},
-                AllowedScopes = { "carselect.api" }
+                AllowedScopes = { "carselect.api.read" }
             },
         };
 }

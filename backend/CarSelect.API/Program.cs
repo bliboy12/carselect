@@ -1,6 +1,7 @@
 
 using System.Net.Http.Headers;
 using System.Text.Json.Serialization;
+using Microsoft.AspNetCore.RateLimiting;
 using Microsoft.EntityFrameworkCore;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -30,7 +31,42 @@ builder.Services.AddAuthentication()
             };
         }
     });
-builder.Services.AddAuthorization();
+
+
+builder.Services.AddAuthorizationBuilder()
+    .AddPolicy("ReadPolicy", policy =>
+    {
+        policy.RequireAuthenticatedUser();
+        policy.RequireClaim("scope", "carselect.api.read");
+    }
+)
+    .AddPolicy("WritePolicy", policy =>
+    {
+        policy.RequireAuthenticatedUser();
+        policy.RequireClaim("scope", "carselect.api.write");
+    }
+)
+    .AddPolicy("AdminPolicy", policy =>
+    {
+        policy.RequireRole("admin");
+        policy.RequireClaim("scope", "carselect.api.read");
+    }
+);
+
+builder.Services.AddRateLimiter(options =>
+{
+    options.AddFixedWindowLimiter("QuoteCreationLimiter", limiterOptions =>
+    {
+        // A max of 10 request each minute, this limit is global meaning the following:
+        // if User A sends in 9 request and User B sends 1, user B will be the one getting rate limited
+        // We could make splits the users based on their IP-adresses but keeping it simple for now
+        // TODO: reassess after presentation if need be 
+        limiterOptions.PermitLimit = 10;
+        limiterOptions.Window = TimeSpan.FromMinutes(1);
+        limiterOptions.QueueLimit = 0;
+    });
+});
+
 
 
 // Azure SQL Connection

@@ -16,6 +16,7 @@ import FavoritesPage from './pages/FavoritesPage.tsx'
 import { AuthProvider } from "react-oidc-context";
 import { authConfig } from './auth/authConfig.ts'
 import CallbackPage from './pages/CallBackPage.tsx'
+import ProtectedRoute from './components/ProtectedRoute.tsx'
 
 
 const query = new QueryClient();
@@ -41,23 +42,23 @@ const router = createBrowserRouter([
         path: "/listings/:id"
       },
       {
-        element: <ProfilePage />,
+        element: <ProtectedRoute><ProfilePage /></ProtectedRoute>,
         path: "/profile"
       },
       {
-        element: <CreateListingPage />,
+        element: <ProtectedRoute><CreateListingPage /></ProtectedRoute>,
         path: "listings/create"
       },
       {
-        element: <EditListingPage />,
+        element: <ProtectedRoute><EditListingPage /></ProtectedRoute>,
         path: "listings/:id/edit"
       },
       {
-        element: <AdminPage />,
+        element: <ProtectedRoute adminOnly={true}><AdminPage /></ProtectedRoute>,
         path: "/adminpanel"
       },
       {
-        element: <FavoritesPage />,
+        element: <ProtectedRoute><FavoritesPage /></ProtectedRoute>,
         path: "/favorites"
       },
       {
