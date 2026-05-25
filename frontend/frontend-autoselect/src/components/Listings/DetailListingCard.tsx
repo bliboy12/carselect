@@ -8,13 +8,15 @@ import defaultCarImage from "../../assets/car.jpg"
 import { CiHeart } from "react-icons/ci";
 import { FaHeart } from "react-icons/fa";
 import { createFavorite, deleteFavorite, isFavorited } from "../../api/favoriteApi";
+import useCurrentUser from "../../hooks/useCurrentUser";
 
-
-const TEMP_USER_ID = "a2a1616d-45a8-478b-ad0e-aa2d82773c31";
 
 const DetailListingCard = () => {
 
     const { id } = useParams();
+
+    const { userId } = useCurrentUser();
+
     const [activeImage, setActiveImage] = useState(0);
     const [isFavorite, setIsFavorite] = useState<boolean>(false);
 
@@ -28,7 +30,7 @@ const DetailListingCard = () => {
 
     const { data: favoriteStatus } = useQuery({
         queryKey: ["isFavorite", id],
-        queryFn: () => isFavorited(TEMP_USER_ID, id!),
+        queryFn: () => isFavorited(userId, id!),
         enabled: !!id
     });
 
@@ -39,15 +41,15 @@ const DetailListingCard = () => {
 
     const { mutate: createFavoriteMutation } = useMutation({
         mutationFn: async () => {
-            const response = await createFavorite(TEMP_USER_ID, id!);
+            const response = await createFavorite(userId, id!);
             return response;
         },
-        onSuccess: () => {setIsFavorite(true);}
+        onSuccess: () => { setIsFavorite(true); }
     })
 
     const { mutate: deleteFavoriteMutation } = useMutation({
         mutationFn: async () => {
-            await deleteFavorite(TEMP_USER_ID, id!);
+            await deleteFavorite(userId, id!);
         },
         onSuccess: () => { setIsFavorite(false); }
     })
@@ -65,16 +67,16 @@ const DetailListingCard = () => {
         return <p>{error.message}</p>
     if (!dataListing)
         return <p>Listing doesn't exist</p>
-    
 
-    const listing = dataListing.data;    
+
+    const listing = dataListing.data;
     const car = listing.car;
     const seller = listing.seller;
 
     const carImages = listing.carImages.length > 0
         ? listing.carImages.map((img) => img.imageUrl)
         : Array.from({ length: 5 }, () => defaultCarImage);
-    
+
     console.log(`${seller.firstName}${seller.lastName}`.toUpperCase());
 
     const sellerInitials = `${seller.firstName[0]}${seller.lastName[0]}`.toUpperCase();
@@ -160,8 +162,8 @@ const DetailListingCard = () => {
                         </div>
 
                         {/* Save Listing */}
-                        <button onClick={() => handleFavorite()} className="w-full flex items-center justify-center gap-2 py-2.5 rounded-xl border border-gray-700 text-gray-300 hover:border-gray-500 hover:text-gray-100 transition-colors text-sm">
-                            {isFavorite ? <FaHeart className="size-5"/> : <CiHeart className="size-5" />}
+                        <button onClick={() => handleFavorite()} className="w-full flex items-center justify-center gap-2 py-2.5 rounded-xl border border-gray-700 text-gray-300 hover:border-gray-500 hover:text-gray-100 transition-colors text-sm cursor-pointer">
+                            {isFavorite ? <FaHeart className="size-5" /> : <CiHeart className="size-5" />}
                             Save listing
                         </button>
 

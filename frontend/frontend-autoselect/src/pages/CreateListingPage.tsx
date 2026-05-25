@@ -5,6 +5,7 @@ import { useMutation } from "@tanstack/react-query";
 import { createListing, uploadListingImages } from "../api/listingApi";
 import { useNavigate } from "react-router";
 import PillSelector from "../components/Listings/Create/PillSelector";
+import useCurrentUser from "../hooks/useCurrentUser";
 
 interface CreateListingForm {
     brand: string
@@ -17,11 +18,10 @@ interface CreateListingForm {
     price: number
 }
 
-const TEMP_USER_ID = "a2a1616d-45a8-478b-ad0e-aa2d82773c31";
-
 const CreateListingPage = () => {
 
     const navigate = useNavigate();
+    const { userId } = useCurrentUser(); 
 
     const { register, handleSubmit } = useForm<CreateListingForm>();
 
@@ -46,7 +46,7 @@ const CreateListingPage = () => {
     const onSubmit = (formData: CreateListingForm) => {
         submitListing({
             listing: {
-                sellerId: TEMP_USER_ID,
+                sellerId: userId,
                 status: "active",
                 price: formData.price,
                 car: {

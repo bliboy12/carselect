@@ -1,37 +1,53 @@
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.RateLimiting;
 
+[Authorize]
 [ApiController]
 [Route("api/reviews")]
-public class ReviewController
+public class ReviewController : ControllerBase
 {
-    private readonly IReviewService _service;
-    public ReviewController(IReviewService service)
+    private readonly IReviewSqlService _service;
+    public ReviewController(IReviewSqlService service)
     {
         _service = service;
     }
-    [HttpGet("{reviewId}")]
-    public async Task<ActionResult<ReviewResponseContract?>> GetReviewWithIdAsync([FromRoute] Guid reviewId)
+    [Authorize("AuthenticatedUser")]
+    [HttpGet]
+    public async Task<ActionResult<ReviewResponseContract>> GetReviewsAsync([FromQuery] Guid? sellerId, [FromQuery] Guid? reviewerId)
     {
-        var result = await _service.GetReviewByIdAsync(reviewId);
-        if (result == null)
-            throw new NotFoundException($"Review with Id {reviewId} Not Found");
-        return result.MapToContract();
+        if (sellerId.HasValue)
+        {
+            var results = await _service.GetAllReviewsBySellerIdAsync(sellerId.Value);
+            return Ok(results.Select((r) => r.MapToContract()));
+        }
+        if (reviewerId.HasValue)
+        {
+            var results = await _service.GetAllReviewsByReviewerIdAsync(reviewerId.Value);
+            return Ok(results.Select((r) => r.MapToContract()));
+        }
+        return BadRequest("Please provide with either sellerId or reviewerId");
     }
-    [HttpPut("{reviewId}")]
-    public async Task<ReviewResponseContract> updateReviewByIdAsync([FromRoute] Guid reviewId, [FromBody] ReviewRequestContract newReview)
+    // TODO: not relevant, once you make a review you can't edit it. Must be deleted
+    [HttpPut]
+    public async Task<ActionResult<ReviewResponseContract>> UpdateReviewByIdAsync([FromQuery] Guid reviewerId, [FromQuery] Guid sellerId, [FromBody] ReviewRequestContract newReview)
     {
-        var result = await _service.UpdateReviewByIdAsync(reviewId, newReview.MapToDomain());
-        return result.MapToContract();
+        var result = await _service.UpdateReviewByIdAsync(reviewerId, sellerId, newReview.MapToDomain());
+        return Ok(result.MapToContract());
     }
+    [Authorize("AuthenticatedUser")]
+    [EnableRateLimiting("QuoteCreationLimiter")]
     [HttpPost]
-    public async Task<ReviewResponseContract> CreateReviewAsync([FromBody] ReviewRequestContract reviewRequest)
+    public async Task<ActionResult<ReviewResponseContract>> CreateReviewAsync([FromBody] ReviewRequestContract reviewRequest)
     {
         var newReview = await _service.CreateReviewAsync(reviewRequest.MapToDomain());
         return newReview.MapToContract();
     }
-    [HttpDelete("{reviewId}")]
-    public async Task DeleteReviewAsync([FromRoute] Guid reviewId)
+    [Authorize("AuthenticatedUser")]
+    [HttpDelete]
+    public async Task<ActionResult> DeleteReviewAsync([FromQuery] Guid reviewerId, [FromQuery] Guid sellerId)
     {
-        await _service.DeleteReviewByIdAsync(reviewId);
+        await _service.DeleteReviewByIdAsync(reviewerId, sellerId);
+        return NoContent();
     }
 }

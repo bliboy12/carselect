@@ -1,3 +1,4 @@
+import useCurrentUser from "../hooks/useCurrentUser";
 import type { ImageRequest, ListingResponse, ListingRequest, ListingUpdateRequest } from "../types";
 import { axiosListings } from "./axiosInstances";
 
@@ -18,7 +19,7 @@ export const getListingById = async (listingId: string): Promise<ListingResponse
 }
 
 export const createListing = async (listing: ListingRequest): Promise<ListingResponse> => {
-    const response = await axiosListings.post<ListingResponse>("/", listing);
+    const response = await axiosListings.post<ListingResponse>("/", listing, );
     return response.data;
 }
 
@@ -30,7 +31,8 @@ export const uploadListingImages = async (listingId: string, images: ImageReques
     })
 
     await axiosListings.post(`/${listingId}/images`, formData, {
-        headers: { "Content-Type": "multipart/form-data" }
+        headers: { "Content-Type": "multipart/form-data" },
+        auth: useCurrentUser()
     });
 }
 

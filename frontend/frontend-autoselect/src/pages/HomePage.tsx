@@ -22,7 +22,7 @@ import { Link } from "react-router";
 
 
 const HomePage = () => {
-    
+
 
     const defaultCarFilter: CarFilter = {
         brand: undefined,
@@ -43,23 +43,22 @@ const HomePage = () => {
     const [filter, setFilter] = useState<CarFilter>(defaultCarFilter);
     const [onSubmit, setOnSubmit] = useState<CarFilter>(defaultCarFilter);
 
-    const {data, isLoading, isError, error} = useQuery({
+    const { data, isLoading, isError, error } = useQuery({
         queryKey: ["GetAllListingsFiltered", onSubmit],
         queryFn: async () => {
-            return await axiosListings.post<ListingResponse[]>("/search", onSubmit)}
+            return await axiosListings.post<ListingResponse[]>("/search", onSubmit)
+        }
     })
 
 
-    if (isLoading)
-    {
+    if (isLoading) {
         return (
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 p-5 gap-5">
-                {Array.from({length: 8}).map((_, i) => (<ListingCardSkeleton key={i}/>))}
+                {Array.from({ length: 8 }).map((_, i) => (<ListingCardSkeleton key={i} />))}
             </div>
         );
     }
-    if (isError)
-    {
+    if (isError) {
         console.log(error.message);
         return <p>Something went wrong</p>
     }
@@ -76,8 +75,7 @@ const HomePage = () => {
 
     const cars = data?.data.map((l) => l.car) ?? [];
 
-    if (cars.length === 0)
-    {
+    if (cars.length === 0) {
         return (
             <div className="flex min-h-dvh">
                 <ListingFilter showFilter={showFilter} onToggle={() => setshowFilter((prev) => !prev)} filter={filter} setFilter={setFilter} setOnSubmit={setOnSubmit} cars={cars} />

@@ -1,6 +1,8 @@
 
 using System.Net.Http.Headers;
 using System.Text.Json.Serialization;
+using Microsoft.AspNetCore.RateLimiting;
+using Microsoft.EntityFrameworkCore;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -17,6 +19,66 @@ builder.Services.AddHttpClient("ReviewsService", client =>
 {
     client.BaseAddress = new Uri("http://localhost:5129/");
 });
+
+builder.Services.AddAuthentication()
+    .AddJwtBearer(options =>
+    {
+        options.Authority = "https://localhost:5001";
+        options.TokenValidationParameters.ValidateAudience = false;
+
+        // TODO: MUST BE REMOVED BEFORE DEPLOYING
+        if (builder.Environment.IsDevelopment())
+        {
+            options.BackchannelHttpHandler = new HttpClientHandler
+            {
+                ServerCertificateCustomValidationCallback =
+                    HttpClientHandler.DangerousAcceptAnyServerCertificateValidator
+            };
+        }
+    });
+
+
+builder.Services.AddAuthorizationBuilder()
+    .AddPolicy("ReadPolicy", policy =>
+    {
+        policy.RequireAuthenticatedUser();
+        policy.RequireClaim("scope", "carselect.api.read");
+    }
+)
+    .AddPolicy("WritePolicy", policy =>
+    {
+        policy.RequireAuthenticatedUser();
+        policy.RequireClaim("scope", "carselect.api.write");
+    }
+)
+    .AddPolicy("AdminPolicy", policy =>
+    {
+        policy.RequireRole("admin");
+        policy.RequireClaim("scope", "carselect.api.read");
+    }
+);
+
+builder.Services.AddRateLimiter(options =>
+{
+    options.AddFixedWindowLimiter("QuoteCreationLimiter", limiterOptions =>
+    {
+        // A max of 10 request each minute, this limit is global meaning the following:
+        // if User A sends in 9 request and User B sends 1, user B will be the one getting rate limited
+        // We could make splits the users based on their IP-adresses but keeping it simple for now
+        // TODO: reassess after presentation if need be 
+        limiterOptions.PermitLimit = 10;
+        limiterOptions.Window = TimeSpan.FromMinutes(1);
+        limiterOptions.QueueLimit = 0;
+    });
+});
+
+
+
+// Azure SQL Connection
+builder.Services.AddDbContext<CarSelectDbContext>(options =>
+    options.UseSqlServer(builder.Configuration.GetConnectionString("SqlConnection")));
+
+
 
 builder.Services.Configure<CarImageRepositoryOptions>(
     builder.Configuration.GetSection("CarImageRepositoryOptions")
@@ -54,15 +116,24 @@ builder.Services.Configure<BlobStorageRepositoryOptions>(
     builder.Configuration.GetSection("BlobStorageRepositoryOptions")
 );
 
-
+// Cosmos Implementations 
 builder.Services.AddScoped<ICarService, CarService>();
 builder.Services.AddScoped<IListingService, ListingService>();
 builder.Services.AddScoped<ITransactionService, TransactionService>();
-builder.Services.AddScoped<IReviewService, ReviewService>();
-builder.Services.AddScoped<IUserService, UserService>();
 builder.Services.AddScoped<ICarImageService, CarImageService>();
+
+
+// Old Implemention (cosmos) - Needs to be removed when SQL Refactor is completed
+builder.Services.AddScoped<IUserService, UserService>();
+// builder.Services.AddScoped<IReviewService, ReviewService>();
 builder.Services.AddScoped<IFavoriteService, FavoriteService>();
 builder.Services.AddScoped<IReviewAggregatorService, ReviewAggregatorService>();
+
+
+// SQL Service Refactor
+builder.Services.AddScoped<IUserSqlService, UserSqlService>();
+builder.Services.AddScoped<IReviewSqlService, ReviewSqlService>();
+builder.Services.AddScoped<IFavoriteSqlService, FavoriteSqlService>();
 
 builder.Services.AddHttpClient<ICarService, CarService>(client =>
 {
@@ -72,13 +143,22 @@ builder.Services.AddHttpClient<ICarService, CarService>(client =>
         );
 });
 
+
+// Cosmos Implementations 
 builder.Services.AddScoped<ICarRepository, CarRepository>();
 builder.Services.AddScoped<IListingRepository, ListingRepository>();
 builder.Services.AddScoped<ITransactionRepository, TransactionRepository>();
-builder.Services.AddScoped<IReviewRepository, ReviewRepository>();
-builder.Services.AddScoped<IUserRepository, UserRepository>();
 builder.Services.AddScoped<ICarImageRepository, CarImageRepository>();
+
+// Old Implemention (cosmos) - Needs to be removed when SQL Refactor is completed
+builder.Services.AddScoped<IUserRepository, UserRepository>();
+// builder.Services.AddScoped<IReviewRepository, ReviewRepository>();
 builder.Services.AddScoped<IFavoriteRepository, FavoriteRepository>();
+
+// SQL Refactoring 
+builder.Services.AddScoped<IUserSqlRepository, UserSqlRepository>();
+builder.Services.AddScoped<IReviewSqlRepository, ReviewSqlRepository>();
+builder.Services.AddScoped<IFavoriteSqlRepository, FavoriteSqlRepository>();
 
 builder.Services.AddScoped<IBlobStorageRepository, BlobStorageRepository>();
 
@@ -87,10 +167,13 @@ builder.Services.AddControllers();
 // Converts enums to strings and vice versa even ignoring capitilizations
 builder.Services.AddControllers().AddJsonOptions(options => options.JsonSerializerOptions.Converters.Add(new JsonStringEnumConverter()));
 
+
 var app = builder.Build();
 
 app.UseRouting();
 app.UseCors("AllowFrontend");
+app.UseAuthentication();
+app.UseAuthorization();
 app.MapControllers();
 
 app.MapGet("/", () => "Hello World!");

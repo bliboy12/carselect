@@ -1,5 +1,6 @@
-using Microsoft.AspNetCore.Http.HttpResults;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.RateLimiting;
 
 [ApiController]
 [Route("api/listings")]
@@ -74,7 +75,8 @@ public class ListingController : ControllerBase
             return NotFound(nfe.Message);
         }
     }
-    // The adding of images to the listing will be called by a separate HttpPost 
+    [Authorize("WritePolicy")]
+    [EnableRateLimiting("QuoteCreationLimiter")]
     [HttpPost]
     public async Task<ActionResult<ListingResponseContract>> CreateListingAsync([FromBody] DetailedListingRequestContract listingRequest)
     {
@@ -82,7 +84,7 @@ public class ListingController : ControllerBase
         return CreatedAtAction("CreateListing", ListingApiMapper.MapToContract(result));
     }
 
-    // Question: is a user allowed to change the carId on a listing?
+    [Authorize("WritePolicy")]
     [HttpPut("{listingId}")]
     public async Task<ActionResult<ListingResponseContract>> UpdateListingAsync([FromRoute] Guid listingId, [FromBody] ListingRequestContract updateListing)
     {
@@ -92,9 +94,12 @@ public class ListingController : ControllerBase
 
         return Ok(ListingApiMapper.MapToContract(result));
     }
+    [Authorize("WritePolicy")]
     [HttpDelete("{listingId}")]
     public async Task<ActionResult> DeleteListingByIdAsync([FromRoute] Guid listingId)
     {
+        // TODO: any user that has write policy can delete someone elses listing
+        // We need to change this for guard for this in all methods that have similar characteristic
         await _listingService.DeletelistingById(listingId);
         return Ok();
     }
@@ -128,7 +133,7 @@ public class ListingController : ControllerBase
             return NotFound(nfe.Message);
         }
     }
-
+    [Authorize("AuthenticatedUser")]
     [HttpPost("{listingId}/images")]
     public async Task<ActionResult<IEnumerable<CarImageResponseContract>>> CreateCarImageAsync([FromRoute] Guid listingId, [FromForm] IEnumerable<CarImageRequestContract> files)
     {
@@ -147,6 +152,7 @@ public class ListingController : ControllerBase
         }
         return Ok(carImages);
     }
+    [Authorize("AuthenticatedUser")]
     [HttpPut("{listingId}/images/{imageId}")]
     public async Task<ActionResult<CarImageResponseContract>> UpdateCarImageToMainImage([FromRoute] Guid listingId, [FromRoute] Guid imageId)
     {
@@ -154,7 +160,7 @@ public class ListingController : ControllerBase
 
         return CarImageApiMapper.MapToContract(result);
     }
-
+    [Authorize("AuthenticatedUser")]
     [HttpDelete("{listingId}/images/{imageId}")]
     public async Task<ActionResult> DeleteCarImageByIdAsync([FromRoute] Guid listingId, [FromRoute] Guid imageId)
     {
@@ -168,6 +174,7 @@ public class ListingController : ControllerBase
             return NotFound(nfe.Message);
         }
     }
+    [Authorize("AuthenticatedUser")]
     [HttpDelete("{listingId}/images")]
     public async Task<ActionResult> DeleteAllImagesByListingIdAsync([FromRoute] Guid listingId)
     {
