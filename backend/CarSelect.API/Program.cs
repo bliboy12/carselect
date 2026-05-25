@@ -12,6 +12,12 @@ builder.Services.AddCors(options =>
         .AllowAnyMethod();
     })
 );
+
+builder.Services.AddHttpClient("ReviewsService", client =>
+{
+    client.BaseAddress = new Uri("http://localhost:5129/");
+});
+
 builder.Services.Configure<CarImageRepositoryOptions>(
     builder.Configuration.GetSection("CarImageRepositoryOptions")
 );
@@ -56,6 +62,7 @@ builder.Services.AddScoped<IReviewService, ReviewService>();
 builder.Services.AddScoped<IUserService, UserService>();
 builder.Services.AddScoped<ICarImageService, CarImageService>();
 builder.Services.AddScoped<IFavoriteService, FavoriteService>();
+builder.Services.AddScoped<IReviewAggregatorService, ReviewAggregatorService>();
 
 builder.Services.AddHttpClient<ICarService, CarService>(client =>
 {

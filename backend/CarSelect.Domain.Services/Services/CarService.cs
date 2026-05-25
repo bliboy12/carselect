@@ -63,7 +63,7 @@ public class CarService : ICarService
         {
             var json = await response.Content.ReadAsStringAsync();
             var deserialized = JsonSerializer.Deserialize<NhtsaMakes>(json);
-            return deserialized?.Results;
+            return deserialized?.Results!;
         }
         return null;
     }

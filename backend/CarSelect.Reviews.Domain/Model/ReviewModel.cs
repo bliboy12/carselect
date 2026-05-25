@@ -6,6 +6,4 @@ public class ReviewModel
     public string Comment { get; set; } = string.Empty;
     public DateTime CreatedAt { get; set; }
 
-    public UserModel? Seller { get; set; }
-    public UserModel? Reviewer { get; set; }
 }
