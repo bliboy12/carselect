@@ -15,6 +15,11 @@ builder.Services.AddCors(options =>
     })
 );
 
+builder.Services.AddHttpClient("ReviewsService", client =>
+{
+    client.BaseAddress = new Uri("http://localhost:5129/");
+});
+
 builder.Services.AddAuthentication()
     .AddJwtBearer(options =>
     {
@@ -122,6 +127,7 @@ builder.Services.AddScoped<ICarImageService, CarImageService>();
 builder.Services.AddScoped<IUserService, UserService>();
 // builder.Services.AddScoped<IReviewService, ReviewService>();
 builder.Services.AddScoped<IFavoriteService, FavoriteService>();
+builder.Services.AddScoped<IReviewAggregatorService, ReviewAggregatorService>();
 
 
 // SQL Service Refactor

@@ -4,6 +4,10 @@
   <Project Path="CarSelect.Domain.Model/CarSelect.Domain.Model.csproj" />
   <Project Path="CarSelect.Domain.Services/CarSelect.Domain.Services.csproj" />
   <Project Path="CarSelect.Storage/CarSelect.Storage.csproj" />
+  <Project Path="CarSelect.Reviews.API/CarSelect.Reviews.API.csproj" />
+  <Project Path="CarSelect.Reviews.Domain/CarSelect.Reviews.Domain.csproj" />
+  <Project Path="CarSelect.Reviews.Storage.DataModel/CarSelect.Reviews.Storage.DataModel.csproj" />
+  <Project Path="CarSelect.Reviews.Storage/CarSelect.Reviews.Storage.csproj" />
   <Project Path="CarSelect.Identity/CarSelect.Identity.csproj" />
   <Project Path="CarSelect.Storage.DataModel/CarSelect.Storage.DataModel.csproj" />
 </Solution>
