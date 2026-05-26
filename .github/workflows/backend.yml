@@ -7,7 +7,7 @@ on:
   workflow_dispatch:
 
 jobs:
-  build-and-deploy-api:
+  build-and-deploy:
     runs-on: ubuntu-latest
     steps:
       - name: Clone repo
@@ -18,11 +18,14 @@ jobs:
         with:
           dotnet-version: "10.0.x"
 
-      - name: Build solution
-        run: dotnet build backend/CarSelect.API/CarSelect.API.csproj -c Release
-
       - name: Publish API
         run: dotnet publish backend/CarSelect.API/CarSelect.API.csproj -c Release -o ${{ github.workspace }}/publish/api
+
+      - name: Publish Identity
+        run: dotnet publish backend/CarSelect.Identity/CarSelect.Identity.csproj -c Release -o ${{ github.workspace }}/publish/identity
+
+      - name: Publish Reviews API
+        run: dotnet publish backend/CarSelect.Reviews.API/CarSelect.Reviews.API.csproj -c Release -o ${{ github.workspace }}/publish/reviews
 
       - name: Deploy API
         uses: azure/webapps-deploy@v3
@@ -30,3 +33,17 @@ jobs:
           app-name: "carselect-api"
           publish-profile: ${{ secrets.API_PUBLISH_PROFILE }}
           package: ${{ github.workspace }}/publish/api
+
+      - name: Deploy Identity
+        uses: azure/webapps-deploy@v3
+        with:
+          app-name: "carselect-identityServer"
+          publish-profile: ${{ secrets.IDENTITY_PUBLISH_PROFILE }}
+          package: ${{ github.workspace }}/publish/identity
+
+      - name: Deploy Reviews API
+        uses: azure/webapps-deploy@v3
+        with:
+          app-name: "carselect-reviews"
+          publish-profile: ${{ secrets.REVIEWS_PUBLISH_PROFILE }}
+          package: ${{ github.workspace }}/publish/reviews
