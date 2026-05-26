@@ -1,0 +1,32 @@
+name: Backend CI/CD
+
+on:
+  push:
+    branches:
+      - main
+  workflow_dispatch:
+
+jobs:
+  build-and-deploy-api:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Clone repo
+        uses: actions/checkout@v4
+
+      - name: Install dotnet
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: "10.0.x"
+
+      - name: Build solution
+        run: dotnet build backend/CarSelect.API/CarSelect.API.csproj -c Release
+
+      - name: Publish API
+        run: dotnet publish backend/CarSelect.API/CarSelect.API.csproj -c Release -o ${{ github.workspace }}/publish/api
+
+      - name: Deploy API
+        uses: azure/webapps-deploy@v3
+        with:
+          app-name: "carselect-api"
+          publish-profile: ${{ secrets.API_PUBLISH_PROFILE }}
+          package: ${{ github.workspace }}/publish/api

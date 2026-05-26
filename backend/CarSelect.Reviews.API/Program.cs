@@ -18,14 +18,14 @@ builder.Services.AddAuthentication("Bearer")
     {
         options.Authority = "https://localhost:5001";
         options.TokenValidationParameters.ValidateAudience = false;
-        if (builder.Environment.IsDevelopment())
-        {
-            options.BackchannelHttpHandler = new HttpClientHandler
-            {
-                ServerCertificateCustomValidationCallback =
-                    HttpClientHandler.DangerousAcceptAnyServerCertificateValidator
-            };
-        }
+        // if (builder.Environment.IsDevelopment())
+        // {
+        //     options.BackchannelHttpHandler = new HttpClientHandler
+        //     {
+        //         ServerCertificateCustomValidationCallback =
+        //             HttpClientHandler.DangerousAcceptAnyServerCertificateValidator
+        //     };
+        // }
     });
 
 builder.Services.AddAuthorizationBuilder()

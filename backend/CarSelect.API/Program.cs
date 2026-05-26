@@ -30,16 +30,16 @@ builder.Services.AddAuthentication()
         options.Authority = "https://localhost:5001";
         options.TokenValidationParameters.ValidateAudience = false;
 
-        // TODO: MUST BE REMOVED BEFORE DEPLOYING
-        // This causes any URL that isn't https to be accepted
-        if (builder.Environment.IsDevelopment())
-        {
-            options.BackchannelHttpHandler = new HttpClientHandler
-            {
-                ServerCertificateCustomValidationCallback =
-                    HttpClientHandler.DangerousAcceptAnyServerCertificateValidator
-            };
-        }
+        // // TODO: MUST BE REMOVED BEFORE DEPLOYING
+        // // This causes any URL that isn't https to be accepted
+        // if (builder.Environment.IsDevelopment())
+        // {
+        //     options.BackchannelHttpHandler = new HttpClientHandler
+        //     {
+        //         ServerCertificateCustomValidationCallback =
+        //             HttpClientHandler.DangerousAcceptAnyServerCertificateValidator
+        //     };
+        // }
     });
 
 
