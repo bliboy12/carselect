@@ -1,4 +1,4 @@
-import useCurrentUser from "../hooks/useCurrentUser";
+// import useCurrentUser from "../hooks/useCurrentUser";
 import type { ImageRequest, ListingResponse, ListingRequest, ListingUpdateRequest } from "../types";
 import { axiosListings } from "./axiosInstances";
 

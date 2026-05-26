@@ -1,5 +1,5 @@
 import axios from "axios";
-import useCurrentUser from "../hooks/useCurrentUser";
+// import useCurrentUser from "../hooks/useCurrentUser";
 
 // const authentication = () => {
 //     const { userId } = useCurrentUser;

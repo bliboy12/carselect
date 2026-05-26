@@ -2,8 +2,8 @@ import { type ListingResponse, type User, type CarImage } from "../types";
 
 const dummyUser: User = {
     id: "u1",
-    firstname: "John",
-    lastname: "Doe",
+    firstName: "John",
+    lastName: "Doe",
     email: "john@example.com",
     registerDate: "2024-01-01",
     isAdmin: false
