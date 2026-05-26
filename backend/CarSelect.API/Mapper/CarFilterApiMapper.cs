@@ -15,7 +15,9 @@ public class CarFilterApiMapper
             MinKilometers = carFilterRequest.MinKilometers,
             MaxKilometers = carFilterRequest.MaxKilometers,
             Doors = carFilterRequest.Doors,
-            Drive = carFilterRequest.Drive == null ? null : (DriveType)carFilterRequest.Drive
+            Drive = carFilterRequest.Drive == null ? null : (DriveType)carFilterRequest.Drive,
+            Page = carFilterRequest.Page,
+            PageSize = carFilterRequest.PageSize
         };
     }
 }

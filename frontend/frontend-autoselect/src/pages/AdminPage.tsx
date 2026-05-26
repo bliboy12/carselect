@@ -6,6 +6,7 @@ import { useEffect, useState } from "react";
 import UserInfoCard from "../components/AdminPanel/UserInfoCard";
 import ListingInfoCard from "../components/AdminPanel/ListingInfoCard";
 import { Link } from "react-router";
+import ExportCsvButton from "../components/AdminPanel/ExportCsvButton";
 
 
 const AdminPage = () => {
@@ -114,7 +115,10 @@ return (
             <div className="bg-gray-900 border border-gray-700 rounded-xl p-6">
                 <div className="flex items-center justify-between mb-4">
                     <p className="text-xs font-medium text-gray-400 uppercase tracking-wider">Listings</p>
-                    <span className="text-xs text-gray-400">{listings.length} total</span>
+                    <div className="flex items-center gap-3">
+                        <span className="text-xs text-gray-400">{listings.length} total</span>
+                        <ExportCsvButton listings={listings} />
+                    </div>
                 </div>
                 <div className="divide-y divide-gray-700">
                     {listings.map((l) => (<Link key={l.id} to={`/listings/${l.id}`}><ListingInfoCard listing={l} onDelete={handleDeleteListing} isDeleting={deletingListingId === l.id} /></Link>))}

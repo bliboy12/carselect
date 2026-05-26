@@ -11,7 +11,7 @@ interface ListingFilterProps {
     onToggle: () => void,
     filter: CarFilter,
     setFilter: React.Dispatch<React.SetStateAction<CarFilter>>,
-    setOnSubmit: React.Dispatch<React.SetStateAction<CarFilter>>,
+    setOnSubmit: (filter: CarFilter) => void,
     cars: CarInfo[]
 }
 
@@ -36,14 +36,8 @@ const ListingFilter = ({ showFilter, onToggle, filter, setFilter, setOnSubmit, c
     // }
 
     const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
-
-        // TODO: need to fix, to avoid giving 'all' as a parameter
         const { id, value } = e.target;
-
-        setFilter((prev) => ({
-            ...prev,
-            [id]: value
-        }));
+        setFilter(prev => ({...prev, [id]: value === "all" || value === "All" || value === "" ? undefined : value}));
     };
 
 

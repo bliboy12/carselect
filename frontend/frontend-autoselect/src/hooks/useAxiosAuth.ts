@@ -1,6 +1,6 @@
 import { useEffect } from "react";
 import { useAuth } from "react-oidc-context";
-import { axiosListings, axiosUsers, axiosCars } from "../api/axiosInstances";
+import { axiosListings, axiosUsers, axiosCars, axiosApi } from "../api/axiosInstances";
 
 // Adds the Bearer for each axios request that is going out, it attaches to it before sending out
 const useAxiosAuth = () => {
@@ -10,7 +10,7 @@ const useAxiosAuth = () => {
         const token = auth.user?.access_token;
 
         // Add interceptor to every axios instance
-        const instances = [axiosListings, axiosUsers, axiosCars];
+        const instances = [axiosListings, axiosUsers, axiosCars, axiosApi];
         
         const interceptors = instances.map(instance =>
             instance.interceptors.request.use(config => {

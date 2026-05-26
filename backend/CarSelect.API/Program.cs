@@ -6,6 +6,7 @@ using CarSelect.Identity.Models;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.RateLimiting;
 using Microsoft.EntityFrameworkCore;
+using Stripe;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -76,6 +77,13 @@ builder.Services.AddRateLimiter(options =>
     });
 });
 
+// Stripe
+builder.Services.Configure<StripeSettings>(
+    builder.Configuration.GetSection("Stripe"));
+
+var stripeSettings = builder.Configuration.GetSection("Stripe").Get<StripeSettings>();
+StripeConfiguration.ApiKey = stripeSettings!.SecretKey;
+
 // Added this in because I realized that the data is being stored in IdentityServer
 // Which in turn makes my User SQL table redunent
 builder.Services.AddDbContext<ApplicationDbContext>(options =>
@@ -131,7 +139,6 @@ builder.Services.Configure<BlobStorageRepositoryOptions>(
 // Cosmos Implementations 
 builder.Services.AddScoped<ICarService, CarService>();
 builder.Services.AddScoped<IListingService, ListingService>();
-builder.Services.AddScoped<ITransactionService, TransactionService>();
 builder.Services.AddScoped<ICarImageService, CarImageService>();
 
 
@@ -147,6 +154,7 @@ builder.Services.AddScoped<IReviewAggregatorService, ReviewAggregatorService>();
 // SQL Service Refactor
 // builder.Services.AddScoped<IUserSqlService, UserSqlService>();
 builder.Services.AddScoped<IFavoriteSqlService, FavoriteSqlService>();
+builder.Services.AddScoped<ITransactionSqlService, TransactionSqlService>();
 
 builder.Services.AddHttpClient<ICarService, CarService>(client =>
 {
@@ -160,7 +168,6 @@ builder.Services.AddHttpClient<ICarService, CarService>(client =>
 // Cosmos Implementations 
 builder.Services.AddScoped<ICarRepository, CarRepository>();
 builder.Services.AddScoped<IListingRepository, ListingRepository>();
-builder.Services.AddScoped<ITransactionRepository, TransactionRepository>();
 builder.Services.AddScoped<ICarImageRepository, CarImageRepository>();
 
 // Old Implemention (cosmos) - Needs to be removed when SQL Refactor is completed
@@ -171,7 +178,7 @@ builder.Services.AddScoped<ICarImageRepository, CarImageRepository>();
 // SQL Refactoring 
 // builder.Services.AddScoped<IUserSqlRepository, UserSqlRepository>();
 builder.Services.AddScoped<IFavoriteSqlRepository, FavoriteSqlRepository>();
-
+builder.Services.AddScoped<ITransactionSqlRepository, TransactionSqlRepository>();
 builder.Services.AddScoped<IBlobStorageRepository, BlobStorageRepository>();
 
 builder.Services.AddHttpClient();

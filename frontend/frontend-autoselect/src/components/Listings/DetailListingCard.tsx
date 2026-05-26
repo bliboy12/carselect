@@ -9,13 +9,25 @@ import { CiHeart } from "react-icons/ci";
 import { FaHeart } from "react-icons/fa";
 import { createFavorite, deleteFavorite, isFavorited } from "../../api/favoriteApi";
 import useCurrentUser from "../../hooks/useCurrentUser";
+import PaymentModal from "./Stripe/PaymentModel";
+import { createPaymentIntent } from "../../api/paymentApi";
 
+
+interface PaymentData {
+    clientSecret: string
+    publishableKey: string
+    amount: number
+}
 
 const DetailListingCard = () => {
 
     const { id } = useParams();
 
     const { userId } = useCurrentUser();
+
+    const [showPayment, setShowPayment] = useState(false);
+    const [paymentData, setPaymentData] = useState<PaymentData | null>(null);
+    const [paymentSuccess, setPaymentSuccess] = useState(false);
 
     const [activeImage, setActiveImage] = useState(0);
     const [isFavorite, setIsFavorite] = useState<boolean>(false);
@@ -60,6 +72,20 @@ const DetailListingCard = () => {
         else
             createFavoriteMutation();
     }
+    const handleBuy = async () => {
+        try {
+            const data = await createPaymentIntent(listing.id, userId);
+            setPaymentData(data);
+            setShowPayment(true);
+        } catch (error) {
+            console.error("Failed to create payment intent", error);
+        }
+    };
+
+    const handlePaymentSuccess = () => {
+        setShowPayment(false);
+        setPaymentSuccess(true);
+    };
 
     if (isLoading)
         return (<DetailListingSkeleton />)
@@ -166,6 +192,18 @@ const DetailListingCard = () => {
                             {isFavorite ? <FaHeart className="size-5" /> : <CiHeart className="size-5" />}
                             Save listing
                         </button>
+
+                        {/* Buy listing */}
+                        {listing.status !== "sold" && (
+                            <button onClick={handleBuy} className="w-full flex items-center justify-center gap-2 py-2.5 rounded-xl bg-blue-600 hover:bg-blue-500 text-white transition-colors text-sm cursor-pointer">
+                                {paymentSuccess ? "✓ Purchase complete" : "Buy listing"}
+                            </button>
+                        )}
+
+                        {/* Payment modal */}
+                        {showPayment && paymentData && (
+                            <PaymentModal clientSecret={paymentData.clientSecret} publishableKey={paymentData.publishableKey} amount={paymentData.amount} onSuccess={handlePaymentSuccess} onClose={() => setShowPayment(false)}/>
+                        )}
 
                         <hr className="border-gray-800" />
 

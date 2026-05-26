@@ -33,20 +33,27 @@ public class ListingController : ControllerBase
         return Ok(result);
     }
     [HttpPost("search")]
-    public async Task<ActionResult<IEnumerable<ListingResponseContract>>> FilterListingsByCarAsync([FromBody] CarFilterRequestContract carFilterRequest)
+    public async Task<ActionResult<PaginatedResponse<ListingResponseContract>>> FilterListingsByCarAsync([FromBody] CarFilterRequestContract carFilterRequest)
     {
         var filter = CarFilterApiMapper.MapToDomein(carFilterRequest);
-        var results = await _listingService.FilterListingsByCarAsync(filter);
+        var result = await _listingService.FilterListingsByCarAsync(filter);
 
-        var result = new List<ListingResponseContract>();
-        foreach (var listing in results)
+        var items = new List<ListingResponseContract>();
+        foreach (var listing in result.Items)
         {
             var seller = await _userManager.FindByIdAsync(listing.SellerId.ToString());
             var contract = ListingApiMapper.MapToContract(listing);
             contract.Seller = seller != null ? UserApiMapper.MapToContract(seller) : new SellerResponseContract();
-            result.Add(contract);
+            items.Add(contract);
         }
-        return Ok(result);
+
+        return Ok(new PaginatedResponse<ListingResponseContract>
+        {
+            Items = items,
+            TotalCount = result.TotalCount,
+            Page = result.Page,
+            PageSize = result.PageSize
+        });
     }
 
     [HttpGet("mainImages")]

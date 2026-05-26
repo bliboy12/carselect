@@ -8,8 +8,8 @@ public class TransactionMapper
             BuyerId = Guid.Parse(transactionDataModel.BuyerId),
             ListingId = Guid.Parse(transactionDataModel.ListingId),
             AgreedPrice = transactionDataModel.AgreedPrice,
-            PurchaseDate = transactionDataModel.TransactionDate,
-            Status = transactionDataModel.Status.ToLower() == "successful" ? TransactionStatus.Successful : (transactionDataModel.Status.ToLower() == "pending" ? TransactionStatus.Pending : TransactionStatus.Rejected),
+            TransactionDate = transactionDataModel.TransactionDate,
+            Status = transactionDataModel.Status
         };
     }
 
@@ -21,8 +21,8 @@ public class TransactionMapper
             BuyerId = transactionModel.BuyerId.ToString(),
             ListingId = transactionModel.ListingId.ToString(),
             AgreedPrice = transactionModel.AgreedPrice,
-            TransactionDate = transactionModel.PurchaseDate,
-            Status = transactionModel.Status.ToString()
+            TransactionDate = transactionModel.TransactionDate,
+            Status = transactionModel.Status
         };
     }
 }

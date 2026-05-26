@@ -5,6 +5,10 @@ import useCurrentUser from "../hooks/useCurrentUser";
 //     const { userId } = useCurrentUser;
 // }
 
+export const axiosApi = axios.create({
+    baseURL: "http://localhost:5028/api"
+});
+
 export const axiosCars = axios.create({
     baseURL: "http://localhost:5028/api/cars"
 });

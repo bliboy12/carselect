@@ -157,11 +157,11 @@ public class ListingService : IListingService
         return ListingMapper.MapToDomein(result);
     }
     // This will be changed after refactoring the Database
-    public async Task<IEnumerable<ListingModel>> FilterListingsByCarAsync(CarFilterModel filter)
+    public async Task<PaginatedListingResult> FilterListingsByCarAsync(CarFilterModel filter)
     {
         var listings = await GetAllListingsAsync();
 
-        return listings.Where(l =>
+        var filtered = listings.Where(l =>
             (string.IsNullOrEmpty(filter.Brand) || l.Car.Brand.ToLower() == filter.Brand) &&
             (string.IsNullOrEmpty(filter.Model) || l.Car.Model.ToLower() == filter.Model) &&
             (string.IsNullOrEmpty(filter.Color) || l.Car.Color.ToLower() == filter.Color) &&
@@ -174,7 +174,21 @@ public class ListingService : IListingService
             (filter.MaxKilometers == null || l.Car.Kilometers <= filter.MaxKilometers) &&
             (filter.Doors == null || l.Car.Doors == filter.Doors) &&
             (filter.Drive == null || l.Car.Drive == filter.Drive)
-        );
+        ).ToList();
+
+        var totalCount = filtered.Count;
+        var items = filtered
+            .Skip((filter.Page - 1) * filter.PageSize)
+            .Take(filter.PageSize)
+            .ToList();
+
+        return new PaginatedListingResult
+        {
+            Items = items,
+            TotalCount = totalCount,
+            Page = filter.Page,
+            PageSize = filter.PageSize
+        };
     }
 
     public async Task DeleteAllListingsBySellerIdAsync(Guid sellerId)

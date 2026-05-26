@@ -32,4 +32,6 @@ public class CarFilterRequestContract
     public int? MaxKilometers { get; set; }
     public int? Doors { get; set; }
     public DriveTypeContract? Drive { get; set; }
+    public int Page { get; set; } = 1;
+    public int PageSize { get; set; } = 12;
 }

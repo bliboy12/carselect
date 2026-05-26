@@ -8,7 +8,7 @@ public interface IListingService
     Task DeletelistingById(Guid listingId);
 
     // Filter listings
-    Task<IEnumerable<ListingModel>> FilterListingsByCarAsync(CarFilterModel filter);
+    Task<PaginatedListingResult> FilterListingsByCarAsync(CarFilterModel filter);
 
     // Car Images for the associated listing will be in a dedicated Service Class
     // Task<CarImageModel> CreateCarImageAsync(CarImageModel carImageData);

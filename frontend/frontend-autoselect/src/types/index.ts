@@ -119,5 +119,15 @@ export interface CarFilter {
     minKilometers?: number,
     maxKilometers?: number,
     doors?: number,
-    drive?: "fwd" | "rwd" | "awd" | "4wd"
+    drive?: "fwd" | "rwd" | "awd" | "4wd",
+    page?: number,
+    pageSize?: number
 };
+
+export interface PaginatedResponse<T> {
+    items: T[]
+    totalCount: number
+    page: number
+    pageSize: number
+    totalPages: number
+}
