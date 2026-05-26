@@ -65,6 +65,6 @@ public class Index : PageModel
         if (!string.IsNullOrEmpty(Input.ReturnUrl))
             return Redirect(Input.ReturnUrl);
 
-        return Redirect("/login");
+        return Redirect("http://localhost:5173");
     }
 }

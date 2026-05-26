@@ -28,7 +28,17 @@ builder.Services.AddAuthentication("Bearer")
         }
     });
 
-builder.Services.AddAuthorization();
+builder.Services.AddAuthorizationBuilder()
+    .AddPolicy("ReadPolicy", policy =>
+    {
+        policy.RequireAuthenticatedUser();
+        policy.RequireClaim("scope", "carselect.api.read");
+    })
+    .AddPolicy("WritePolicy", policy =>
+    {
+        policy.RequireAuthenticatedUser();
+        policy.RequireClaim("scope", "carselect.api.write");
+    });
 
 builder.Services.AddDbContext<ReviewsDbContext>(options =>
     options.UseSqlServer(builder.Configuration.GetConnectionString("SqlConnection")));

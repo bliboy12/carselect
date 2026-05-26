@@ -25,8 +25,10 @@ const ProtectedRoute = ({ children, adminOnly = false }: ProtectedRouteProps) =>
             </div>
         );
     }
-    if (adminOnly && auth.user?.profile.role !== "Admin")
+    if (adminOnly && auth.user?.profile.role !== "Admin") {
+        console.log("this is the role: ", auth.user?.profile.role);
         return <Navigate to={"/"} replace />
+    }
     
     return <>{children}</>
 }

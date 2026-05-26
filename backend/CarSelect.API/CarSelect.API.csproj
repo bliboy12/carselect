@@ -3,6 +3,7 @@
   <ItemGroup>
     <ProjectReference Include="..\CarSelect.Storage\CarSelect.Storage.csproj" />
     <ProjectReference Include="..\CarSelect.Domain.Services\CarSelect.Domain.Services.csproj" />
+    <ProjectReference Include="..\CarSelect.Identity\CarSelect.Identity.csproj" />
   </ItemGroup>
 
   <ItemGroup>

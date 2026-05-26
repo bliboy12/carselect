@@ -5,7 +5,7 @@ public class ListingApiMapper
         return new ListingResponseContract
         {
             Id = listingModel.Id,
-            Seller = UserApiMapper.MapToContract(listingModel.Seller),
+            Seller = listingModel.Seller != null ? UserApiMapper.MapToContract(listingModel.Seller) : new SellerResponseContract(), // ← fallback if null
             Car = CarApiMapper.MapToContract(listingModel.Car),
             Price = listingModel.Price,
             CreatedAt = listingModel.CreatedAt,

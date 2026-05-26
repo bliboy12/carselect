@@ -1,152 +1,155 @@
-using Microsoft.AspNetCore.Authorization;
+using CarSelect.Identity.Models;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.AspNetCore.RateLimiting;
+using Microsoft.EntityFrameworkCore;
 
 [ApiController]
 [Route("api/users")]
 public class UserController : ControllerBase
 {
-    private readonly IUserSqlService _service;
+    private readonly UserManager<ApplicationUser> _userManager;
     private readonly IFavoriteSqlService _favoriteService;
-    public UserController(IUserSqlService userService, IFavoriteSqlService favoriteService)
+
+    public UserController(UserManager<ApplicationUser> userManager, IFavoriteSqlService favoriteService)
     {
-        _service = userService;
+        _userManager = userManager;
         _favoriteService = favoriteService;
     }
-    [EnableRateLimiting("QuoteCreationLimiter")]
-    [HttpPost]
-    public async Task<ActionResult<UserResponseContract>> CreateUserAsync([FromBody] UserRequestContract userRequest)
-    {
-        try
-        {
-            var request = await _service.CreateUserAsync(UserApiMapper.MapToDomein(userRequest));
-            return CreatedAtAction("CreateUser", UserApiMapper.MapToResponse(request));
-        }
-        catch (ArgumentException)
-        {
-            return BadRequest("Email Already Exists");
-        }
-    }
-    [Authorize("ReadPolicy")]
+
     [HttpGet("{id}")]
     public async Task<ActionResult<UserResponseContract>> GetUserByIdAsync([FromRoute] Guid id)
     {
-        try
-        {
-            var userResponse = await _service.GetUserByIdAsync(id);
+        var user = await _userManager.FindByIdAsync(id.ToString());
+        if (user == null)
+            return NotFound($"User with id {id} not found");
 
-            return UserApiMapper.MapToResponse(userResponse);
-        }
-        catch (NotFoundException nfe)
-        {
-            return NotFound(nfe.Message);
-        }
+        var response = UserApiMapper.MapToResponse(user);
+        response.IsAdmin = await _userManager.IsInRoleAsync(user, "Admin");
+        return Ok(response);
     }
-    [Authorize("AdminOnly")]
+
     [HttpGet]
     public async Task<ActionResult<IEnumerable<UserResponseContract>>> GetAllUsers()
     {
+        var users = await _userManager.Users.ToListAsync();
+        var adminIds = (await _userManager.GetUsersInRoleAsync("Admin"))
+            .Select(u => u.Id)
+            .ToHashSet();
 
-        var userResponses = await _service.GetAllUsers();
-        List<UserResponseContract> users = new();
-
-        foreach (UserModel user in userResponses)
-            users.Add(UserApiMapper.MapToResponse(user));
-
-        return users;
-
+        return Ok(users.Select(u =>
+        {
+            var response = UserApiMapper.MapToResponse(u);
+            response.IsAdmin = adminIds.Contains(u.Id);
+            return response;
+        }));
     }
-    [Authorize("AuthenticatedUser")]
+
     [HttpPut("{id}")]
     public async Task<ActionResult<UserResponseContract>> UpdateUserAsync([FromRoute] Guid id, [FromBody] UserRequestContract updateUser)
     {
-        try
-        {
-            var userModel = UserApiMapper.MapToDomein(updateUser);
-            userModel.Id = id;
-            var userFound = await _service.UpdateUserAsync(userModel);
+        var user = await _userManager.FindByIdAsync(id.ToString());
+        if (user == null)
+            return NotFound($"User with id {id} not found");
 
-            return Ok(UserApiMapper.MapToResponse(userFound));
-        }
-        catch (NotFoundException efx)
-        {
-            return NotFound(efx.Message);
-        }
+        user.FirstName = updateUser.FirstName;
+        user.LastName = updateUser.LastName;
+        user.Email = updateUser.Email;
+        user.UpdateAt = DateTime.UtcNow;
+
+        await _userManager.UpdateAsync(user);
+
+        var response = UserApiMapper.MapToResponse(user);
+        response.IsAdmin = await _userManager.IsInRoleAsync(user, "Admin");
+        return Ok(response);
     }
-    [Authorize("AdminOnly")]
+
     [HttpDelete("{id}")]
     public async Task<ActionResult> RemoveUserAsync([FromRoute] Guid id)
     {
-        try
-        {
-            await _service.RemoveUserAsync(id);
-            return Ok();
-        }
-        catch (NotFoundException efx)
-        {
-            return NotFound(efx.Message);
-        }
+        var user = await _userManager.FindByIdAsync(id.ToString());
+        if (user == null)
+            return NotFound($"User with id {id} not found");
+
+        user.FirstName = "Deleted";
+        user.LastName = "User";
+        user.Email = $"deleted_{id}@deleted.com";
+        user.IsDeleted = true;
+        user.UpdateAt = DateTime.UtcNow;
+
+        await _userManager.UpdateAsync(user);
+        return Ok();
     }
-    [Authorize("AdminOnly")]
-    [HttpGet("search")] // Admin to search on a specific users first-, lastname
-    public async Task<ActionResult<UserResponseContract>> GetAllUsersByNameAsync([FromQuery] string? firstName, [FromQuery] string? lastName)
+
+    [HttpGet("search")]
+    public async Task<ActionResult<IEnumerable<UserResponseContract>>> GetAllUsersByNameAsync([FromQuery] string? firstName, [FromQuery] string? lastName)
     {
-        var response = await _service.GetAllUsersByNameAsync(firstName, lastName);
-        List<UserResponseContract> results = new();
+        var query = _userManager.Users.AsQueryable();
 
-        foreach (UserModel user in response)
-            results.Add(UserApiMapper.MapToResponse(user));
+        if (!string.IsNullOrEmpty(firstName))
+            query = query.Where(u => u.FirstName.StartsWith(firstName));
+        if (!string.IsNullOrEmpty(lastName))
+            query = query.Where(u => u.LastName.StartsWith(lastName));
 
-        return Ok(results);
+        var users = await query.ToListAsync();
+
+        if (!users.Any())
+            return NotFound($"No users found");
+
+        var adminIds = (await _userManager.GetUsersInRoleAsync("Admin"))
+            .Select(u => u.Id)
+            .ToHashSet();
+
+        return Ok(users.Select(u =>
+        {
+            var response = UserApiMapper.MapToResponse(u);
+            response.IsAdmin = adminIds.Contains(u.Id);
+            return response;
+        }));
     }
 
-    [Authorize("AuthenticatedUser")]
+    [HttpPatch("{id}/role")]
+    public async Task<ActionResult<UserResponseContract>> UpdateUserRoleAsync([FromRoute] Guid id, [FromBody] bool isAdmin)
+    {
+        var user = await _userManager.FindByIdAsync(id.ToString());
+        if (user == null)
+            return NotFound($"User with id {id} not found");
+
+        if (isAdmin)
+            await _userManager.AddToRoleAsync(user, "Admin");
+        else
+            await _userManager.RemoveFromRoleAsync(user, "Admin");
+
+        var response = UserApiMapper.MapToResponse(user);
+        response.IsAdmin = isAdmin;
+        return Ok(response);
+    }
+
+    // Favorites
     [HttpPost("{userId}/favorites")]
     public async Task<ActionResult<FavoriteReponseContract>> CreateFavoriteAsync([FromRoute] Guid userId, [FromBody] Guid listingId)
     {
         var response = await _favoriteService.CreateFavoriteAsync(userId, listingId);
-
         return Ok(FavoriteApiMapper.MapToContract(response));
     }
 
-    [Authorize("AuthenticatedUser")]
     [HttpGet("{userId}/favorites")]
-    public async Task<ActionResult<FavoritesReponseContract>> GetAllFavoritesByUserIdAsync([FromRoute] Guid userId)
+    public async Task<ActionResult<FavoriteReponseContract>> GetAllFavoritesByUserIdAsync([FromRoute] Guid userId)
     {
         IEnumerable<FavoriteModel> response = await _favoriteService.GetAllFavoritesByUserIdAsync(userId);
-
         return Ok(FavoriteApiMapper.MapToContract(userId, response));
     }
 
-    [Authorize("AuthenticatedUser")]
     [HttpDelete("{userId}/favorites/{listingId}")]
     public async Task<ActionResult> DeleteFavoriteByListingIdAsync([FromRoute] Guid userId, [FromRoute] Guid listingId)
     {
         await _favoriteService.DeleteFavoriteByListingIdAsync(userId, listingId);
-
-        return NoContent(); // 204;
+        return NoContent();
     }
-    [Authorize("AuthenticatedUser")]
+
     [HttpGet("{userId}/favorites/{listingId}")]
     public async Task<ActionResult<bool>> IsFavoritedAsync([FromRoute] Guid userId, [FromRoute] Guid listingId)
     {
         bool isFavorite = await _favoriteService.IsFavoritedAsync(userId, listingId);
-
         return Ok(isFavorite);
     }
-    [Authorize("AdminOnly")]
-    [HttpPatch("{userId}/role")]
-    public async Task<ActionResult<UserResponseContract>> UpdateUserRoleAsync([FromRoute] Guid userId, [FromBody] bool isAdmin)
-    {
-        var response = await _service.UpdateUserRoleAsync(userId, isAdmin);
-
-        return Ok(UserApiMapper.MapToContract(response));
-    }
-
-    // WIP
-    // [HttpGet("{userId}/favorites")]
-    // public async Task<ActionResult<IEnumerable<FavoriteReponseContract>>> GetAllFavorites([FromRoute] Guid userId)
-    // {
-
-    // }
 }

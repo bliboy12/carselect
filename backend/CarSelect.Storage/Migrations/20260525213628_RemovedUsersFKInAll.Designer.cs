@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -10,9 +11,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace CarSelect.Storage.Migrations
 {
     [DbContext(typeof(CarSelectDbContext))]
-    partial class CarSelectDbContextModelSnapshot : ModelSnapshot
+    [Migration("20260525213628_RemovedUsersFKInAll")]
+    partial class RemovedUsersFKInAll
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -32,6 +35,30 @@ namespace CarSelect.Storage.Migrations
                     b.HasKey("UserId", "ListingId");
 
                     b.ToTable("Favorites");
+                });
+
+            modelBuilder.Entity("ReviewDataModelSQL", b =>
+                {
+                    b.Property<Guid>("SellerId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<Guid>("ReviewerId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<string>("Comment")
+                        .IsRequired()
+                        .HasMaxLength(1000)
+                        .HasColumnType("nvarchar(1000)");
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<int>("Rating")
+                        .HasColumnType("int");
+
+                    b.HasKey("SellerId", "ReviewerId");
+
+                    b.ToTable("Reviews");
                 });
 
             modelBuilder.Entity("TransactionDataModelSQL", b =>

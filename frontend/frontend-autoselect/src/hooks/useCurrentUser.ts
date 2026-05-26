@@ -1,17 +1,11 @@
-import { useAuth } from "react-oidc-context"
-
+import { useContext } from "react";
+import { UserContext } from "../Context/UserContext";
 
 const useCurrentUser = () => {
-    const auth = useAuth();
-
-    return {
-        userId: auth.user?.profile.sub ?? "",
-        firstName: auth.user?.profile.given_name ?? "",
-        lastName: auth.user?.profile.family_name ?? "",
-        isAuthenticated: auth.isAuthenticated,
-        isLoading: auth.isLoading,
-        token: auth.user?.access_token ?? ""
-    }
-}
+    const context = useContext(UserContext);
+    if (!context)
+        throw new Error("useCurrentUser must be used within a UserProvider");
+    return context;
+};
 
 export default useCurrentUser;

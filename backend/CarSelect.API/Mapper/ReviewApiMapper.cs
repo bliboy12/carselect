@@ -19,7 +19,6 @@ public static class ReivewApiMapper
             ReviewerId = reviewRequestContract.ReviewerId,
             Rating = reviewRequestContract.Rating,
             Comment = reviewRequestContract.Comment,
-            CreatedAt = reviewRequestContract.CreatedAt
         };
     }
 }

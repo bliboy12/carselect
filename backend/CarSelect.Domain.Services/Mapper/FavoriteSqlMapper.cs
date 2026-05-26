@@ -14,7 +14,7 @@ public class FavoriteSqlMapper
         {
             UserId = favoriteModel.UserId,
             ListingId = favoriteModel.ListingId,
-            User = UserSqlMapper.MapFromDomein(favoriteModel.User!)
+            // User = UserSqlMapper.MapFromDomein(favoriteModel.User!)
         };
     }
 }

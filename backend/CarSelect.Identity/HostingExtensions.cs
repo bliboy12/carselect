@@ -40,7 +40,8 @@ internal static class HostingExtensions
                 options.EmitStaticAudienceClaim = true;
             })
             .AddConfigurationStore()
-            .AddAspNetIdentity<ApplicationUser>();
+            .AddAspNetIdentity<ApplicationUser>()
+            .AddProfileService<CarSelectProfileService>();
 
         builder.Services.AddAuthentication()
             .AddGoogle(options =>

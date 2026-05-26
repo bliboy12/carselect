@@ -17,6 +17,7 @@ import { AuthProvider } from "react-oidc-context";
 import { authConfig } from './auth/authConfig.ts'
 import CallbackPage from './pages/CallBackPage.tsx'
 import ProtectedRoute from './components/ProtectedRoute.tsx'
+import UserProvider from './Context/UserContext.tsx'
 
 
 const query = new QueryClient();
@@ -72,9 +73,11 @@ const router = createBrowserRouter([
 createRoot(document.getElementById('root')!).render(
   <StrictMode>
     <AuthProvider {...authConfig}>
-      <QueryClientProvider client={query}>
-        <RouterProvider router={router} />
-      </QueryClientProvider>
+      <UserProvider>
+        <QueryClientProvider client={query}>
+          <RouterProvider router={router} />
+        </QueryClientProvider>
+      </UserProvider>
     </AuthProvider>
   </StrictMode>,
 )

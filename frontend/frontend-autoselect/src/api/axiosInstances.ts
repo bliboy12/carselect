@@ -1,9 +1,9 @@
 import axios from "axios";
 import useCurrentUser from "../hooks/useCurrentUser";
 
-const authentication = () => {
-    const { userId } = useCurrentUser();
-}
+// const authentication = () => {
+//     const { userId } = useCurrentUser;
+// }
 
 export const axiosCars = axios.create({
     baseURL: "http://localhost:5028/api/cars"

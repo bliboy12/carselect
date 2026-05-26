@@ -1,6 +1,9 @@
 
 using System.Net.Http.Headers;
 using System.Text.Json.Serialization;
+using CarSelect.Identity.Data;
+using CarSelect.Identity.Models;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.RateLimiting;
 using Microsoft.EntityFrameworkCore;
 
@@ -27,6 +30,7 @@ builder.Services.AddAuthentication()
         options.TokenValidationParameters.ValidateAudience = false;
 
         // TODO: MUST BE REMOVED BEFORE DEPLOYING
+        // This causes any URL that isn't https to be accepted
         if (builder.Environment.IsDevelopment())
         {
             options.BackchannelHttpHandler = new HttpClientHandler
@@ -72,6 +76,14 @@ builder.Services.AddRateLimiter(options =>
     });
 });
 
+// Added this in because I realized that the data is being stored in IdentityServer
+// Which in turn makes my User SQL table redunent
+builder.Services.AddDbContext<ApplicationDbContext>(options =>
+    options.UseSqlServer(builder.Configuration.GetConnectionString("IdentityConnection")));
+
+builder.Services.AddIdentityCore<ApplicationUser>()
+    .AddRoles<IdentityRole>()
+    .AddEntityFrameworkStores<ApplicationDbContext>();
 
 
 // Azure SQL Connection
@@ -104,13 +116,13 @@ builder.Services.Configure<TransactionRepositoryOptions>(
     builder.Configuration.GetSection("TransactionRepositoryOptions")
 );
 
-builder.Services.Configure<ReviewRepositoryOptions>(
-    builder.Configuration.GetSection("ReviewRepositoryOptions")
-);
+// builder.Services.Configure<ReviewRepositoryOptions>(
+//     builder.Configuration.GetSection("ReviewRepositoryOptions")
+// );
 
-builder.Services.Configure<UserRepositoryOptions>(
-    builder.Configuration.GetSection("UserRepositoryOptions")
-);
+// builder.Services.Configure<UserRepositoryOptions>(
+//     builder.Configuration.GetSection("UserRepositoryOptions")
+// );
 
 builder.Services.Configure<BlobStorageRepositoryOptions>(
     builder.Configuration.GetSection("BlobStorageRepositoryOptions")
@@ -124,15 +136,16 @@ builder.Services.AddScoped<ICarImageService, CarImageService>();
 
 
 // Old Implemention (cosmos) - Needs to be removed when SQL Refactor is completed
-builder.Services.AddScoped<IUserService, UserService>();
+// builder.Services.AddScoped<IUserService, UserService>();
 // builder.Services.AddScoped<IReviewService, ReviewService>();
-builder.Services.AddScoped<IFavoriteService, FavoriteService>();
+// builder.Services.AddScoped<IFavoriteService, FavoriteService>();
+
+// The Review Service
 builder.Services.AddScoped<IReviewAggregatorService, ReviewAggregatorService>();
 
 
 // SQL Service Refactor
-builder.Services.AddScoped<IUserSqlService, UserSqlService>();
-builder.Services.AddScoped<IReviewSqlService, ReviewSqlService>();
+// builder.Services.AddScoped<IUserSqlService, UserSqlService>();
 builder.Services.AddScoped<IFavoriteSqlService, FavoriteSqlService>();
 
 builder.Services.AddHttpClient<ICarService, CarService>(client =>
@@ -151,13 +164,12 @@ builder.Services.AddScoped<ITransactionRepository, TransactionRepository>();
 builder.Services.AddScoped<ICarImageRepository, CarImageRepository>();
 
 // Old Implemention (cosmos) - Needs to be removed when SQL Refactor is completed
-builder.Services.AddScoped<IUserRepository, UserRepository>();
+// builder.Services.AddScoped<IUserRepository, UserRepository>();
 // builder.Services.AddScoped<IReviewRepository, ReviewRepository>();
-builder.Services.AddScoped<IFavoriteRepository, FavoriteRepository>();
+// builder.Services.AddScoped<IFavoriteRepository, FavoriteRepository>();
 
 // SQL Refactoring 
-builder.Services.AddScoped<IUserSqlRepository, UserSqlRepository>();
-builder.Services.AddScoped<IReviewSqlRepository, ReviewSqlRepository>();
+// builder.Services.AddScoped<IUserSqlRepository, UserSqlRepository>();
 builder.Services.AddScoped<IFavoriteSqlRepository, FavoriteSqlRepository>();
 
 builder.Services.AddScoped<IBlobStorageRepository, BlobStorageRepository>();

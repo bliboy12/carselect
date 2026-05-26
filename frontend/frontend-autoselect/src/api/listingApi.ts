@@ -32,7 +32,6 @@ export const uploadListingImages = async (listingId: string, images: ImageReques
 
     await axiosListings.post(`/${listingId}/images`, formData, {
         headers: { "Content-Type": "multipart/form-data" },
-        auth: useCurrentUser()
     });
 }
 

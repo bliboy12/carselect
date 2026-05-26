@@ -1,18 +1,21 @@
+using CarSelect.Identity.Models;
+
 public class UserApiMapper
 {
-    public static UserResponseContract MapToResponse(UserModel userModel)
+    public static UserResponseContract MapToResponse(ApplicationUser user)
     {
         return new UserResponseContract
         {
-            Id = userModel.Id,
-            FirstName = userModel.FirstName,
-            LastName = userModel.LastName,
-            Email = userModel.Email,
-            CreatedAt = userModel.CreatedAt,
-            UpdatedAt = userModel.UpdatedAt,
-            IsAdmin = userModel.IsAdmin
+            Id = Guid.Parse(user.Id),
+            FirstName = user.FirstName,
+            LastName = user.LastName,
+            Email = user.Email ?? string.Empty,
+            CreatedAt = user.CreatedAt,
+            UpdatedAt = user.UpdateAt,
+            IsAdmin = false
         };
     }
+
     public static UserModel MapToDomein(UserResponseContract userResponseContract)
     {
         return new UserModel
@@ -26,6 +29,7 @@ public class UserApiMapper
             IsAdmin = userResponseContract.IsAdmin
         };
     }
+
     public static UserModel MapToDomein(UserRequestContract userRequestContract)
     {
         return new UserModel
@@ -34,6 +38,16 @@ public class UserApiMapper
             LastName = userRequestContract.LastName,
             Email = userRequestContract.Email,
             IsAdmin = false
+        };
+    }
+
+    public static SellerResponseContract MapToContract(ApplicationUser user)
+    {
+        return new SellerResponseContract
+        {
+            Id = Guid.Parse(user.Id),
+            FirstName = user.FirstName,
+            LastName = user.LastName
         };
     }
     public static SellerResponseContract MapToContract(UserModel userModel)

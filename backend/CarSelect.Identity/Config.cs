@@ -9,6 +9,10 @@ public static class Config
         {
             new IdentityResources.OpenId(),
             new IdentityResources.Profile(),
+            new IdentityResource(
+                name: "roles",
+                userClaims: new[] {"role"}
+            )
         };
 
     public static IEnumerable<ApiScope> ApiScopes =>
@@ -33,7 +37,7 @@ public static class Config
                 PostLogoutRedirectUris = {"http://localhost:5173"},
                 AllowedCorsOrigins = { "http://localhost:5173" },
                 AllowOfflineAccess = true, // allows the user to ask for a refresh token
-                AllowedScopes = { "openid", "profile", "carselect.api.read", "carselect.api.write" }, // what is the frontend allowed to access
+                AllowedScopes = { "openid", "profile", "roles", "carselect.api.read", "carselect.api.write" }, // what is the frontend allowed to access
             },
 
             // Postman
@@ -44,5 +48,14 @@ public static class Config
                 ClientSecrets = { new Secret("eenGrootGeheim".Sha256())},
                 AllowedScopes = { "carselect.api.read" }
             },
+
+            // m2m
+            new Client
+            {
+                ClientId = "carselect-api-client",
+                AllowedGrantTypes = GrantTypes.ClientCredentials,
+                ClientSecrets = { new Secret("carselect-api-secret".Sha256()) },
+                AllowedScopes = { "carselect.api.read", "carselect.api.write"}
+            }
         };
 }

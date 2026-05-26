@@ -1,3 +1,4 @@
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 [ApiController]
@@ -12,6 +13,7 @@ public class ReviewController : ControllerBase
     }
 
     [HttpGet]
+    [Authorize(policy: "ReadPolicy")]
     public async Task<ActionResult<IEnumerable<ReviewResponseContract>>> GetReviewsAsync([FromQuery] Guid? sellerId, [FromQuery] Guid? reviewerId)
     {
         if (sellerId.HasValue)
@@ -28,9 +30,8 @@ public class ReviewController : ControllerBase
     }
 
     [HttpGet("{sellerId}/{reviewerId}")]
-    public async Task<ActionResult<ReviewResponseContract>> GetReviewAsync(
-        [FromRoute] Guid sellerId,
-        [FromRoute] Guid reviewerId)
+    [Authorize(policy: "ReadPolicy")]
+    public async Task<ActionResult<ReviewResponseContract>> GetReviewAsync([FromRoute] Guid sellerId, [FromRoute] Guid reviewerId)
     {
         var result = await _service.GetReviewByIdAsync(sellerId, reviewerId);
         if (result == null)
@@ -39,27 +40,24 @@ public class ReviewController : ControllerBase
     }
 
     [HttpPost]
-    public async Task<ActionResult<ReviewResponseContract>> CreateReviewAsync(
-        [FromBody] ReviewRequestContract request)
+    [Authorize(policy: "WritePolicy")]
+    public async Task<ActionResult<ReviewResponseContract>> CreateReviewAsync([FromBody] ReviewRequestContract request)
     {
         var review = await _service.CreateReviewAsync(ReviewApiMapper.ToDomain(request));
         return Ok(ReviewApiMapper.ToContract(review));
     }
 
     [HttpPut("{sellerId}/{reviewerId}")]
-    public async Task<ActionResult<ReviewResponseContract>> UpdateReviewAsync(
-        [FromRoute] Guid sellerId,
-        [FromRoute] Guid reviewerId,
-        [FromBody] ReviewRequestContract request)
+    [Authorize(policy: "WritePolicy")]
+    public async Task<ActionResult<ReviewResponseContract>> UpdateReviewAsync([FromRoute] Guid sellerId, [FromRoute] Guid reviewerId, [FromBody] ReviewRequestContract request)
     {
         var result = await _service.UpdateReviewAsync(sellerId, reviewerId, ReviewApiMapper.ToDomain(request));
         return Ok(ReviewApiMapper.ToContract(result));
     }
 
     [HttpDelete("{sellerId}/{reviewerId}")]
-    public async Task<ActionResult> DeleteReviewAsync(
-        [FromRoute] Guid sellerId,
-        [FromRoute] Guid reviewerId)
+    [Authorize(policy: "WritePolicy")]
+    public async Task<ActionResult> DeleteReviewAsync([FromRoute] Guid sellerId, [FromRoute] Guid reviewerId)
     {
         await _service.DeleteReviewAsync(sellerId, reviewerId);
         return NoContent();

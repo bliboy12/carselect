@@ -3,7 +3,9 @@ import { axiosUsers } from "./axiosInstances"
 
 
 export const createFavorite = async (userId: string, listingId: string): Promise<FavoriteResponse> => {
-    const response = await axiosUsers.post<FavoriteResponse>(`/${userId}/favorites`, listingId);
+    const response = await axiosUsers.post<FavoriteResponse>(`/${userId}/favorites`, listingId, {
+        headers: { "Content-Type": "application/json"}
+    });
     return response.data;
 }
 

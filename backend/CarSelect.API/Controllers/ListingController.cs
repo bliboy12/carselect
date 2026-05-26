@@ -1,4 +1,6 @@
+using CarSelect.Identity.Models;
 using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.RateLimiting;
 
@@ -8,34 +10,27 @@ public class ListingController : ControllerBase
 {
     private readonly ICarImageService _carImageService;
     private readonly IListingService _listingService;
-    public ListingController(ICarImageService carImageService, IListingService listingService)
+    private readonly UserManager<ApplicationUser> _userManager;
+    public ListingController(ICarImageService carImageService, IListingService listingService, UserManager<ApplicationUser> userManager)
     {
         _carImageService = carImageService;
         _listingService = listingService;
+        _userManager = userManager;
     }
     [HttpGet]
     public async Task<ActionResult<IEnumerable<ListingResponseContract>>> GetAllListingsAsync([FromQuery] Guid? sellerId)
     {
-        if (sellerId.HasValue)
+        var listings = sellerId.HasValue ? await _listingService.GetAllListingsBySellerIdAsync(sellerId.Value) : await _listingService.GetAllListingsAsync();
+
+        var result = new List<ListingResponseContract>();
+        foreach (var listing in listings)
         {
-            try
-            {
-                var filteredResponse = await _listingService.GetAllListingsBySellerIdAsync(sellerId.Value);
-                return Ok(filteredResponse);
-            }
-            catch (NotFoundException nfe)
-            {
-                return NotFound(nfe.Message);
-            }
+            var seller = await _userManager.FindByIdAsync(listing.SellerId.ToString());
+            var contract = ListingApiMapper.MapToContract(listing);
+            contract.Seller = seller != null ? UserApiMapper.MapToContract(seller) : new SellerResponseContract();
+            result.Add(contract);
         }
-
-        var response = await _listingService.GetAllListingsAsync();
-        List<ListingResponseContract> listings = new();
-
-        foreach (ListingModel listing in response)
-            listings.Add(ListingApiMapper.MapToContract(listing));
-
-        return Ok(listings);
+        return Ok(result);
     }
     [HttpPost("search")]
     public async Task<ActionResult<IEnumerable<ListingResponseContract>>> FilterListingsByCarAsync([FromBody] CarFilterRequestContract carFilterRequest)
@@ -43,11 +38,15 @@ public class ListingController : ControllerBase
         var filter = CarFilterApiMapper.MapToDomein(carFilterRequest);
         var results = await _listingService.FilterListingsByCarAsync(filter);
 
-        List<ListingResponseContract> listings = new();
-        foreach (ListingModel listing in results)
-            listings.Add(ListingApiMapper.MapToContract(listing));
-
-        return Ok(listings);
+        var result = new List<ListingResponseContract>();
+        foreach (var listing in results)
+        {
+            var seller = await _userManager.FindByIdAsync(listing.SellerId.ToString());
+            var contract = ListingApiMapper.MapToContract(listing);
+            contract.Seller = seller != null ? UserApiMapper.MapToContract(seller) : new SellerResponseContract();
+            result.Add(contract);
+        }
+        return Ok(result);
     }
 
     [HttpGet("mainImages")]
@@ -68,7 +67,10 @@ public class ListingController : ControllerBase
         try
         {
             var result = await _listingService.GetListingByIdAsync(listingId);
-            return Ok(ListingApiMapper.MapToContract(result));
+            var seller = await _userManager.FindByIdAsync(result.SellerId.ToString());
+            var contract = ListingApiMapper.MapToContract(result);
+            contract.Seller = seller != null ? UserApiMapper.MapToContract(seller) : new SellerResponseContract();
+            return Ok(contract);
         }
         catch (NotFoundException nfe)
         {
