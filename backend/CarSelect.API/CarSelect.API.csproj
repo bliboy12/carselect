@@ -26,6 +26,8 @@
     <Nullable>enable</Nullable>
     <ImplicitUsings>enable</ImplicitUsings>
     <ErrorOnDuplicatePublishOutputFiles>false</ErrorOnDuplicatePublishOutputFiles>
+    <SelfContained>false</SelfContained>
+    <PublishSingleFile>false</PublishSingleFile>
   </PropertyGroup>
 
 </Project>

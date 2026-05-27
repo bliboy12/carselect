@@ -13,7 +13,7 @@ var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddCors(options =>
     options.AddPolicy("AllowFrontend", policy =>
     {
-        policy.WithOrigins("https://pg3alicarselect.z6.web.core.windows.net/")
+        policy.WithOrigins("https://pg3alicarselect.z6.web.core.windows.net")
         .AllowAnyHeader()
         .AllowAnyMethod();
     })
@@ -189,7 +189,7 @@ builder.Services.AddControllers().AddJsonOptions(options => options.JsonSerializ
 
 var app = builder.Build();
 
-app.UseRouting();
+// app.UseRouting();
 app.UseCors("AllowFrontend");
 app.UseAuthentication();
 app.UseAuthorization();
