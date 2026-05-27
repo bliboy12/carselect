@@ -106,8 +106,7 @@ const DetailListingCard = () => {
     console.log("seller:", seller);
     console.log(`${seller.firstName}${seller.lastName}`.toUpperCase());
 
-    const sellerInitials = `${seller.firstName[0]}${seller.lastName[0]}`.toUpperCase();
-
+    const sellerInitials = `${seller.firstName?.[0] ?? '?'}${seller.lastName?.[0] ?? '?'}`.toUpperCase();
     return (
         <div className="min-h-screen bg-gray-950 py-8 px-4">
             <div className="max-w-6xl mx-auto">

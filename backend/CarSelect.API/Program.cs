@@ -189,7 +189,7 @@ builder.Services.AddControllers().AddJsonOptions(options => options.JsonSerializ
 
 var app = builder.Build();
 
-// app.UseRouting();
+app.UseRouting();
 app.UseCors("AllowFrontend");
 app.UseAuthentication();
 app.UseAuthorization();
