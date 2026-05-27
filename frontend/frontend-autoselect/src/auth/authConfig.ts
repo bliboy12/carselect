@@ -1,8 +1,8 @@
 export const authConfig = {
-    authority: "https://localhost:5001",
+    authority: "https://carselect-identityserver-evafhmh8eacxbbgd.westeurope-01.azurewebsites.net",
     client_id: "carselect-frontend",
-    redirect_uri: "http://localhost:5173/callback",
-    post_logout_redirect_uri: "http://localhost:5173",
+    redirect_uri: "https://carselect-api-cmbgbafrdqhebmgz.westeurope-01.azurewebsites.net/callback",
+    post_logout_redirect_uri: "https://carselect-api-cmbgbafrdqhebmgz.westeurope-01.azurewebsites.net",
     scope: "openid profile carselect.api.read carselect.api.write roles",
     response_type: "code",
     loadUserInfo: true,

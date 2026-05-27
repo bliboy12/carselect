@@ -14,7 +14,7 @@ try
     builder.Services.AddCors(options =>
     options.AddPolicy("AllowFrontend", policy =>
     {
-        policy.WithOrigins("https://carselect-api-cmbgbafrdqhebmgz.westeurope-01.azurewebsites.net")
+        policy.WithOrigins("https://carselect-api-cmbgbafrdqhebmgz.westeurope-01.azurewebsites.net/")
         .AllowAnyHeader()
         .AllowAnyMethod();
     })
