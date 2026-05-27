@@ -102,7 +102,8 @@ const DetailListingCard = () => {
     const carImages = listing.carImages.length > 0
         ? listing.carImages.map((img) => img.imageUrl)
         : Array.from({ length: 5 }, () => defaultCarImage);
-
+    
+    console.log("seller:", seller);
     console.log(`${seller.firstName}${seller.lastName}`.toUpperCase());
 
     const sellerInitials = `${seller.firstName[0]}${seller.lastName[0]}`.toUpperCase();
