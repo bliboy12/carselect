@@ -43,7 +43,7 @@ const DetailListingCard = () => {
     const { data: favoriteStatus } = useQuery({
         queryKey: ["isFavorite", id],
         queryFn: () => isFavorited(dataListing!.data.seller.id, id!),
-        enabled: !!dataListing?.data.seller.id
+        enabled: !!dataListing?.data.seller.id && !!id
     });
 
     useEffect(() => {
