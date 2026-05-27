@@ -44,6 +44,6 @@ jobs:
       - name: Deploy Reviews API
         uses: azure/webapps-deploy@v3
         with:
-          app-name: "carselect-reviews"
+          app-name: "carselect-reviews-api"
           publish-profile: ${{ secrets.REVIEWS_PUBLISH_PROFILE }}
           package: ${{ github.workspace }}/publish/reviews
