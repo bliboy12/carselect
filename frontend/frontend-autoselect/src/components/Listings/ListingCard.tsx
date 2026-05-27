@@ -1,5 +1,5 @@
 import type {ListingResponse } from "../../types";
-import vehicle from "../../assets/car.jpg"
+// import vehicle from "../../assets/car.jpg"
 
 interface listingCardProp {
     listing: ListingResponse,
@@ -19,7 +19,7 @@ const ListingCard = (prop: listingCardProp) => {
     return (
         <div className="group bg-gray-900 border border-gray-800 rounded-2xl overflow-hidden hover:border-gray-600 hover:shadow-xl hover:shadow-black/40 transition-all duration-200 cursor-pointer ">
             <div className="relative aspect-4/3 bg-gray-800 overflow-hidden">
-                <img src={vehicle} className="w-full h-full object-cover" />
+                <img src={listing.carImages.filter((c) => c.isMainImage === true)[0].imageUrl} className="w-full h-full object-cover" />
                 {/* Sold overlay */}
                 {status === "sold" && (
                     <div className="absolute inset-0 bg-gray-950/75 flex items-center justify-center">
