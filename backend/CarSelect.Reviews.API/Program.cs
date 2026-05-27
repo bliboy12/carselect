@@ -7,7 +7,7 @@ var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddCors(options =>
     options.AddPolicy("AllowFrontend", policy =>
     {
-        policy.WithOrigins("http://localhost:5173")
+        policy.WithOrigins("https://carselect-api-cmbgbafrdqhebmgz.westeurope-01.azurewebsites.net")
             .AllowAnyHeader()
             .AllowAnyMethod();
     })
@@ -16,7 +16,7 @@ builder.Services.AddCors(options =>
 builder.Services.AddAuthentication("Bearer")
     .AddJwtBearer("Bearer", options =>
     {
-        options.Authority = "https://localhost:5001";
+        options.Authority = "https://carselect-identityserver-evafhmh8eacxbbgd.westeurope-01.azurewebsites.net";
         options.TokenValidationParameters.ValidateAudience = false;
         // if (builder.Environment.IsDevelopment())
         // {

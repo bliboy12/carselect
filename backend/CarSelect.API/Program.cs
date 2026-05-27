@@ -13,7 +13,7 @@ var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddCors(options =>
     options.AddPolicy("AllowFrontend", policy =>
     {
-        policy.WithOrigins("http://localhost:5173")
+        policy.WithOrigins("https://pg3alicarselect.z6.web.core.windows.net/")
         .AllowAnyHeader()
         .AllowAnyMethod();
     })
@@ -21,13 +21,13 @@ builder.Services.AddCors(options =>
 
 builder.Services.AddHttpClient("ReviewsService", client =>
 {
-    client.BaseAddress = new Uri("http://localhost:5129/");
+    client.BaseAddress = new Uri("https://carselect-reviews-api-d2dvbtgpdcfkhra6.westeurope-01.azurewebsites.net");
 });
 
 builder.Services.AddAuthentication()
     .AddJwtBearer(options =>
     {
-        options.Authority = "https://localhost:5001";
+        options.Authority = "https://carselect-identityserver-evafhmh8eacxbbgd.westeurope-01.azurewebsites.net";
         options.TokenValidationParameters.ValidateAudience = false;
 
         // // TODO: MUST BE REMOVED BEFORE DEPLOYING

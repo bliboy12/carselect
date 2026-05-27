@@ -6,17 +6,17 @@ import axios from "axios";
 // }
 
 export const axiosApi = axios.create({
-    baseURL: "http://localhost:5028/api"
+    baseURL: "https://carselect-api-cmbgbafrdqhebmgz.westeurope-01.azurewebsites.net/api/"
 });
 
 export const axiosCars = axios.create({
-    baseURL: "http://localhost:5028/api/cars"
+    baseURL: "https://carselect-api-cmbgbafrdqhebmgz.westeurope-01.azurewebsites.net/api/cars"
 });
 
 export const axiosListings = axios.create({
-    baseURL: "http://localhost:5028/api/listings"
+    baseURL: "https://carselect-api-cmbgbafrdqhebmgz.westeurope-01.azurewebsites.net/api/listings"
 });
 
 export const axiosUsers = axios.create({
-    baseURL: "http://localhost:5028/api/users"
+    baseURL: "https://carselect-api-cmbgbafrdqhebmgz.westeurope-01.azurewebsites.net/api/users"
 });
