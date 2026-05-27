@@ -81,7 +81,7 @@ const Navbar = () => {
                                     <button onClick={handleLogin} className="cursor-pointer text-sm text-gray-400 hover:text-white transition-colors">
                                         Inloggen
                                     </button>
-                                    <button onClick={() => window.location.href = "https://localhost:5001/Account/Register"} className="cursor-pointer text-sm bg-blue-600 hover:bg-blue-700 transition-colors text-white px-4 py-2 rounded-md font-medium">
+                                    <button onClick={() => window.location.href = "https://carselect-identityserver-evafhmh8eacxbbgd.westeurope-01.azurewebsites.net/Account/Register"} className="cursor-pointer text-sm bg-blue-600 hover:bg-blue-700 transition-colors text-white px-4 py-2 rounded-md font-medium">
                                         Registreren
                                     </button>
                                 </>
