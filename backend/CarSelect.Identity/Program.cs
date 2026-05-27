@@ -14,16 +14,15 @@ try
     builder.Services.AddCors(options =>
     options.AddPolicy("AllowFrontend", policy =>
     {
-        policy.WithOrigins("https://carselect-api-cmbgbafrdqhebmgz.westeurope-01.azurewebsites.net")
+        policy.WithOrigins("https://pg3alicarselect.z6.web.core.windows.net")
         .AllowAnyHeader()
         .AllowAnyMethod();
     })
 );
-    // For testing
-    // builder.Host.UseSerilog((ctx, lc) => lc
-    //     .WriteTo.Console(outputTemplate: "[{Timestamp:HH:mm:ss} {Level}] {SourceContext}{NewLine}{Message:lj}{NewLine}{Exception}{NewLine}")
-    //     .Enrich.FromLogContext()
-    //     .ReadFrom.Configuration(ctx.Configuration));
+    builder.Host.UseSerilog((ctx, lc) => lc
+        .WriteTo.Console(outputTemplate: "[{Timestamp:HH:mm:ss} {Level}] {SourceContext}{NewLine}{Message:lj}{NewLine}{Exception}{NewLine}")
+        .Enrich.FromLogContext()
+        .ReadFrom.Configuration(ctx.Configuration));
 
     var app = builder
         .ConfigureServices()
