@@ -46,10 +46,14 @@ const DetailListingCard = () => {
         enabled: !!dataListing?.data.seller.id && !!id
     });
 
+    console.log("Favorite status: ", favoriteStatus);
+
     useEffect(() => {
         if (favoriteStatus !== undefined)
             setIsFavorite(favoriteStatus);
     }, [favoriteStatus]);
+
+    console.log("isFavorite: ", isFavorite);
 
     const { mutate: createFavoriteMutation } = useMutation({
         mutationFn: async () => {
