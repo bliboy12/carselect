@@ -65,6 +65,6 @@ public class Index : PageModel
         if (!string.IsNullOrEmpty(Input.ReturnUrl))
             return Redirect(Input.ReturnUrl);
 
-        return Redirect("http://localhost:5173");
+        return Redirect("https://pg3alicarselect.z6.web.core.windows.net/");
     }
 }
