@@ -33,9 +33,9 @@ public static class Config
 
                 AllowedGrantTypes = GrantTypes.Code,
                 RequireClientSecret = false, // no need to store any secrets in the frontend
-                RedirectUris = {"https://carselect-api-cmbgbafrdqhebmgz.westeurope-01.azurewebsites.net/callback"},
-                PostLogoutRedirectUris = {"https://carselect-api-cmbgbafrdqhebmgz.westeurope-01.azurewebsites.net"},
-                AllowedCorsOrigins = { "https://carselect-api-cmbgbafrdqhebmgz.westeurope-01.azurewebsites.net" },
+                RedirectUris = {"https://pg3alicarselect.z6.web.core.windows.net/callback"},
+                PostLogoutRedirectUris = {"https://pg3alicarselect.z6.web.core.windows.net"},
+                AllowedCorsOrigins = { "https://pg3alicarselect.z6.web.core.windows.net" },
                 AllowOfflineAccess = true, // allows the user to ask for a refresh token
                 AllowedScopes = { "openid", "profile", "roles", "carselect.api.read", "carselect.api.write" }, // what is the frontend allowed to access
             },
