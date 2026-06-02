@@ -43,12 +43,6 @@ const CreateListingPage = () => {
         onSuccess: () => navigate("/profile")
     });
 
-    const { mutate: submitImages } = useMutation({
-        mutationFn: async (images: ImageRequest[]) => {
-            const createImages = await createImages(images):
-        }
-    })
-
     const onSubmit = (formData: CreateListingForm) => {
         submitListing({
             listing: {
