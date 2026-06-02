@@ -15,6 +15,6 @@ public interface IListingRepository
     // Task RemoveCarImageAsync(string carImageId);
 
     // Amount of Favorited of this listing
-    Task<IEnumerable<FavoriteDataModel>> GetAllFavoritesByListingIdAsync(string userId, string listingId);
+    Task<IEnumerable<FavoriteDataModelSQL>> GetAllFavoritesByListingIdAsync(string userId, string listingId);
 
 }

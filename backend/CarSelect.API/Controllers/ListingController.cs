@@ -110,7 +110,7 @@ public class ListingController : ControllerBase
         // TODO: any user that has write policy can delete someone elses listing
         // We need to change this for guard for this in all methods that have similar characteristic
         await _listingService.DeletelistingById(listingId);
-        return Ok();
+        return NoContent();
     }
 
     // CAR IMAGES 
@@ -142,7 +142,7 @@ public class ListingController : ControllerBase
             return NotFound(nfe.Message);
         }
     }
-    [Authorize("AuthenticatedUser")]
+    [Authorize("WritePolicy")]
     [HttpPost("{listingId}/images")]
     public async Task<ActionResult<IEnumerable<CarImageResponseContract>>> CreateCarImageAsync([FromRoute] Guid listingId, [FromForm] IEnumerable<CarImageRequestContract> files)
     {
@@ -161,7 +161,7 @@ public class ListingController : ControllerBase
         }
         return Ok(carImages);
     }
-    [Authorize("AuthenticatedUser")]
+    [Authorize("WritePolicy")]
     [HttpPut("{listingId}/images/{imageId}")]
     public async Task<ActionResult<CarImageResponseContract>> UpdateCarImageToMainImage([FromRoute] Guid listingId, [FromRoute] Guid imageId)
     {
@@ -169,7 +169,7 @@ public class ListingController : ControllerBase
 
         return CarImageApiMapper.MapToContract(result);
     }
-    [Authorize("AuthenticatedUser")]
+    [Authorize("WritePolicy")]
     [HttpDelete("{listingId}/images/{imageId}")]
     public async Task<ActionResult> DeleteCarImageByIdAsync([FromRoute] Guid listingId, [FromRoute] Guid imageId)
     {
@@ -183,7 +183,7 @@ public class ListingController : ControllerBase
             return NotFound(nfe.Message);
         }
     }
-    [Authorize("AuthenticatedUser")]
+    [Authorize("WritePolicy")]
     [HttpDelete("{listingId}/images")]
     public async Task<ActionResult> DeleteAllImagesByListingIdAsync([FromRoute] Guid listingId)
     {

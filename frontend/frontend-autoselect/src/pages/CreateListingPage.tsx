@@ -21,7 +21,7 @@ interface CreateListingForm {
 const CreateListingPage = () => {
 
     const navigate = useNavigate();
-    const { userId } = useCurrentUser(); 
+    const { userId } = useCurrentUser();
 
     const { register, handleSubmit } = useForm<CreateListingForm>();
 
@@ -42,6 +42,12 @@ const CreateListingPage = () => {
         },
         onSuccess: () => navigate("/profile")
     });
+
+    const { mutate: submitImages } = useMutation({
+        mutationFn: async (images: ImageRequest[]) => {
+            const createImages = await createImages(images):
+        }
+    })
 
     const onSubmit = (formData: CreateListingForm) => {
         submitListing({
@@ -235,15 +241,15 @@ const CreateListingPage = () => {
                     <label className="block border-2 border-dashed border-gray-700 rounded-xl p-10 text-center cursor-pointer hover:border-gray-500 transition-colors">
                         <p className="text-sm text-white mb-1">Drop images here or click to upload</p>
                         <p className="text-xs text-gray-400">PNG, JPG up to 10MB each</p>
-                        <input type="file" multiple accept="image/*" className="hidden" onChange={handleImageUpload}/>
+                        <input type="file" multiple accept="image/*" className="hidden" onChange={handleImageUpload} />
                     </label>
 
                     {images.length > 0 && (
                         <div className="mt-4 grid grid-cols-3 gap-3">
                             {images.map((img, i) => (
-                                <div key={i} className={`relative rounded-xl overflow-hidden border-2 transition-all ${ img.isMainImage ? "border-blue-500" : "border-gray-700"}`}>
+                                <div key={i} className={`relative rounded-xl overflow-hidden border-2 transition-all ${img.isMainImage ? "border-blue-500" : "border-gray-700"}`}>
                                     {/* Thumbnail */}
-                                    <img src={URL.createObjectURL(img.file)} alt={img.file.name} className="w-full aspect-4/3 object-cover"/>
+                                    <img src={URL.createObjectURL(img.file)} alt={img.file.name} className="w-full aspect-4/3 object-cover" />
 
                                     {/* Main image badge */}
                                     {img.isMainImage && (

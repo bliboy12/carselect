@@ -62,8 +62,8 @@ public class ListingService : IListingService
         var results = await _listingRepo.GetAllFavoritesByListingIdAsync(userId.ToString(), listingId.ToString());
         List<FavoriteModel> favorites = new();
 
-        foreach (FavoriteDataModel favorite in results)
-            favorites.Add(FavoriteMapper.MapToDomein(favorite));
+        foreach (FavoriteDataModelSQL favorite in results)
+            favorites.Add(FavoriteSqlMapper.MapToDomein(favorite));
 
         return favorites;
     }

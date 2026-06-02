@@ -37,14 +37,14 @@ public class ListingRepository : IListingRepository
             throw new NotFoundException($"listing with Id {listingId} Not Found");
         }
     }
-    public async Task<IEnumerable<FavoriteDataModel>> GetAllFavoritesByListingIdAsync(string userId, string listingId)
+    public async Task<IEnumerable<FavoriteDataModelSQL>> GetAllFavoritesByListingIdAsync(string userId, string listingId)
     {
         var sql = new QueryDefinition($"SELECT * FROM c WHERE c.userId=@userId AND c.listingId=@listingId")
         .WithParameter("@userId", userId)
         .WithParameter("@listingId", listingId);
 
-        var query = _favoriteContainer.GetItemQueryIterator<FavoriteDataModel>(sql);
-        List<FavoriteDataModel> results = new();
+        var query = _favoriteContainer.GetItemQueryIterator<FavoriteDataModelSQL>(sql);
+        List<FavoriteDataModelSQL> results = new();
 
         while (query.HasMoreResults)
         {

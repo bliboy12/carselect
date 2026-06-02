@@ -19,19 +19,19 @@ public class TransactionSqlService : ITransactionSqlService
             Status = transaction.Status
         };
         var result = await _repo.AddTransactionAsync(dataModel);
-        return MapToModel(result);
+        return TransactionMapper.MapToModel(result);
     }
 
     public async Task<TransactionModel?> GetTransactionsByListingIdAsync(Guid listingId)
     {
         var result = await _repo.GetTransactionByListingIdAsync(listingId);
-        return result == null ? null : MapToModel(result);
+        return result == null ? null : TransactionMapper.MapToModel(result);
     }
 
     public async Task<IEnumerable<TransactionModel>> GetAllTransactionsByBuyerIdAsync(Guid userId)
     {
         var results = await _repo.GetAllTransactionsByBuyerIdAsync(userId);
-        return results.Select(MapToModel);
+        return results.Select(TransactionMapper.MapToModel);
     }
 
     public Task<TransactionModel?> GetTransactionByIdAsync(Guid transactionId)
@@ -43,16 +43,4 @@ public class TransactionSqlService : ITransactionSqlService
     public Task RemoveTransactionByIdAsync(Guid transactionId)
         => throw new NotImplementedException();
 
-    private TransactionModel MapToModel(TransactionDataModelSQL dataModel)
-    {
-        return new TransactionModel
-        {
-            Id = dataModel.Id,
-            BuyerId = dataModel.BuyerId,
-            ListingId = dataModel.ListingId,
-            AgreedPrice = dataModel.AgreedPrice,
-            TransactionDate = dataModel.TransactionDate,
-            Status = dataModel.Status
-        };
-    }
 }

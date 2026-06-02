@@ -1,25 +1,25 @@
 public class TransactionMapper
 {
-    public TransactionModel MapToDomein(TransactionDataModel transactionDataModel)
+    public static TransactionModel MapToModel(TransactionDataModelSQL dataModel)
     {
         return new TransactionModel
         {
-            Id = Guid.Parse(transactionDataModel.Id),
-            BuyerId = Guid.Parse(transactionDataModel.BuyerId),
-            ListingId = Guid.Parse(transactionDataModel.ListingId),
-            AgreedPrice = transactionDataModel.AgreedPrice,
-            TransactionDate = transactionDataModel.TransactionDate,
-            Status = transactionDataModel.Status
+            Id = dataModel.Id,
+            BuyerId = dataModel.BuyerId,
+            ListingId = dataModel.ListingId,
+            AgreedPrice = dataModel.AgreedPrice,
+            TransactionDate = dataModel.TransactionDate,
+            Status = dataModel.Status
         };
     }
 
-    public TransactionDataModel MapFromDomein(TransactionModel transactionModel)
+    public static TransactionDataModelSQL MapFromDomein(TransactionModel transactionModel)
     {
-        return new TransactionDataModel
+        return new TransactionDataModelSQL
         {
-            Id = transactionModel.Id.ToString(),
-            BuyerId = transactionModel.BuyerId.ToString(),
-            ListingId = transactionModel.ListingId.ToString(),
+            Id = transactionModel.Id,
+            BuyerId = transactionModel.BuyerId,
+            ListingId = transactionModel.ListingId,
             AgreedPrice = transactionModel.AgreedPrice,
             TransactionDate = transactionModel.TransactionDate,
             Status = transactionModel.Status
