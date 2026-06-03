@@ -4,6 +4,7 @@ using Microsoft.Extensions.Options;
 using Stripe;
 
 [ApiController]
+[Authorize]
 [Route("api/payments")]
 public class PaymentController : ControllerBase
 {
@@ -17,7 +18,7 @@ public class PaymentController : ControllerBase
         _transactionService = transactionSqlService;
     }
 
-    [Authorize(Policy = "WritePolicy")]
+    [Authorize("WritePolicy")]
     [HttpPost("create-payment-intent")]
     public async Task<ActionResult> CreatePaymentIntent([FromBody] CreatePaymentIntentRequest request)
     {

@@ -2,6 +2,7 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 [ApiController]
+[Authorize]
 [Route("api/reviews")]
 public class ReviewAggregatorController : ControllerBase
 {
@@ -13,7 +14,7 @@ public class ReviewAggregatorController : ControllerBase
     }
 
     [HttpGet]
-    [Authorize(Policy = "ReadPolicy")]
+    [Authorize("ReadPolicy")]
     public async Task<ActionResult<IEnumerable<EnrichedReviewResponseContract>>> GetReviewsBySellerIdAsync([FromQuery] Guid sellerId)
     {
         try

@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { useAuth } from "react-oidc-context";
 import { Link, useLocation } from "react-router";
+import { useFavorites } from "../context/FavoritesContext";
 
 const Navbar = () => {
     // TODO: when the login is pressed, the page loads but doesn't stop
@@ -13,6 +14,8 @@ const Navbar = () => {
     const location = useLocation();
     const auth = useAuth();
     // const navigate = useNavigate();
+
+    const { favoritesCount } = useFavorites();
 
     const handleLogin = async () => {
         setIsRedirecting(true);
@@ -44,7 +47,7 @@ const Navbar = () => {
                 </div>
             )}
             <nav className="sticky top-0 z-50 bg-gray-950/90 backdrop-blur-sm border-b border-gray-800">
-                
+
                 <div className="max-w-7xl mx-auto px-6 h-16 flex items-center justify-between">
 
                     {/* Logo */}
@@ -57,8 +60,13 @@ const Navbar = () => {
                         <Link to="/" className={`hover:text-white transition-colors ${location.pathname === "/" ? "text-white" : ""}`}>
                             Listings
                         </Link>
-                        <Link to="/favorites" className={`hover:text-white transition-colors ${location.pathname === "/favorites" ? "text-white" : ""}`}>
+                        <Link to="/favorites" className={`relative hover:text-white transition-colors ${location.pathname === "/favorites" ? "text-white" : ""}`}>
                             Favorieten
+                            {auth.isAuthenticated && favoritesCount > 0 && (
+                                <span className="absolute -top-2 -right-4 bg-blue-600 text-white text-xs rounded-full w-4 h-4 flex items-center justify-center">
+                                    {favoritesCount}
+                                </span>
+                            )}
                         </Link>
                     </div>
 
@@ -77,21 +85,20 @@ const Navbar = () => {
                                 </button>
                             </>
                         ) : (
-                                <>
-                                    <button onClick={handleLogin} className="cursor-pointer text-sm text-gray-400 hover:text-white transition-colors">
-                                        Inloggen
-                                    </button>
-                                    <button onClick={() => window.location.href = "https://carselect-identityserver-evafhmh8eacxbbgd.westeurope-01.azurewebsites.net/Account/Register"} className="cursor-pointer text-sm bg-blue-600 hover:bg-blue-700 transition-colors text-white px-4 py-2 rounded-md font-medium">
-                                        Registreren
-                                    </button>
-                                </>
-                            )
+                            <>
+                                <button onClick={handleLogin} className="cursor-pointer text-sm text-gray-400 hover:text-white transition-colors">
+                                    Inloggen
+                                </button>
+                                <button onClick={() => window.location.href = "https://carselect-identityserver-evafhmh8eacxbbgd.westeurope-01.azurewebsites.net/Account/Register"} className="cursor-pointer text-sm bg-blue-600 hover:bg-blue-700 transition-colors text-white px-4 py-2 rounded-md font-medium">
+                                    Registreren
+                                </button>
+                            </>
+                        )
                         }
                     </div>
-
                 </div>
-                </nav>
-            </>
+            </nav>
+        </>
     );
 };
 

@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.RateLimiting;
+using QuestPDF.Fluent;
 
 [ApiController]
 [Route("api/listings")]
@@ -97,6 +98,15 @@ public class ListingController : ControllerBase
     [HttpPut("{listingId}")]
     public async Task<ActionResult<ListingResponseContract>> UpdateListingAsync([FromRoute] Guid listingId, [FromBody] ListingRequestContract updateListing)
     {
+        // get the current user's ID from the JWT joken
+        var currentUserId = User.FindFirst(System.Security.Claims.ClaimTypes.NameIdentifier)?.Value;
+
+        if (currentUserId == null)
+            return Unauthorized(); // 401 - user is not logged in and can't change a listing
+
+        if (currentUserId != updateListing.SellerId.ToString())
+            return Forbid(); // 403 - user is not allowed to change a listing that they don't own
+
         var convertModel = ListingApiMapper.MapToDomein(updateListing);
         convertModel.Id = listingId;
         var result = await _listingService.UpdateListingAsync(convertModel);
@@ -107,10 +117,40 @@ public class ListingController : ControllerBase
     [HttpDelete("{listingId}")]
     public async Task<ActionResult> DeleteListingByIdAsync([FromRoute] Guid listingId)
     {
-        // TODO: any user that has write policy can delete someone elses listing
-        // We need to change this for guard for this in all methods that have similar characteristic
+        // we retrieve the listing that needs to be deleted to check who owns it
+        // and if the current user that is logged in owns the listing
+        var toDeleteListing = await _listingService.GetListingByIdAsync(listingId);
+
+        // get the current user's ID from the JWT joken
+        var currentUserId = User.FindFirst(System.Security.Claims.ClaimTypes.NameIdentifier)?.Value;
+
+        if (currentUserId == null)
+            return Unauthorized(); // 401 - user is not logged-in
+
+        if (currentUserId != toDeleteListing.SellerId.ToString())
+            return Forbid(); // 403 - user is not allowed to change
+
         await _listingService.DeletelistingById(listingId);
         return NoContent();
+    }
+
+    // QuestPDF
+    [HttpGet("export/pdf")]
+    [Authorize(Policy = "AdminPolicy")]
+    public async Task<ActionResult> ExportListingsPdfAsync()
+    {
+        var listings = await _listingService.GetAllListingsAsync();
+
+        var document = new ListingsDocument
+        {
+            Listings = listings,
+            ExportedAt = DateTime.UtcNow
+        };
+
+        var pdf = document.GeneratePdf();
+        var fileName = $"listings_{DateTime.UtcNow:yyyy-MM-dd}.pdf";
+
+        return File(pdf, "application/pdf", fileName);
     }
 
     // CAR IMAGES 
@@ -175,6 +215,19 @@ public class ListingController : ControllerBase
     {
         try
         {
+            // we retrieve the listing that needs to be deleted to check who owns it
+            // and if the current user that is logged in owns the listing
+            var toDeleteListing = await _listingService.GetListingByIdAsync(listingId);
+
+            // get the current user's ID from the JWT joken
+            var currentUserId = User.FindFirst(System.Security.Claims.ClaimTypes.NameIdentifier)?.Value;
+
+            if (currentUserId == null)
+                return Unauthorized(); // 401 - user is not logged-in
+
+            if (currentUserId != toDeleteListing.SellerId.ToString())
+                return Forbid(); // 403 - user is not allowed to change
+
             await _carImageService.DeleteCarImageByIdAsync(listingId, imageId);
             return Ok();
         }
@@ -189,6 +242,19 @@ public class ListingController : ControllerBase
     {
         try
         {
+            // we retrieve the listing that needs to be deleted to check who owns it
+            // and if the current user that is logged in owns the listing
+            var toDeleteListing = await _listingService.GetListingByIdAsync(listingId);
+
+            // get the current user's ID from the JWT joken
+            var currentUserId = User.FindFirst(System.Security.Claims.ClaimTypes.NameIdentifier)?.Value;
+
+            if (currentUserId == null)
+                return Unauthorized(); // 401 - user is not logged-in
+
+            if (currentUserId != toDeleteListing.SellerId.ToString())
+                return Forbid(); // 403 - user is not allowed to change
+
             await _listingService.DeletelistingById(listingId);
             return Ok();
         }

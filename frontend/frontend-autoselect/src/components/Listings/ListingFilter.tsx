@@ -9,15 +9,15 @@ import type { CarFilter, CarInfo } from "../../types";
 interface ListingFilterProps {
     showFilter: boolean,
     onToggle: () => void,
-    filter: CarFilter,
-    setFilter: React.Dispatch<React.SetStateAction<CarFilter>>,
+    pendingFilter: CarFilter,
+    setPendingFilter: React.Dispatch<React.SetStateAction<CarFilter>>,
     setOnSubmit: (filter: CarFilter) => void,
     cars: CarInfo[]
 }
 
 
 
-const ListingFilter = ({ showFilter, onToggle, filter, setFilter, setOnSubmit, cars }: ListingFilterProps) => {
+const ListingFilter = ({ showFilter, onToggle, pendingFilter: filter, setPendingFilter: setFilter, setOnSubmit, cars }: ListingFilterProps) => {
     const inputClass = "w-full bg-gray-800 text-white text-sm border border-gray-700 rounded-lg px-3 py-2 focus:outline-none focus:border-blue-500";
     const labelClass = "text-sm text-gray-400";
 
@@ -37,7 +37,7 @@ const ListingFilter = ({ showFilter, onToggle, filter, setFilter, setOnSubmit, c
 
     const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
         const { id, value } = e.target;
-        setFilter(prev => ({...prev, [id]: value === "all" || value === "All" || value === "" ? undefined : value}));
+        setFilter(prev => ({ ...prev, [id]: value === "all" || value === "All" || value === "" ? undefined : value }));
     };
 
 
@@ -57,14 +57,14 @@ const ListingFilter = ({ showFilter, onToggle, filter, setFilter, setOnSubmit, c
                     <div className="flex flex-col gap-1">
                         <label htmlFor="brand" className={labelClass}>Brand</label>
                         <select id="brand" value={filter.brand} onChange={handleChange} className={`${inputClass}`}>
-                            <option value="All" >All</option>
+                            <option value="" >All</option>
                             {brands?.map((c) => <option key={c} value={c}>{c}</option>)}
                         </select>
                     </div>
                     <div className="flex flex-col gap-1">
                         <label htmlFor="model" className={labelClass}>Model</label>
                         <select id="model" className={`${inputClass} ${filter.brand === "All" || filter.brand === undefined ? "opacity-50 cursor-not-allowed" : ""}`} disabled={filter.brand === "All" || filter.brand === ""} onChange={handleChange} value={filter.model}>
-                            <option disabled={filter.brand === undefined} value="All">All</option>
+                            <option disabled={filter.brand === undefined} value="">All</option>
                             {filteredModels.map((m) => (<option key={m} value={m}>{m}</option>))}
                         </select>
                     </div>
@@ -89,7 +89,7 @@ const ListingFilter = ({ showFilter, onToggle, filter, setFilter, setOnSubmit, c
                     <div className="flex flex-col gap-1">
                         <label htmlFor="fuel" className={labelClass}>Fuel</label>
                         <select id="fuel" value={filter.fuel} onChange={handleChange} className={inputClass}>
-                            <option value="all">All</option>
+                            <option value="">All</option>
                             <option value="petrol">Petrol</option>
                             <option value="diesel">Diesel</option>
                             <option value="hybrid">Hybrid</option>
@@ -99,7 +99,7 @@ const ListingFilter = ({ showFilter, onToggle, filter, setFilter, setOnSubmit, c
                     <div className="flex flex-col gap-1">
                         <label htmlFor="transmission" className={labelClass}>Transmission</label>
                         <select id="transmission" value={filter.transmission} onChange={handleChange} className={inputClass}>
-                            <option value="all">All</option>
+                            <option value="">All</option>
                             <option value="manual">Manual</option>
                             <option value="automatic">Automatic</option>
                         </select>
@@ -119,8 +119,8 @@ const ListingFilter = ({ showFilter, onToggle, filter, setFilter, setOnSubmit, c
                     <div className="flex flex-col gap-1">
                         <label htmlFor="drive" className={labelClass}>Drive</label>
                         <select id="drive" value={filter.drive} onChange={handleChange} className={inputClass}>
-                            <option value="all">All</option>
-                            <option value="4wd">4WD</option>
+                            <option value="">All</option>
+                            <option value="fourwd">4WD</option>
                             <option value="awd">AWD</option>
                             <option value="fwd">FWD</option>
                             <option value="rwd">RWD</option>

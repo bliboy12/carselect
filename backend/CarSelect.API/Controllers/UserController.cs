@@ -1,9 +1,11 @@
 using CarSelect.Identity.Models;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 
 [ApiController]
+[Authorize]
 [Route("api/users")]
 public class UserController : ControllerBase
 {
@@ -17,8 +19,15 @@ public class UserController : ControllerBase
     }
 
     [HttpGet("{id}")]
+    [Authorize("ReadPolicy")]
     public async Task<ActionResult<UserResponseContract>> GetUserByIdAsync([FromRoute] Guid id)
     {
+        var currentUserId = User.FindFirst(System.Security.Claims.ClaimTypes.NameIdentifier)?.Value;
+
+        // Check if the current logged-in user is the one that is being asked 
+        if (currentUserId != id.ToString())
+            return Forbid();
+
         var user = await _userManager.FindByIdAsync(id.ToString());
         if (user == null)
             return NotFound($"User with id {id} not found");
@@ -29,6 +38,7 @@ public class UserController : ControllerBase
     }
 
     [HttpGet]
+    [Authorize("AdminPolicy")]
     public async Task<ActionResult<IEnumerable<UserResponseContract>>> GetAllUsers()
     {
         var users = await _userManager.Users.ToListAsync();
@@ -45,6 +55,7 @@ public class UserController : ControllerBase
     }
 
     [HttpPut("{id}")]
+    [Authorize("WritePolicy")]
     public async Task<ActionResult<UserResponseContract>> UpdateUserAsync([FromRoute] Guid id, [FromBody] UserRequestContract updateUser)
     {
         var user = await _userManager.FindByIdAsync(id.ToString());
@@ -64,6 +75,7 @@ public class UserController : ControllerBase
     }
 
     [HttpDelete("{id}")]
+    [Authorize("AdminPolicy")]
     public async Task<ActionResult> RemoveUserAsync([FromRoute] Guid id)
     {
         var user = await _userManager.FindByIdAsync(id.ToString());
@@ -81,6 +93,7 @@ public class UserController : ControllerBase
     }
 
     [HttpGet("search")]
+    [Authorize("ReadPolicy")]
     public async Task<ActionResult<IEnumerable<UserResponseContract>>> GetAllUsersByNameAsync([FromQuery] string? firstName, [FromQuery] string? lastName)
     {
         var query = _userManager.Users.AsQueryable();
@@ -108,6 +121,7 @@ public class UserController : ControllerBase
     }
 
     [HttpPatch("{id}/role")]
+    [Authorize("AdminPolicy")]
     public async Task<ActionResult<UserResponseContract>> UpdateUserRoleAsync([FromRoute] Guid id, [FromBody] bool isAdmin)
     {
         var user = await _userManager.FindByIdAsync(id.ToString());
@@ -126,6 +140,7 @@ public class UserController : ControllerBase
 
     // Favorites
     [HttpPost("{userId}/favorites")]
+    [Authorize("WritePolicy")]
     public async Task<ActionResult<FavoriteReponseContract>> CreateFavoriteAsync([FromRoute] Guid userId, [FromBody] Guid listingId)
     {
         var response = await _favoriteService.CreateFavoriteAsync(userId, listingId);
@@ -133,6 +148,7 @@ public class UserController : ControllerBase
     }
 
     [HttpGet("{userId}/favorites")]
+    [Authorize("ReadPolicy")]
     public async Task<ActionResult<FavoriteReponseContract>> GetAllFavoritesByUserIdAsync([FromRoute] Guid userId)
     {
         IEnumerable<FavoriteModel> response = await _favoriteService.GetAllFavoritesByUserIdAsync(userId);
@@ -140,6 +156,7 @@ public class UserController : ControllerBase
     }
 
     [HttpDelete("{userId}/favorites/{listingId}")]
+    [Authorize("WritePolicy")]
     public async Task<ActionResult> DeleteFavoriteByListingIdAsync([FromRoute] Guid userId, [FromRoute] Guid listingId)
     {
         await _favoriteService.DeleteFavoriteByListingIdAsync(userId, listingId);
@@ -147,6 +164,7 @@ public class UserController : ControllerBase
     }
 
     [HttpGet("{userId}/favorites/{listingId}")]
+    [Authorize("ReadPolicy")]
     public async Task<ActionResult<bool>> IsFavoritedAsync([FromRoute] Guid userId, [FromRoute] Guid listingId)
     {
         bool isFavorite = await _favoriteService.IsFavoritedAsync(userId, listingId);

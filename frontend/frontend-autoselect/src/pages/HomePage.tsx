@@ -26,15 +26,22 @@ const defaultCarFilter: CarFilter = {
 
 const HomePage = () => {
     const [showFilter, setshowFilter] = useState(true);
-    const [filter, setFilter] = useState<CarFilter>(defaultCarFilter);
-    const [onSubmit, setOnSubmit] = useState<CarFilter>(defaultCarFilter);
+
+    // pendingFilter: tracks the live form input state as the user types/selects
+    // without triggering API calls on every change
+    const [pendingFilter, setPendingFilter] = useState<CarFilter>(defaultCarFilter);
+
+    // commitedFilter: only updates when the user clicks Search, which changes
+    // the queryKey and triggers a new API request via TanStack Query
+    const [committedFilter, setCommittedFilter] = useState<CarFilter>(defaultCarFilter);
+
     const [currentPage, setCurrentPage] = useState(1);
 
     const { data, isLoading, isError, error } = useQuery({
-        queryKey: ["GetAllListingsFiltered", onSubmit, currentPage],
+        queryKey: ["GetAllListingsFiltered", committedFilter, currentPage],
         queryFn: async () => {
             return await axiosListings.post<PaginatedResponse<ListingResponse>>("/search", {
-                ...onSubmit,
+                ...committedFilter,
                 page: currentPage,
                 pageSize: 12
             });
@@ -48,7 +55,7 @@ const HomePage = () => {
 
     const handleSubmit = (newFilter: CarFilter) => {
         setCurrentPage(1); // reset to page 1 on new search
-        setOnSubmit(newFilter);
+        setCommittedFilter(newFilter);
     };
 
     if (isLoading) {
@@ -71,7 +78,7 @@ const HomePage = () => {
     if (listings.length === 0) {
         return (
             <div className="flex min-h-dvh">
-                <ListingFilter showFilter={showFilter} onToggle={() => setshowFilter(prev => !prev)} filter={filter} setFilter={setFilter} setOnSubmit={handleSubmit} cars={cars} />
+                <ListingFilter showFilter={showFilter} onToggle={() => setshowFilter(prev => !prev)} pendingFilter={pendingFilter} setPendingFilter={setPendingFilter} setOnSubmit={handleSubmit} cars={cars} />
                 <div className="flex-1 flex items-center justify-center">
                     <p className="text-gray-400">No results found</p>
                 </div>
@@ -82,7 +89,7 @@ const HomePage = () => {
     return (
         <div className="flex min-h-dvh flex-col">
             <div className="flex flex-1">
-                <ListingFilter showFilter={showFilter} onToggle={() => setshowFilter(prev => !prev)} filter={filter} setFilter={setFilter} setOnSubmit={handleSubmit} cars={cars} />
+                <ListingFilter showFilter={showFilter} onToggle={() => setshowFilter(prev => !prev)} pendingFilter={pendingFilter} setPendingFilter={setPendingFilter} setOnSubmit={handleSubmit} cars={cars} />
                 <div className="flex-1 flex flex-col">
                     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 p-5 gap-5">
                         {listings.map(listing => (
@@ -107,11 +114,10 @@ const HomePage = () => {
                                 <button
                                     key={page}
                                     onClick={() => handlePageChange(page)}
-                                    className={`px-3 py-2 text-sm rounded-lg border transition-colors ${
-                                        page === currentPage
-                                            ? "bg-blue-600 border-blue-600 text-white"
-                                            : "border-gray-700 text-gray-400 hover:border-gray-500 hover:text-white"
-                                    }`}
+                                    className={`px-3 py-2 text-sm rounded-lg border transition-colors ${page === currentPage
+                                        ? "bg-blue-600 border-blue-600 text-white"
+                                        : "border-gray-700 text-gray-400 hover:border-gray-500 hover:text-white"
+                                        }`}
                                 >
                                     {page}
                                 </button>

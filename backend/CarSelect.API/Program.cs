@@ -6,6 +6,7 @@ using CarSelect.Identity.Models;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.RateLimiting;
 using Microsoft.EntityFrameworkCore;
+using QuestPDF.Infrastructure;
 using Stripe;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -42,6 +43,8 @@ builder.Services.AddAuthentication()
         // }
     });
 
+// Community licences for QuestPDF
+QuestPDF.Settings.License = LicenseType.Community;
 
 builder.Services.AddAuthorizationBuilder()
     .AddPolicy("ReadPolicy", policy =>
@@ -58,8 +61,9 @@ builder.Services.AddAuthorizationBuilder()
 )
     .AddPolicy("AdminPolicy", policy =>
     {
-        policy.RequireRole("admin");
+        policy.RequireRole("Admin");
         policy.RequireClaim("scope", "carselect.api.read");
+        policy.RequireClaim("scope", "carselect.api.write");
     }
 );
 
@@ -156,6 +160,7 @@ builder.Services.AddScoped<IReviewAggregatorService, ReviewAggregatorService>();
 builder.Services.AddScoped<IFavoriteSqlService, FavoriteSqlService>();
 builder.Services.AddScoped<ITransactionSqlService, TransactionSqlService>();
 
+// Future implementations, this is an API that gets all car models
 builder.Services.AddHttpClient<ICarService, CarService>(client =>
 {
     client.BaseAddress = new Uri("https://vpic.nhtsa.dot.gov/api/vehicles/");

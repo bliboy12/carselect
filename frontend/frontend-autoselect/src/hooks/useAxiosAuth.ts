@@ -11,7 +11,7 @@ const useAxiosAuth = () => {
 
         // Add interceptor to every axios instance
         const instances = [axiosListings, axiosUsers, axiosCars, axiosApi];
-        
+
         const interceptors = instances.map(instance =>
             instance.interceptors.request.use(config => {
                 if (token)
