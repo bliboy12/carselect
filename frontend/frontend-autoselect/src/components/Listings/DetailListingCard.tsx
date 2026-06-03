@@ -11,6 +11,7 @@ import { createFavorite, deleteFavorite, isFavorited } from "../../api/favoriteA
 import useCurrentUser from "../../hooks/useCurrentUser";
 import PaymentModal from "./Stripe/PaymentModel";
 import { createPaymentIntent } from "../../api/paymentApi";
+import { useFavorites } from "../../context/FavoritesContext";
 
 
 interface PaymentData {
@@ -31,6 +32,8 @@ const DetailListingCard = () => {
 
     const [activeImage, setActiveImage] = useState(0);
     const [isFavorite, setIsFavorite] = useState<boolean>(false);
+
+    const { incrementCount, decrementCount } = useFavorites();
 
     const { data: dataListing, isLoading, isError, error } = useQuery({
         queryKey: ["listing", id],
@@ -71,10 +74,13 @@ const DetailListingCard = () => {
     })
 
     const handleFavorite = () => {
-        if (isFavorite)
+        if (isFavorite) {
             deleteFavoriteMutation();
-        else
+            decrementCount();
+        } else {
             createFavoriteMutation();
+            incrementCount();
+        }
     }
     const handleBuy = async () => {
         try {
