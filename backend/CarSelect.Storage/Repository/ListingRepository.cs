@@ -73,7 +73,9 @@ public class ListingRepository : IListingRepository
     public async Task<IEnumerable<ListingDataModel>> GetAllListingsBySellerIdAsync(string sellerId)
     {
 
-        var sql = new QueryDefinition("SELECT * FROM c WHERE c.sellerId=@sellerId").WithParameter("@sellerId", sellerId);
+        var sql = new QueryDefinition("SELECT * FROM c WHERE c.sellerId=@sellerId AND c.status=@status")
+        .WithParameter("@sellerId", sellerId)
+        .WithParameter("@status", "Active");
 
         // this just creates query not sending anything out to the network, that's why we don't await this.
         var query = _listingContainer.GetItemQueryIterator<ListingDataModel>(sql);
