@@ -39,9 +39,10 @@ public class ListingRepository : IListingRepository
     }
     public async Task<IEnumerable<FavoriteDataModelSQL>> GetAllFavoritesByListingIdAsync(string userId, string listingId)
     {
-        var sql = new QueryDefinition($"SELECT * FROM c WHERE c.userId=@userId AND c.listingId=@listingId")
+        var sql = new QueryDefinition($"SELECT * FROM c WHERE c.userId=@userId AND c.listingId=@listingId AND c.status=@status")
         .WithParameter("@userId", userId)
-        .WithParameter("@listingId", listingId);
+        .WithParameter("@listingId", listingId)
+        .WithParameter("@status", "Active");
 
         var query = _favoriteContainer.GetItemQueryIterator<FavoriteDataModelSQL>(sql);
         List<FavoriteDataModelSQL> results = new();
@@ -56,7 +57,7 @@ public class ListingRepository : IListingRepository
 
     public async Task<IEnumerable<ListingDataModel>> GetAllListingsAsync()
     {
-        var sql = new QueryDefinition("SELECT * FROM c");
+        var sql = new QueryDefinition("SELECT * FROM c WHERE c.status=@status").WithParameter("@status", "Active");
         var query = _listingContainer.GetItemQueryIterator<ListingDataModel>(sql);
 
         var results = new List<ListingDataModel>();
@@ -73,9 +74,7 @@ public class ListingRepository : IListingRepository
     public async Task<IEnumerable<ListingDataModel>> GetAllListingsBySellerIdAsync(string sellerId)
     {
 
-        var sql = new QueryDefinition("SELECT * FROM c WHERE c.sellerId=@sellerId AND c.status=@status")
-        .WithParameter("@sellerId", sellerId)
-        .WithParameter("@status", "Active");
+        var sql = new QueryDefinition("SELECT * FROM c WHERE c.sellerId=@sellerId").WithParameter("@sellerId", sellerId);
 
         // this just creates query not sending anything out to the network, that's why we don't await this.
         var query = _listingContainer.GetItemQueryIterator<ListingDataModel>(sql);
