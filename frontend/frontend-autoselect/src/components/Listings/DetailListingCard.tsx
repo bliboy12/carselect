@@ -81,8 +81,9 @@ const DetailListingCard = () => {
             const data = await createPaymentIntent(listing.id, userId);
             setPaymentData(data);
             setShowPayment(true);
+            console.log("payment success")
         } catch (error) {
-            console.error("Failed to create payment intent", error);
+            console.log("Failed to create payment intent", error);
         }
     };
 
@@ -106,7 +107,7 @@ const DetailListingCard = () => {
     const carImages = listing.carImages.length > 0
         ? listing.carImages.map((img) => img.imageUrl)
         : Array.from({ length: 5 }, () => defaultCarImage);
-    
+
     console.log("seller:", seller);
     console.log(`${seller.firstName}${seller.lastName}`.toUpperCase());
 
@@ -206,7 +207,7 @@ const DetailListingCard = () => {
 
                         {/* Payment modal */}
                         {showPayment && paymentData && (
-                            <PaymentModal clientSecret={paymentData.clientSecret} publishableKey={paymentData.publishableKey} amount={paymentData.amount} onSuccess={handlePaymentSuccess} onClose={() => setShowPayment(false)}/>
+                            <PaymentModal clientSecret={paymentData.clientSecret} publishableKey={paymentData.publishableKey} amount={paymentData.amount} onSuccess={handlePaymentSuccess} onClose={() => setShowPayment(false)} />
                         )}
 
                         <hr className="border-gray-800" />
