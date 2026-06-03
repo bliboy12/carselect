@@ -11,7 +11,7 @@ import { createFavorite, deleteFavorite, isFavorited } from "../../api/favoriteA
 import useCurrentUser from "../../hooks/useCurrentUser";
 import PaymentModal from "./Stripe/PaymentModel";
 import { createPaymentIntent } from "../../api/paymentApi";
-import { useFavorites } from "../../context/FavoritesContext";
+import { useFavorites } from "../../Context/FavoritesContext";
 
 
 interface PaymentData {
