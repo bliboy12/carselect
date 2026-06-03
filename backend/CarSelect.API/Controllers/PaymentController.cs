@@ -98,6 +98,13 @@ public class PaymentController : ControllerBase
                         });
 
                         Console.WriteLine("Transaction saved successfully");
+
+                        // mark listing as sold
+                        var listing = await _listingService.GetListingByIdAsync(listingId);
+                        listing.Status = ListingStatus.Sold;
+                        await _listingService.UpdateListingAsync(listing);
+
+                        Console.WriteLine("Transaction saved and listing marked as sold");
                     }
                     else
                     {
