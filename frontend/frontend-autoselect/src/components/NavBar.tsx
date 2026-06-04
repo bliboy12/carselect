@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { useAuth } from "react-oidc-context";
 import { Link, useLocation } from "react-router";
-import { useFavorites } from "../Context/FavoritesContext";
+import { useFavorites } from "../context/FavoritesContext";
 
 const Navbar = () => {
     // TODO: when the login is pressed, the page loads but doesn't stop
