@@ -19,8 +19,10 @@ export const FavoritesProvider = ({ children }: PropsWithChildren) => {
         if (!isAuthenticated || !userId) return;
         try {
             const response = await axiosUsers.get(`/${userId}/favorites`);
+            console.log("favorites response:", response.data);
             setFavoritesCount(response.data.favorites?.length ?? 0);
-        } catch {
+        } catch (error) {
+            console.error("favorites count error:", error);
             setFavoritesCount(0);
         }
     };
