@@ -21,20 +21,6 @@ const ListingFilter = ({ showFilter, onToggle, pendingFilter: filter, setPending
     const inputClass = "w-full bg-gray-800 text-white text-sm border border-gray-700 rounded-lg px-3 py-2 focus:outline-none focus:border-blue-500";
     const labelClass = "text-sm text-gray-400";
 
-    // const [searchBrand, setSearchBrand] = useState("");
-    // const [searchModel, setSearchModel] = useState("");
-
-
-    // const handleSubmit = () => {
-
-    // }
-
-    // const [submitQuery, setSubmitQuery] = useState<CarFilter>();
-
-    // const filteredCars = () => {
-
-    // }
-
     const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
         const { id, value } = e.target;
         setFilter(prev => ({ ...prev, [id]: value === "all" || value === "All" || value === "" ? undefined : value }));

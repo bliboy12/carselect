@@ -68,6 +68,11 @@ const Navbar = () => {
                                 </span>
                             )}
                         </Link>
+                        {auth.isAuthenticated && auth.user?.profile.role === "Admin" && (
+                            <Link to="/adminpanel" className={`hover:text-white transition-colors ${location.pathname === "/adminpanel" ? "text-white" : ""}`}>
+                                Admin
+                            </Link>
+                        )}
                     </div>
 
                     {/* Auth buttons */}

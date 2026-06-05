@@ -1,4 +1,4 @@
-import type {ListingResponse } from "../../types";
+import type { ListingResponse } from "../../types";
 // import vehicle from "../../assets/car.jpg"
 
 interface listingCardProp {
@@ -7,15 +7,11 @@ interface listingCardProp {
 
 const ListingCard = (prop: listingCardProp) => {
 
-    const {listing} = prop;
-    const {car} = listing;
-    //const mainImage = carImages.find((c) => c.isMainImage === true);
-
-    //const carImage = carImages.find(c => c.isMainImage == true);
+    const { listing } = prop;
+    const { car } = listing;
 
     new Intl.NumberFormat("de-DE", { style: "currency", currency: "EUR" }).format(listing.price);
 
-    // CarImage is hardcoded, needs to be replaced!
     return (
         <div className="group bg-gray-900 border border-gray-800 rounded-2xl overflow-hidden hover:border-gray-600 hover:shadow-xl hover:shadow-black/40 transition-all duration-200 cursor-pointer ">
             <div className="relative aspect-4/3 bg-gray-800 overflow-hidden">
