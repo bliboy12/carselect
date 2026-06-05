@@ -4,7 +4,6 @@ using Microsoft.Extensions.Options;
 using Stripe;
 
 [ApiController]
-[Authorize]
 [Route("api/payments")]
 public class PaymentController : ControllerBase
 {
