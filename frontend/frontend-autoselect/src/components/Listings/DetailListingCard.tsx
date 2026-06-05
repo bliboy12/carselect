@@ -110,8 +110,11 @@ const DetailListingCard = () => {
     const car = listing.car;
     const seller = listing.seller;
 
+    // Sorting the images first to put the main image first before the others
     const carImages = listing.carImages.length > 0
-        ? listing.carImages.map((img) => img.imageUrl)
+        ? [...listing.carImages]
+            .sort((a, b) => (b.isMainImage ? 1 : 0) - (a.isMainImage ? 1 : 0))
+            .map((img) => img.imageUrl)
         : Array.from({ length: 5 }, () => defaultCarImage);
 
     console.log("seller:", seller);
